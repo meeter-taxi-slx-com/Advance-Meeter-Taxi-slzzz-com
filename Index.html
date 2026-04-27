@@ -226,4 +226,52 @@
     }
 
     function saveRide(f, d, from, to, rid) {
-        let h = JSON.parse(localStorage.getItem('
+        let h = JSON.parse(localStorage.getItem('as4_v27_data') || '[]');
+        h.push({f, d, from, to, rid, time: Date.now()});
+        localStorage.setItem('as4_v27_data', JSON.stringify(h)); updateUI();
+    }
+
+    function toggleSection(id) { let s = document.getElementById(id); s.style.display = (s.style.display === "flex" || s.style.display === "block") ? "none" : (id.includes('modal') ? "flex" : "block"); }
+    function closeModal() { document.getElementById('receiptModal').style.display = "none"; }
+    
+    function updateUI() {
+        let h = JSON.parse(localStorage.getItem('as4_v27_data') || '[]');
+        let today = h.filter(i => new Date(i.time).toDateString() === new Date().toDateString());
+        let todayVal = today.reduce((a, b) => a + b.f, 0);
+        document.getElementById('stat-short').innerText = today.filter(i => i.d < 15).length;
+        document.getElementById('stat-long').innerText = today.filter(i => i.d >= 15).length;
+        document.getElementById('stat-today').innerText = "Rs. " + todayVal;
+        document.getElementById('stat-today-main').innerText = todayVal;
+        document.getElementById('stat-month').innerText = "Rs. " + h.reduce((a, b) => a + b.f, 0);
+        let dayData = [0,0,0,0,0,0,0]; h.forEach(i => { let d = new Date(i.time).getDay(); dayData[d === 0 ? 6 : d-1] += i.f; });
+        if(window.mChart) window.mChart.destroy();
+        window.mChart = new Chart(document.getElementById('earningsChart').getContext('2d'), { type: 'bar', data: { labels: ['M','T','W','T','F','S','S'], datasets: [{ data: dayData, backgroundColor: '#1a4a9e' }] }, options: { plugins: { legend: { display: false } } } });
+        document.getElementById('history-list').innerHTML = h.slice().reverse().map(i => `<div class="history-item"><div style="display:flex;justify-content:space-between;"><b>${i.rid}</b><span>${new Date(i.time).toLocaleDateString()}</span></div><div style="color:var(--primary);font-weight:bold;">${i.from || 'S'}➔${i.to || 'E'}</div><div style="display:flex;justify-content:space-between;"><span>${i.d.toFixed(2)} km</span><b>Rs. ${i.f}</b></div></div>`).join('');
+    }
+
+    function downloadCSV() {
+        let h = JSON.parse(localStorage.getItem('as4_v27_data') || '[]');
+        let csv = "ID,Date,KM,Fare\n"; h.forEach(i => csv += `${i.rid},${new Date(i.time).toLocaleDateString()},${i.d.toFixed(2)},${i.f}\n`);
+        const a = document.createElement('a'); a.href = window.URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = `Report_${Date.now()}.csv`; a.click();
+    }
+
+    function sendGmailReceipt() {
+        let email = document.getElementById('cust-email').value;
+        let body = `AMT TAXI Receipt\nID: ${currentRID}\nKM: ${totalKm.toFixed(2)}\nFare: ${document.getElementById('r-total').innerText}`;
+        window.location.href = `mailto:${email}?subject=Taxi Receipt ${currentRID}&body=${encodeURIComponent(body)}`;
+    }
+
+    function sendDailySummary() {
+        let h = JSON.parse(localStorage.getItem('as4_v27_data') || '[]');
+        let today = h.filter(i => new Date(i.time).toDateString() === new Date().toDateString());
+        let body = `Daily Summary (${new Date().toLocaleDateString()})\nTotal Rides: ${today.length}\nTotal Income: Rs. ${today.reduce((a,b)=>a+b.f,0)}`;
+        window.location.href = `mailto:?subject=Daily Summary&body=${encodeURIComponent(body)}`;
+    }
+
+    async function downloadPDF() { const { jsPDF } = window.jspdf; const canvas = await html2canvas(document.getElementById('receipt-render')); const pdf = new jsPDF('p', 'mm', [80, 160]); pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 80, 160); pdf.save(`${currentRID}.pdf`); }
+    async function share() { const canvas = await html2canvas(document.getElementById('receipt-render')); canvas.toBlob(b => { const f = new File([b], `${currentRID}.png`, {type:'image/png'}); if(navigator.share) navigator.share({files:[f]}); }); }
+    
+    window.onload = () => { loadSettings(); updateUI(); };
+</script>
+</body>
+</html>
