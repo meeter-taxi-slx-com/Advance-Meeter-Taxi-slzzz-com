@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AS4 TAXI - Ultra Pro v26</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root { --primary: #1a4a9e; --secondary: #2ecc71; --accent: #e74c3c; --dark: #2c3e50; --gray: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .app-container { background: white; width: 100%; max-width: 420px; border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); padding: 25px; }
+        .logo-section { text-align: center; margin-bottom: 20px; position: relative; }
+        .logo-img { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); margin-bottom: 5px; }
+        .logo-circle { background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 5px; font-weight: bold; border: 4px solid #fff; font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .brand-name { color: var(--primary); font-size: 22px; font-weight: 900; }
+        .settings-icon { position: absolute; right: 0; top: 10px; cursor: pointer; font-size: 20px; color: var(--primary); }
+        input, textarea, select { width: 100%; padding: 12px; margin: 6px 0; border: 1px solid #e0e0e0; border-radius: 12px; font-size: 14px; box-sizing: border-box; background: var(--gray); font-family: inherit; }
+        .fare-calc-box { background: var(--gray); border-radius: 15px; padding: 15px; margin: 10px 0; border: 1px solid #eee; text-align: center; }
+        .calc-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .calc-label { font-size: 12px; color: #7f8c8d; font-weight: bold; }
+        .calc-val-big { font-weight: 900; color: var(--primary); display: block; font-size: 38px; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+        button { border: none; border-radius: 12px; font-size: 13px; font-weight: bold; color: white; cursor: pointer; padding: 14px; }
+        .btn-start { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .btn-end { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .btn-report { background: #34495e; }
+        .btn-history { background: #8e44ad; }
+        .btn-new { background: #3498db; }
+        .chart-container { background: white; border: 1px solid #eee; border-radius: 20px; padding: 15px; margin-top: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .stat-box { background: var(--gray); padding: 10px; border-radius: 15px; text-align: center; font-size: 11px; color: #7f8c8d; }
+        .stat-box b { display: block; color: var(--primary); font-size: 14px; margin-top: 2px; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; }
+        .modal-content { background: white; width: 85%; max-width: 360px; border-radius: 25px; padding: 30px 20px; position: relative; margin: auto; max-height: 90vh; overflow-y: auto; }
+        #receipt-render { background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee; text-align: center; }
+        .r-header { background: black; color: white; padding: 8px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 10px; }
+        .r-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f9f9f9; font-size: 12px; text-align: left; }
+        .r-total-box { background: var(--primary); color: white; text-align: center; padding: 12px; border-radius: 8px; font-size: 18px; font-weight: bold; margin: 10px 0; }
+        .close-btn { position: absolute; top: 10px; right: 10px; background: var(--accent); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; z-index: 1001; }
+        .section-card { display: none; }
+        .history-item { border-bottom: 1px solid #eee; padding: 10px 0; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="logo-section">
+        <div id="main-logo-area"><div class="logo-circle">AS4</div></div>
+        <div class="brand-name">AS4 TAXI</div>
+        <div class="settings-icon" onclick="toggleSection('settings-modal')">⚙️</div>
+    </div>
+    
+    <input type="email" id="cust-email" placeholder="Customer Email (Optional)">
+    <input type="tel" id="mobile" placeholder="Customer Mobile (Optional)">
+    <input list="wp-towns" id="start-loc" placeholder="Pick Up Location">
+    <input list="wp-towns" id="end-loc" placeholder="Drop Off Location">
+    <input type="number" id="manual-fare" placeholder="Manual Fare (Optional)">
+
+    <div style="display:flex; gap:10px; align-items:center; margin:5px 0;">
+        <label style="font-size:11px; font-weight:bold;">Wait Time:</label>
+        <select id="wait-select" onchange="updateDisplay()">
+            <option value="0">0 min</option>
+            <script>for(let i=1;i<=60;i++) document.write(`<option value="${i}">${i} min</option>`);</script>
+        </select>
+    </div>
+
+    <datalist id="wp-towns"></datalist>
+
+    <div class="fare-calc-box">
+        <div class="calc-grid">
+            <div><span class="calc-label">DISTANCE</span><span class="calc-val-big" id="disp-km">0.0 km</span></div>
+            <div style="border-top:1px solid #ddd; padding-top:10px;"><span class="calc-label">TOTAL FARE</span><span class="calc-val-big" id="disp-fare">Rs. 0</span></div>
+        </div>
+    </div>
+
+    <div class="btn-grid">
+        <button class="btn-start" id="startBtn" onclick="startRide()">START RIDE</button>
+        <button class="btn-end" onclick="endRide()">END RIDE</button>
+        <button class="btn-report" onclick="toggleSection('report-section')">INCOME REPORTS</button>
+        <button class="btn-history" onclick="toggleSection('history-section')">HISTORY</button>
+        <button class="btn-new" onclick="location.reload()" style="grid-column: span 2;">+ NEW RIDE</button>
+    </div>
+
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="close-btn" onclick="toggleSection('settings-modal')">X</div>
+            <h3 style="color:var(--primary); text-align:center;">Settings</h3>
+            <label style="font-size:11px; font-weight:bold;">Logo Image:</label>
+            <input type="file" id="logo-input" accept="image/*">
+            <label style="font-size:11px; font-weight:bold;">1st KM Rate (Base):</label>
+            <input type="number" id="set-base">
+            <label style="font-size:11px; font-weight:bold;">Next KM Rate:</label>
+            <input type="number" id="set-rate">
+            <label style="font-size:11px; font-weight:bold;">Wait Rate /Min:</label>
+            <input type="number" id="set-wait-rate">
+            <label style="font-size:11px; font-weight:bold;">Night %:</label>
+            <input type="number" id="set-night">
+            <label style="font-size:11px; font-weight:bold;">Town List:</label>
+            <textarea id="set-towns" rows="3"></textarea>
+            <button style="background:var(--secondary); width:100%; margin-top:10px;" onclick="saveSettings()">SAVE SETTINGS</button>
+        </div>
+    </div>
+
+    <div id="report-section" class="section-card">
+        <div class="chart-container">
+            <div style="font-weight:bold; font-size:14px; margin-bottom:10px; display:flex; justify-content:space-between;">
+                <span>Daily Earnings</span>
+                <button onclick="downloadCSV()" style="padding:5px; font-size:10px; background:var(--primary); width:auto; border-radius:5px;">CSV ⬇</button>
+            </div>
+            <canvas id="earningsChart" height="180"></canvas>
+            <div class="stats-grid">
+                <div class="stat-box">Short Trips (<15km)<b id="stat-short">0</b></div>
+                <div class="stat-box">Long Trips (>15km)<b id="stat-long">0</b></div>
+            </div>
+            <div style="text-align:center; margin-top:10px; font-weight:bold; color:var(--primary);">Today: Rs. <span id="stat-today-main">0</span></div>
+            <div class="stats-grid">
+                <div class="stat-box">Today Total<b id="stat-today">Rs. 0</b></div>
+                <div class="stat-box">This Month<b id="stat-month">Rs. 0</b></div>
+            </div>
+            <button style="background:var(--primary); width:100%; margin-top:10px; font-size:11px;" onclick="sendDailySummary()">SEND SUMMARY TO GMAIL</button>
+        </div>
+    </div>
+
+    <div id="history-section" class="section-card chart-container">
+        <div style="font-weight:bold; font-size:14px; margin-bottom:5px;">Travel History</div>
+        <div id="history-list" style="max-height:200px; overflow-y:auto;"></div>
+    </div>
+</div>
+
+<div id="receiptModal" class="modal">
+    <div class="modal-content">
+        <div class="close-btn" onclick="closeModal()">X</div>
+        <div id="receipt-render">
+            <div id="r-logo-area"></div>
+            <div class="r-header">AS4 TAXI - RECEIPT</div>
+            <div id="r-body"></div>
+            <div class="r-total-box" id="r-total"></div>
+            <div id="qrcode" style="display:flex; justify-content:center; margin:10px;"></div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:15px;">
+            <button style="background:#2ecc71;" onclick="share()">WHATSAPP</button>
+            <button style="background:#1a4a9e;" onclick="sendGmailReceipt()">GMAIL</button>
+            <button style="background:#e67e22; grid-column: span 2;" onclick="downloadPDF()">SAVE PDF</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let sTime, watchID, totalKm = 0, lastLat, lastLon, currentRID = "";
+    let RATE = 80, BASE = 100, WAIT_RATE = 5, NIGHT_PCT = 10, LOGO_DATA = "";
+    
+    const WP_TOWNS = "Colombo 01, Colombo 02, Colombo 03, Colombo 04, Colombo 05, Colombo 06, Colombo 07, Colombo 08, Colombo 09, Colombo 10, Colombo 11, Colombo 12, Colombo 13, Colombo 14, Colombo 15, Dehiwala, Mount Lavinia, Ratmalana, Moratuwa, Kesbewa, Piliyandala, Maharagama, Boralesgamuwa, Nugegoda, Kottawa, Pannipitiya, Homagama, Malabe, Kaduwela, Battaramulla, Athurugiriya, Hanwella, Avissawella, Gampaha, Negombo, Katunayake, Seeduwa, Ja-Ela, Kandana, Wattala, Kelaniya, Peliyagoda, Kiribathgoda, Kadawatha, Ragama, Minuwangoda, Veyangoda, Nittambuwa, Kalutara, Panadura, Wadduwa, Beruwala, Aluthgama, Horana, Bandaragama, Matugama, Agalawatte, Ingiriya";
+
+    function loadSettings() {
+        let s = JSON.parse(localStorage.getItem('as4_v26_settings') || JSON.stringify({base:100, rate:80, wait:5, night:10, towns: WP_TOWNS, logo:""}));
+        BASE = s.base; RATE = s.rate; WAIT_RATE = s.wait; NIGHT_PCT = s.night; LOGO_DATA = s.logo;
+        document.getElementById('set-base').value = BASE;
+        document.getElementById('set-rate').value = RATE;
+        document.getElementById('set-wait-rate').value = WAIT_RATE;
+        document.getElementById('set-night').value = NIGHT_PCT;
+        document.getElementById('set-towns').value = s.towns;
+        if(LOGO_DATA) document.getElementById('main-logo-area').innerHTML = `<img src="${LOGO_DATA}" class="logo-img">`;
+        document.getElementById('wp-towns').innerHTML = s.towns.split(',').map(t => `<option value="${t.trim()}">`).join('');
+    }
+
+    function saveSettings() {
+        const file = document.getElementById('logo-input').files[0];
+        if(file) {
+            const reader = new FileReader();
+            reader.onload = e => { LOGO_DATA = e.target.result; finalizeSave(); };
+            reader.readAsDataURL(file);
+        } else finalizeSave();
+    }
+
+    function finalizeSave() {
+        let s = {base: parseInt(document.getElementById('set-base').value), rate: parseInt(document.getElementById('set-rate').value), wait: parseInt(document.getElementById('set-wait-rate').value), night: parseInt(document.getElementById('set-night').value), towns: document.getElementById('set-towns').value, logo: LOGO_DATA};
+        localStorage.setItem('as4_v26_settings', JSON.stringify(s)); loadSettings(); toggleSection('settings-modal');
+    }
+
+    function updateDisplay() {
+        let waitMins = parseInt(document.getElementById('wait-select').value);
+        let fare = Math.round(BASE + (Math.max(0, totalKm - 1) * RATE) + (waitMins * WAIT_RATE));
+        let hour = new Date().getHours();
+        if(hour >= 22 || hour < 5) fare += (fare * (NIGHT_PCT/100));
+        document.getElementById('disp-km').innerText = totalKm.toFixed(2) + " km";
+        if(!document.getElementById('manual-fare').value) document.getElementById('disp-fare').innerText = "Rs. " + Math.round(fare);
+    }
+
+    function startRide() {
+        sTime = new Date(); document.getElementById('startBtn').innerText = "RIDE ACTIVE ✅";
+        watchID = navigator.geolocation.watchPosition(pos => {
+            if (lastLat) totalKm += calcDist(lastLat, lastLon, pos.coords.latitude, pos.coords.longitude);
+            lastLat = pos.coords.latitude; lastLon = pos.coords.longitude;
+            updateDisplay();
+        }, null, {enableHighAccuracy: true});
+    }
+
+    function calcDist(lat1, lon1, lat2, lon2) {
+        const R = 6371; const dLat = (lat2-lat1)*Math.PI/180; const dLon = (lon2-lon1)*Math.PI/180;
+        const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    // 04. Enhanced Receipt ID Logic (YY-MONTH-AS4-0000000000)
+    function genReceiptID() {
+        let h = JSON.parse(localStorage.getItem('as4_v26_data') || '[]');
+        let d = new Date();
+        let yearSuffix = d.getFullYear().toString().slice(-2);
+        const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+        return `${yearSuffix}${months[d.getMonth()]}-AS4-${(h.length + 1).toString().padStart(10, '0')}`;
+    }
+
+    function endRide() {
+        if(!sTime) return;
+        navigator.geolocation.clearWatch(watchID);
+        let fare = document.getElementById('manual-fare').value ? parseInt(document.getElementById('manual-fare').value) : parseInt(document.getElementById('disp-fare').innerText.replace('Rs. ', ''));
+        currentRID = genReceiptID();
+        if(LOGO_DATA) document.getElementById('r-logo-area').innerHTML = `<img src="${LOGO_DATA}" style="width:70px;height:70px;border-radius:50%;margin-bottom:10px;">`;
+        document.getElementById('r-body').innerHTML = `<div class="r-row"><span>ID:</span><b>${currentRID}</b></div><div class="r-row"><span>Mobile:</span><b>${document.getElementById('mobile').value || 'N/A'}</b></div><div class="r-row"><span>Route:</span><b>${document.getElementById('start-loc').value || 'S'}➔${document.getElementById('end-loc').value || 'E'}</b></div><div class="r-row"><span>KM:</span><b>${totalKm.toFixed(2)}</b></div><div class="r-row"><span>Wait:</span><b>${document.getElementById('wait-select').value}m</b></div><div class="r-row"><span>Time:</span><b>${sTime.toLocaleTimeString()}</b></div>`;
+        document.getElementById('r-total').innerText = "Total: Rs. " + fare;
+        document.getElementById('qrcode').innerHTML = ""; new QRCode(document.getElementById("qrcode"), { text: currentRID, width: 80, height: 80 });
+        document.getElementById('receiptModal').style.display = "flex";
+        saveRide(fare, totalKm, document.getElementById('start-loc').value, document.getElementById('end-loc').value, currentRID);
+    }
+
+    function saveRide(f, d, from, to, rid) {
+        let h = JSON.parse(localStorage.getItem('as4_v26_data') || '[]');
+        h.push({f, d, from, to, rid, time: Date.now()});
+        localStorage.setItem('as4_v26_data', JSON.stringify(h)); updateUI();
+    }
+
+    function toggleSection(id) { let s = document.getElementById(id); s.style.display = (s.style.display === "flex" || s.style.display === "block") ? "none" : (id.includes('modal') ? "flex" : "block"); }
+    function closeModal() { document.getElementById('receiptModal').style.display = "none"; }
+    
+    function updateUI() {
+        let h = JSON.parse(localStorage.getItem('as4_v26_data') || '[]');
+        let today = h.filter(i => new Date(i.time).toDateString() === new Date().toDateString());
+        let todayVal = today.reduce((a, b) => a + b.f, 0);
+        document.getElementById('stat-short').innerText = today.filter(i => i.d < 15).length;
+        document.getElementById('stat-long').innerText = today.filter(i => i.d >= 15).length;
+        document.getElementById('stat-today').innerText = "Rs. " + todayVal;
+        document.getElementById('stat-today-main').innerText = todayVal;
+        document.getElementById('stat-month').innerText = "Rs. " + h.reduce((a, b) => a + b.f, 0);
+        let dayData = [0,0,0,0,0,0,0]; h.forEach(i => { let d = new Date(i.time).getDay(); dayData[d === 0 ? 6 : d-1] += i.f; });
+        if(window.mChart) window.mChart.destroy();
+        window.mChart = new Chart(document.getElementById('earningsChart').getContext('2d'), { type: 'bar', data: { labels: ['M','T','W','T','F','S','S'], datasets: [{ data: dayData, backgroundColor: '#1a4a9e' }] }, options: { plugins: { legend: { display: false } } } });
+        document.getElementById('history-list').innerHTML = h.slice().reverse().map(i => `<div class="history-item"><div style="display:flex;justify-content:space-between;"><b>${i.rid}</b><span>${new Date(i.time).toLocaleDateString()}</span></div><div style="color:var(--primary);font-weight:bold;">${i.from || 'S'}➔${i.to || 'E'}</div><div style="display:flex;justify-content:space-between;"><span>${i.d.toFixed(2)} km</span><b>Rs. ${i.f}</b></div></div>`).join('');
+    }
+
+    function downloadCSV() {
+        let h = JSON.parse(localStorage.getItem('as4_v26_data') || '[]');
+        let csv = "ID,Date,KM,Fare\n"; h.forEach(i => csv += `${i.rid},${new Date(i.time).toLocaleDateString()},${i.d.toFixed(2)},${i.f}\n`);
+        const a = document.createElement('a'); a.href = window.URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = `Report_${Date.now()}.csv`; a.click();
+    }
+
+    function sendGmailReceipt() {
+        let email = document.getElementById('cust-email').value;
+        let body = `AS4 TAXI Receipt\nID: ${currentRID}\nKM: ${totalKm.toFixed(2)}\nFare: ${document.getElementById('r-total').innerText}`;
+        window.location.href = `mailto:${email}?subject=Taxi Receipt ${currentRID}&body=${encodeURIComponent(body)}`;
+    }
+
+    function sendDailySummary() {
+        let h = JSON.parse(localStorage.getItem('as4_v26_data') || '[]');
+        let today = h.filter(i => new Date(i.time).toDateString() === new Date().toDateString());
+        let body = `Daily Summary (${new Date().toLocaleDateString()})\nTotal Rides: ${today.length}\nTotal Income: Rs. ${today.reduce((a,b)=>a+b.f,0)}`;
+        window.location.href = `mailto:?subject=Daily Summary&body=${encodeURIComponent(body)}`;
+    }
+
+    async function downloadPDF() { const { jsPDF } = window.jspdf; const canvas = await html2canvas(document.getElementById('receipt-render')); const pdf = new jsPDF('p', 'mm', [80, 160]); pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 80, 160); pdf.save(`${currentRID}.pdf`); }
+    async function share() { const canvas = await html2canvas(document.getElementById('receipt-render')); canvas.toBlob(b => { const f = new File([b], `${currentRID}.png`, {type:'image/png'}); if(navigator.share) navigator.share({files:[f]}); }); }
+    
+    window.onload = () => { loadSettings(); updateUI(); };
+</script>
+</body>
+</html>
