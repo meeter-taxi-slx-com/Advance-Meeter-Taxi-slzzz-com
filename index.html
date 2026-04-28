@@ -3,221 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advance Meeter Taxi - v26 Fixed</title>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <title id="app-title-tab">ADVANCE MEETER TAXI</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a4a9e">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        :root { --primary: #1a4a9e; --secondary: #2ecc71; --accent: #e74c3c; --dark: #2c3e50; --gray: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 15px; display: flex; justify-content: center; }
-        .app-container { background: white; width: 100%; max-width: 420px; border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); padding: 25px; }
-        .logo-section { text-align: center; margin-bottom: 20px; position: relative; }
-        .logo-circle { background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 5px; font-weight: bold; border: 4px solid #fff; font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .brand-name { color: var(--primary); font-size: 18px; font-weight: 900; }
-        .settings-icon { position: absolute; right: 0; top: 10px; cursor: pointer; font-size: 20px; color: var(--primary); }
-        input, textarea, select { width: 100%; padding: 12px; margin: 6px 0; border: 1px solid #e0e0e0; border-radius: 12px; font-size: 14px; box-sizing: border-box; background: var(--gray); font-family: inherit; }
+        :root { --primary: #1a4a9e; --secondary: #2ecc71; --accent: #e74c3c; --dark: #2c3e50; --gray: #f8f9fa; --shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: #eef2f7; margin: 0; padding: 15px; display: flex; justify-content: center; overflow-x: hidden; }
+        .app-container { background: white; width: 100%; max-width: 420px; border-radius: 45px; box-shadow: var(--shadow); padding: 25px; position: relative; border: 8px solid #fff; box-sizing: border-box; }
+        .header-section { text-align: center; margin-bottom: 20px; position: relative; }
+        .logo-area { width: 70px; height: 70px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: 900; border: 4px solid #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1); overflow: hidden; }
+        .logo-area img { width: 100%; height: 100%; object-fit: cover; }
+        .brand-name { color: var(--primary); font-size: 20px; font-weight: 800; text-transform: uppercase; }
+        .settings-btn { position: absolute; right: 0; top: 10px; cursor: pointer; font-size: 22px; }
         
-        /* Layout logic to match your image exactly */
-        .fare-calc-box { background: var(--gray); border-radius: 15px; padding: 15px; margin: 10px 0; border: 1px solid #eee; text-align: center; }
-        .calc-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
-        .calc-label { font-size: 12px; color: #7f8c8d; font-weight: bold; }
-        .calc-val-big { font-weight: 900; color: var(--primary); display: block; font-size: 38px; }
+        input, select, textarea { width: 100%; padding: 14px; margin: 5px 0; border: 1px solid #e0e6ed; border-radius: 15px; background: var(--gray); font-family: inherit; box-sizing: border-box; font-size: 14px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        label { font-size: 11px; font-weight: 700; color: #7f8c8d; margin-left: 5px; text-transform: uppercase; display: block; margin-top: 5px;}
         
-        /* Buttons strictly following image colors */
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
-        button { border: none; border-radius: 12px; font-size: 13px; font-weight: bold; color: white; cursor: pointer; padding: 14px; transition: 0.3s; }
-        .btn-start { background: #2ecc71; } /* Green */
-        .btn-end { background: #e74c3c; }   /* Red */
-        .btn-report { background: #34495e; } /* Dark Gray */
-        .btn-history { background: #9b59b6; } /* Purple */
-        .btn-new { background: #3498db; }    /* Light Blue */
+        .btn-main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+        button { border: none; border-radius: 166px; font-size: 14px; font-weight: 800; color: white; cursor: pointer; padding: 16px; transition: 0.3s; text-transform: uppercase; }
+        .btn-start { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .btn-end { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .btn-new { background: linear-gradient(135deg, #3498db, #2980b9); width: 100%; margin-top: 12px; }
         
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; }
-        .modal-content { background: white; width: 85%; max-width: 360px; border-radius: 25px; padding: 30px 20px; position: relative; margin: auto; max-height: 90vh; overflow-y: auto; }
-        .section-card { display: none; margin-top: 15px; padding: 15px; background: #fff; border-radius: 20px; border: 1px solid #eee; }
-        .history-item { border-bottom: 1px solid #eee; padding: 10px 0; font-size: 11px; }
+        @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(46, 204, 113, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); } }
+        @keyframes neon-blink { 0%, 100% { opacity: 1; text-shadow: 0 0 10px #2ecc71; } 50% { opacity: 0.7; text-shadow: 0 0 20px #2ecc71, 0 0 30px #2ecc71; } }
+        
+        .btn-active-anim { animation: pulse-btn 1.5s infinite; background: #27ae60 !important; }
+        .dist-active-anim { animation: neon-blink 1s infinite; color: #2ecc71 !important; }
 
-        /* Receipt Style from v26 */
-        #receipt-render { background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee; text-align: center; }
-        .r-header { background: black; color: white; padding: 8px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 10px; }
-        .r-total-box { background: var(--primary); color: white; text-align: center; padding: 12px; border-radius: 8px; font-size: 18px; font-weight: bold; margin: 10px 0; }
+        .fare-display-card { background: #fdfdfe; border-radius: 25px; padding: 20px; margin-top: 20px; border: 1px solid #edf2f7; text-align: center; }
+        .display-val-km { font-size: 42px; font-weight: 900; color: var(--dark); margin: 5px 0; }
+        .display-val-fare { font-size: 36px; font-weight: 900; color: var(--primary); }
+
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); align-items: center; justify-content: center; }
+        .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 35px; padding: 20px; position: relative; max-height: 90vh; overflow-y: auto; box-sizing: border-box; }
+        .close-circle { position: absolute; top: 15px; right: 15px; background: #eee; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5; }
+        
+        #receipt-render { padding: 15px; background: white; color: #333; font-family: sans-serif; }
+        .r-header { background: #000; color: #fff; padding: 10px; border-radius: 5px; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; text-align: center; font-size: 14px; }
+        .r-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dotted #ccc; font-size: 12px; color: #333; }
+        .r-row b { color: #000; }
+        .r-total-box { background: #1a4a9e; color: white; padding: 15px; border-radius: 12px; font-size: 24px; font-weight: bold; text-align: center; margin: 20px 0; }
+        
+        .receipt-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn-wa { background: #2ecc71; border-radius: 12px; }
+        .btn-gm { background: #e74c3c; border-radius: 12px; }
+        .btn-pdf { background: #34495e; width: 100%; margin-top: 10px; border-radius: 12px; }
+        .btn-reprint { background: var(--primary); padding: 5px 10px; font-size: 10px; margin-top: 5px; width: auto; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div class="logo-section">
-        <div id="main-logo-area"><div class="logo-circle">AMT</div></div>
-        <div class="brand-name">ADVANCE MEETER TAXI</div>
-        <div class="settings-icon" onclick="toggleSection('settings-modal')">⚙️</div>
+    <div class="header-section">
+        <div id="main-logo-area" class="logo-area">AMT</div>
+        <div class="brand-name" id="display-app-name">ADVANCE MEETER TAXI</div>
+        <div class="settings-btn" onclick="openLogin()">⚙️</div>
     </div>
-    
-    <input type="tel" id="mobile" placeholder="Customer Mobile (Optional)">
-    <div style="display:flex; gap:8px;">
-        <input list="wp-towns" id="start-loc" placeholder="Pick Up Location">
-        <input list="wp-towns" id="end-loc" placeholder="Drop Off Location">
-    </div>
-    <div style="display:flex; gap:8px; align-items:center;">
-        <input type="number" id="manual-fare" placeholder="Manual Fare (Optional)">
-        <div style="width:140px; display:flex; align-items:center;">
-            <label style="font-size:10px; font-weight:bold; margin-right:5px;">Wait Time:</label>
-            <select id="wait-select" onchange="updateDisplay()">
-                <option value="0">0 min</option>
-                <script>for(let i=1;i<=60;i++) document.write(`<option value="${i}">${i} min</option>`);</script>
-            </select>
+
+    <div class="input-group">
+        <input type="tel" id="mobile" placeholder="Customer Mobile (Optional)">
+        <div class="grid-2">
+            <input id="start-loc" list="wp-towns" placeholder="Pick Up Location">
+            <input id="end-loc" list="wp-towns" placeholder="Drop Off Location">
+            <datalist id="wp-towns"></datalist>
         </div>
-    </div>
-
-    <datalist id="wp-towns"></datalist>
-
-    <div class="fare-calc-box">
-        <div class="calc-grid">
-            <div><span class="calc-label">DISTANCE</span><span class="calc-val-big" id="disp-km">0.0 km</span></div>
-            <div style="border-top:1px solid #ddd; padding-top:10px;"><span class="calc-label">TOTAL FARE</span><span class="calc-val-big" id="disp-fare">Rs. 0</span></div>
+        <div class="grid-2" style="align-items: center;">
+            <input type="number" id="manual-fare" placeholder="Manual Fare (Optional)" oninput="updateDisplay()">
+            <div style="display:flex; align-items:center; background:var(--gray); border-radius:15px; padding:0 10px; height: 48px;">
+                <span style="font-size:10px; font-weight:bold;">Wait:</span>
+                <select id="wait-select" onchange="updateDisplay()" style="background:transparent; border:none; width: 60px;">
+                    <option value="0">0m</option>
+                    <script>for(let i=1;i<=120;i++) document.write(`<option value="${i}">${i}m</option>`);</script>
+                </select>
+            </div>
         </div>
+        <input type="number" id="discount-input" placeholder="Discount Amount (Rs.)" oninput="updateDisplay()">
     </div>
 
-    <div class="btn-grid">
+    <div class="btn-main-grid">
         <button class="btn-start" id="startBtn" onclick="startRide()">START RIDE</button>
         <button class="btn-end" onclick="endRide()">END RIDE</button>
-        <button class="btn-report" onclick="toggleSection('report-section')">INCOME REPORTS</button>
-        <button class="btn-history" onclick="showHistory()">HISTORY</button>
-        <button class="btn-new" onclick="location.reload()" style="grid-column: span 2;">+ NEW RIDE</button>
     </div>
+    <button class="btn-new" onclick="location.reload()">+ NEW RIDE</button>
 
-    <div id="report-section" class="section-card">
-        <h4 style="margin:0;">Daily Income</h4>
-        <div id="stat-today" style="font-size:24px; font-weight:900; color:var(--primary);">Rs. 0</div>
-        <canvas id="earningsChart" height="150"></canvas>
-    </div>
-
-    <div id="history-section" class="section-card">
-        <h4 style="margin:0 0 10px 0;">Recent Rides</h4>
-        <div id="history-list"></div>
-    </div>
-
-    <div id="receiptModal" class="modal">
-        <div class="modal-content">
-            <div id="receipt-render">
-                <div class="r-header">ADVANCE MEETER TAXI</div>
-                <div id="r-body"></div>
-                <div class="r-total-box" id="r-total"></div>
-                <div id="qrcode" style="display:flex; justify-content:center; margin:10px;"></div>
-            </div>
-            <button style="background:var(--secondary); width:100%; margin-top:10px;" onclick="downloadPDF()">SAVE PDF</button>
-            <button style="background:var(--accent); width:100%; margin-top:5px;" onclick="toggleSection('receiptModal')">CLOSE</button>
-        </div>
-    </div>
-
-    <div id="settings-modal" class="modal">
-        <div class="modal-content">
-            <h3>Settings</h3>
-            <label>1st KM Rate:</label><input type="number" id="set-base">
-            <label>Next KM Rate:</label><input type="number" id="set-rate">
-            <label>Wait Rate /Min:</label><input type="number" id="set-wait-rate">
-            <button style="background:var(--secondary); width:100%; margin-top:10px;" onclick="saveSettings()">SAVE</button>
-            <button style="background:var(--accent); width:100%; margin-top:5px;" onclick="toggleSection('settings-modal')">CLOSE</button>
-        </div>
+    <div class="fare-display-card">
+        <small id="dist-label">DISTANCE</small>
+        <div class="display-val-km" id="disp-km">0.0 km</div>
+        <hr style="opacity:0.1">
+        <small>TOTAL FARE</small>
+        <div class="display-val-fare" id="disp-fare">Rs. 0</div>
     </div>
 </div>
 
-<script>
-    // --- Firebase Configuration (v26 vith Cloud Sync) ---
-    const firebaseConfig = {
-        apiKey: "AIzaSyB2ZF9xap5SBGo5E_1G8d_23MkBkEGo-YY",
-        authDomain: "as4-taxi-db.firebaseapp.com",
-        projectId: "as4-taxi-db",
-        storageBucket: "as4-taxi-db.firebasestorage.app",
-        messagingSenderId: "823982155898",
-        appId: "1:823982155898:web:ff9a793a4669a0058e73c3",
-        databaseURL: "https://as4-taxi-db-default-rtdb.firebaseio.com/" 
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+<div id="login-modal" class="modal"><div class="modal-content" style="max-width: 280px;"><h3 style="text-align:center;">Admin Login</h3><input type="password" id="admin-pass-input" placeholder="Enter Password" style="text-align:center;"><button style="background:var(--primary); width:100%; margin-top:10px;" onclick="checkLogin()">LOGIN</button><button style="background:#ccc; width:100%; margin-top:5px; padding:10px; color:#333;" onclick="closeM('login-modal')">CANCEL</button></div></div>
 
-    let sTime, watchID, totalKm = 0, lastLat, lastLon;
-    let RATE = 80, BASE = 100, WAIT_RATE = 5;
+<div id="settings-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeM('settings-modal')">✕</div><h3 style="text-align:center; color:var(--primary);">Settings</h3><label>App Name:</label><input type="text" id="set-app-name"><label>Receipt Header:</label><input type="text" id="set-receipt-header"><label>Logo Image (Upload):</label><input type="file" id="set-logo-upload" accept="image/*" style="padding: 10px;"><div class="grid-2"><div><label>Base (Rs):</label><input type="number" id="set-base"></div><div><label>Rate/KM:</label><input type="number" id="set-rate"></div></div><div class="grid-2"><div><label>Wait Rate:</label><input type="number" id="set-wait-rate"></div><div><label>Night %:</label><input type="number" id="set-night"></div></div><label>Town List (Comma Separated):</label><textarea id="set-towns" rows="3" style="font-size: 11px;"></textarea><label>Change Password:</label><input type="password" id="set-password"><button style="background:var(--secondary); width:100%; margin-top:10px;" onclick="saveSettings()">SAVE SETTINGS</button><hr style="margin:20px 0; opacity:0.1"><button style="background:var(--dark); width:100%; margin-bottom:5px;" onclick="openPanel('income-modal')">📊 INCOME REPORTS</button><button style="background:var(--dark); width:100%;" onclick="openPanel('history-modal')">📜 TRAVEL HISTORY</button></div></div>
+
+<div id="receiptModal" class="modal">
+    <div class="modal-content">
+        <div class="close-circle" onclick="closeM('receiptModal')">✕</div>
+        <div id="receipt-render">
+            <div class="r-header" id="r-display-header">AMT OFFICIAL RECEIPT</div>
+            <div id="r-body"></div>
+            <div class="r-total-box">TOTAL: <span id="r-total"></span></div>
+            <div id="qrcode" style="display:flex; justify-content:center; margin:15px 0;"></div>
+        </div>
+        <div class="receipt-btns">
+            <button class="btn-wa" onclick="shareWhatsApp()">WHATSAPP</button>
+            <button class="btn-gm" onclick="sendGmail()">GMAIL</button>
+        </div>
+        <button class="btn-pdf" onclick="downloadPDF()">SAVE AS PDF</button>
+    </div>
+</div>
+
+<div id="income-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="backToS('income-modal')">✕</div><h3 style="text-align:center;">Earnings</h3><canvas id="earningsChart"></canvas><div class="grid-2" style="margin-top:20px; text-align:center;"><div style="background:var(--gray); padding:10px; border-radius:10px;"><small>Today</small><br><b id="stat-today" style="color:var(--primary);">Rs. 0</b></div><div style="background:var(--gray); padding:10px; border-radius:10px;"><small>Total</small><br><b id="stat-month" style="color:var(--primary);">Rs. 0</b></div></div><button style="background:var(--primary); width:100%; margin-top:20px;" onclick="downloadCSV()">DOWNLOAD CSV</button></div></div>
+<div id="history-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="backToS('history-modal')">✕</div><h3 style="text-align:center; color:var(--primary);">Travel History</h3><div id="history-list"></div></div></div>
+
+<script>
+    let sTime, watchID, totalKm = 0, lastLat, lastLon, currentRID = "";
+    const DEFAULT_TOWNS = "Colombo 01, Colombo 02, Colombo 03, Colombo 04, Colombo 05, Colombo 06, Colombo 07, Colombo 08, Colombo 09, Colombo 10, Colombo 11, Colombo 12, Colombo 13, Colombo 14, Colombo 15, Dehiwala, Mount Lavinia, Ratmalana, Moratuwa, Kesbewa, Piliyandala, Maharagama, Boralesgamuwa, Nugegoda, Kottawa, Pannipitiya, Homagama, Malabe, Kaduwela, Battaramulla, Athurugiriya, Hanwella, Avissawella, Gampaha, Negombo, Katunayake, Seeduwa, Ja-Ela, Kandana, Wattala, Kelaniya, Peliyagoda, Kiribathgoda, Kadawatha, Ragama, Minuwangoda, Veyangoda, Nittambuwa, Kalutara, Panadura, Wadduwa, Beruwala, Aluthgama, Horana, Bandaragama, Matugama, Agalawatte, Ingiriya";
+    
+    let SETTINGS = { 
+        base: 100, rate: 80, wait: 5, night: 10, 
+        appName: "ADVANCE MEETER TAXI", receiptName: "AMT OFFICIAL RECEIPT", 
+        password: "1234", logo: "", towns: DEFAULT_TOWNS
+    };
+
+    function generateReceiptID() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
+        let finYear = (month >= 3) ? year : year - 1;
+        let yearPrefix = finYear.toString().slice(-2);
+        let monthName = now.toLocaleString('en-GB', { month: 'short' }).toUpperCase();
+        let counterKey = `amt_counter_${finYear}`;
+        let count = parseInt(localStorage.getItem(counterKey) || "0") + 1;
+        localStorage.setItem(counterKey, count);
+        return `${yearPrefix}${monthName}-${count.toString().padStart(10, '0')}`;
+    }
 
     function loadSettings() {
-        let s = JSON.parse(localStorage.getItem('as4_v26_settings') || JSON.stringify({base:100, rate:80, wait:5}));
-        BASE = s.base; RATE = s.rate; WAIT_RATE = s.wait;
-        document.getElementById('set-base').value = BASE;
-        document.getElementById('set-rate').value = RATE;
-        document.getElementById('set-wait-rate').value = WAIT_RATE;
+        const saved = localStorage.getItem('amt_pro_settings');
+        if(saved) SETTINGS = {...SETTINGS, ...JSON.parse(saved)};
+        document.getElementById('display-app-name').innerText = SETTINGS.appName;
+        document.getElementById('r-display-header').innerText = SETTINGS.receiptName;
+        document.getElementById('set-app-name').value = SETTINGS.appName;
+        document.getElementById('set-receipt-header').value = SETTINGS.receiptName;
+        document.getElementById('set-base').value = SETTINGS.base;
+        document.getElementById('set-rate').value = SETTINGS.rate;
+        document.getElementById('set-wait-rate').value = SETTINGS.wait;
+        document.getElementById('set-night').value = SETTINGS.night;
+        document.getElementById('set-towns').value = SETTINGS.towns;
+        document.getElementById('wp-towns').innerHTML = SETTINGS.towns.split(',').map(t => `<option value="${t.trim()}">`).join('');
+        if(SETTINGS.logo) document.getElementById('main-logo-area').innerHTML = `<img src="${SETTINGS.logo}">`;
+        updateDisplay();
+    }
+
+    function saveSettings() {
+        const fileInput = document.getElementById('set-logo-upload');
+        const file = fileInput.files[0];
+        const proceedSave = (logoData = SETTINGS.logo) => {
+            SETTINGS.appName = document.getElementById('set-app-name').value;
+            SETTINGS.receiptName = document.getElementById('set-receipt-header').value;
+            SETTINGS.base = parseInt(document.getElementById('set-base').value);
+            SETTINGS.rate = parseInt(document.getElementById('set-rate').value);
+            SETTINGS.wait = parseInt(document.getElementById('set-wait-rate').value);
+            SETTINGS.night = parseInt(document.getElementById('set-night').value);
+            SETTINGS.towns = document.getElementById('set-towns').value;
+            SETTINGS.logo = logoData;
+            if(document.getElementById('set-password').value) SETTINGS.password = document.getElementById('set-password').value;
+            localStorage.setItem('amt_pro_settings', JSON.stringify(SETTINGS));
+            loadSettings(); closeM('settings-modal');
+        };
+        if (file) { const reader = new FileReader(); reader.onload = (e) => proceedSave(e.target.result); reader.readAsDataURL(file); } 
+        else { proceedSave(); }
     }
 
     function updateDisplay() {
-        let wait = parseInt(document.getElementById('wait-select').value) * WAIT_RATE;
-        let fare = Math.round(BASE + (Math.max(0, totalKm - 1) * RATE) + wait);
-        document.getElementById('disp-km').innerText = totalKm.toFixed(2) + " km";
-        if(!document.getElementById('manual-fare').value) document.getElementById('disp-fare').innerText = "Rs. " + fare;
-        else document.getElementById('disp-fare').innerText = "Rs. " + document.getElementById('manual-fare').value;
-    }
-
-    function startRide() {
-        sTime = new Date();
-        document.getElementById('startBtn').innerText = "RIDE ACTIVE";
-        watchID = navigator.geolocation.watchPosition(pos => {
-            if (lastLat) totalKm += calcDist(lastLat, lastLon, pos.coords.latitude, pos.coords.longitude);
-            lastLat = pos.coords.latitude; lastLon = pos.coords.longitude;
-            updateDisplay();
-        }, null, {enableHighAccuracy: true});
-    }
-
-    function calcDist(lat1, lon1, lat2, lon2) {
-        const R = 6371;
-        const dLat = (lat2-lat1)*Math.PI/180; const dLon = (lon2-lon1)*Math.PI/180;
-        const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    }
-
-    function endRide() {
-        if(!sTime) return;
-        navigator.geolocation.clearWatch(watchID);
-        let fare = parseInt(document.getElementById('disp-fare').innerText.replace('Rs. ', ''));
-        let rid = "AMT-" + Date.now();
-        
-        let rideData = { f: fare, d: totalKm.toFixed(2), from: document.getElementById('start-loc').value || 'S', to: document.getElementById('end-loc').value || 'E', rid: rid, time: Date.now() };
-        
-        // Push to Firebase and Show Receipt
-        db.ref('rides/' + rid).set(rideData).then(() => {
-            document.getElementById('r-body').innerHTML = `ID: ${rid}<br>KM: ${totalKm.toFixed(2)}km<br>Wait: ${document.getElementById('wait-select').value}m`;
-            document.getElementById('r-total').innerText = "Total: Rs. " + fare;
-            new QRCode(document.getElementById("qrcode"), { text: rid, width: 80, height: 80 });
-            toggleSection('receiptModal');
-        });
-    }
-
-    function showHistory() {
-        toggleSection('history-section');
-        db.ref('rides').limitToLast(10).once('value', s => {
-            let list = "";
-            s.forEach(child => {
-                let v = child.val();
-                list += `<div class="history-item"><b>${v.rid}</b>: ${v.d}km - Rs.${v.f}</div>`;
-            });
-            document.getElementById('history-list').innerHTML = list;
-        });
-    }
-
-    function toggleSection(id) {
-        let el = document.getElementById(id);
-        el.style.display = (el.style.display === "block" || el.style.display === "flex") ? "none" : (id.includes('modal') ? "flex" : "block");
-    }
-
-    async function downloadPDF() {
-        const { jsPDF } = window.jspdf;
-        const canvas = await html2canvas(document.getElementById('receipt-render'));
-        const pdf = new jsPDF('p', 'mm', [80, 160]);
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 80, 160);
-        pdf.save("Receipt.pdf");
-    }
-
-    window.onload = loadSettings;
-</script>
-</body>
-</html>
+        let manual = parseInt(document.getElementById('manual-fare').value) ||
