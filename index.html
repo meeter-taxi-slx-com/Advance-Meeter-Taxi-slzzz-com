@@ -1,191 +1,688 @@
 <!DOCTYPE html>
-<html lang="si">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="app-title-tab">ADVANCE MEETER TAXI</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1a4a9e">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ADVANCE MEETER TAXI - Payments</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root { --primary: #1a4a9e; --secondary: #2ecc71; --accent: #e74c3c; --dark: #2c3e50; --gray: #f8f9fa; --shadow: 0 10px 30px rgba(0,0,0,0.08); }
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background: #eef2f7; margin: 0; padding: 15px; display: flex; justify-content: center; overflow-x: hidden; }
-        .app-container { background: white; width: 100%; max-width: 420px; border-radius: 45px; box-shadow: var(--shadow); padding: 25px; position: relative; border: 8px solid #fff; box-sizing: border-box; }
-        .header-section { text-align: center; margin-bottom: 20px; position: relative; }
-        .logo-area { width: 70px; height: 70px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: 900; border: 4px solid #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1); overflow: hidden; }
-        .logo-area img { width: 100%; height: 100%; object-fit: cover; }
-        .brand-name { color: var(--primary); font-size: 20px; font-weight: 800; text-transform: uppercase; }
-        .settings-btn { position: absolute; right: 0; top: 10px; cursor: pointer; font-size: 22px; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: #eef2f7; margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .app-container { background: white; width: 100%; max-width: 420px; border-radius: 45px; box-shadow: var(--shadow); padding: 20px; position: relative; border: 8px solid #fff; }
+        .header-section { text-align: center; margin-bottom: 15px; position: relative; }
+        .logo-area { width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-weight: 900; border: 3px solid #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .brand-name { color: var(--primary); font-size: 16px; font-weight: 800; text-transform: uppercase; }
         
-        input, select, textarea { width: 100%; padding: 14px; margin: 5px 0; border: 1px solid #e0e6ed; border-radius: 15px; background: var(--gray); font-family: inherit; box-sizing: border-box; font-size: 14px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        label { font-size: 11px; font-weight: 700; color: #7f8c8d; margin-left: 5px; text-transform: uppercase; display: block; margin-top: 5px;}
+        .top-bar { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 10px; }
+        .top-btn { background: #f0f2f5; border: 1px solid #e0e6ed; padding: 8px 14px; border-radius: 25px; font-size: 12px; font-weight: 700; color: var(--dark); cursor: pointer; }
+        .night-top-btn { background: linear-gradient(135deg, #f39c12, #e67e22); color: white; border: none; }
+        .night-top-active { background: linear-gradient(135deg, #e74c3c, #c0392b); }
         
-        .btn-main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
-        button { border: none; border-radius: 166px; font-size: 14px; font-weight: 800; color: white; cursor: pointer; padding: 16px; transition: 0.3s; text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; margin: 4px 0; border: 1px solid #e0e6ed; border-radius: 15px; background: var(--gray); font-size: 13px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        
+        .btn-main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+        .btn-start, .btn-end { border: none; border-radius: 16px; font-size: 14px; font-weight: 800; color: white; cursor: pointer; padding: 14px; text-transform: uppercase; }
         .btn-start { background: linear-gradient(135deg, #2ecc71, #27ae60); }
         .btn-end { background: linear-gradient(135deg, #e74c3c, #c0392b); }
-        .btn-new { background: linear-gradient(135deg, #3498db, #2980b9); width: 100%; margin-top: 12px; }
+        .btn-start-disabled { background: #95a5a6 !important; cursor: not-allowed !important; opacity: 0.6; }
         
-        @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(46, 204, 113, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); } }
-        @keyframes neon-blink { 0%, 100% { opacity: 1; text-shadow: 0 0 10px #2ecc71; } 50% { opacity: 0.7; text-shadow: 0 0 20px #2ecc71, 0 0 30px #2ecc71; } }
-        
+        @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 rgba(46,204,113,0.7); } 70% { box-shadow: 0 0 0 15px rgba(46,204,113,0); } 100% { box-shadow: 0 0 0 0 rgba(46,204,113,0); } }
         .btn-active-anim { animation: pulse-btn 1.5s infinite; background: #27ae60 !important; }
-        .dist-active-anim { animation: neon-blink 1s infinite; color: #2ecc71 !important; }
-
-        .fare-display-card { background: #fdfdfe; border-radius: 25px; padding: 20px; margin-top: 20px; border: 1px solid #edf2f7; text-align: center; }
-        .display-val-km { font-size: 42px; font-weight: 900; color: var(--dark); margin: 5px 0; }
-        .display-val-fare { font-size: 36px; font-weight: 900; color: var(--primary); }
-
+        
+        .fare-card { background: #fdfdfe; border-radius: 25px; padding: 15px; margin-top: 15px; border: 1px solid #edf2f7; text-align: center; }
+        .display-km { font-size: 42px; font-weight: 900; color: var(--dark); }
+        .display-fare { font-size: 32px; font-weight: 900; color: var(--primary); }
+        
+        .saved-locations { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+        .saved-loc-btn { background: #eef2f7; color: var(--dark); padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: none; cursor: pointer; }
+        
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); align-items: center; justify-content: center; }
-        .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 35px; padding: 20px; position: relative; max-height: 90vh; overflow-y: auto; box-sizing: border-box; }
-        .close-circle { position: absolute; top: 15px; right: 15px; background: #eee; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5; }
+        .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 35px; padding: 20px; position: relative; max-height: 85vh; overflow-y: auto; }
+        .close-circle { position: absolute; top: 12px; right: 12px; background: #eee; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         
-        #receipt-render { padding: 15px; background: white; color: #333; font-family: sans-serif; }
-        .r-header { background: #000; color: #fff; padding: 10px; border-radius: 5px; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; text-align: center; font-size: 14px; }
-        .r-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dotted #ccc; font-size: 12px; color: #333; }
-        .r-row b { color: #000; }
-        .r-total-box { background: #1a4a9e; color: white; padding: 15px; border-radius: 12px; font-size: 24px; font-weight: bold; text-align: center; margin: 20px 0; }
-        
+        .receipt { padding: 15px; background: white; }
+        .r-header { background: #000; color: #fff; padding: 10px; border-radius: 5px; text-align: center; font-size: 14px; margin-bottom: 15px; }
+        .r-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dotted #ccc; font-size: 12px; }
+        .r-total { background: #1a4a9e; color: white; padding: 15px; border-radius: 12px; text-align: center; margin: 15px 0; }
         .receipt-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .btn-wa { background: #2ecc71; border-radius: 12px; }
-        .btn-gm { background: #e74c3c; border-radius: 12px; }
-        .btn-pdf { background: #34495e; width: 100%; margin-top: 10px; border-radius: 12px; }
-        .btn-reprint { background: var(--primary); padding: 5px 10px; font-size: 10px; margin-top: 5px; width: auto; }
+        .btn-wa { background: #25D366; color: white; padding: 10px; border-radius: 12px; border: none; }
+        .btn-gm { background: #EA4335; color: white; padding: 10px; border-radius: 12px; border: none; }
+        .btn-pdf { background: #34495e; color: white; padding: 10px; border-radius: 12px; width: 100%; margin-top: 10px; border: none; }
+        .btn-reprint { background: var(--primary); padding: 5px 10px; font-size: 10px; color: white; border: none; border-radius: 10px; }
+        
+        .gps-status { font-size: 11px; text-align: center; margin-top: 8px; padding: 8px; border-radius: 20px; }
+        .gps-ready { background: #d4edda; color: #155724; }
+        .gps-warning { background: #fff3cd; color: #856404; }
+        .gps-error { background: #f8d7da; color: #721c24; }
+        
+        .autocomplete-dropdown { position: absolute; background: white; border: 1px solid #ddd; border-radius: 12px; max-height: 150px; overflow-y: auto; z-index: 100; width: 100%; }
+        .autocomplete-item { padding: 10px; cursor: pointer; font-size: 12px; border-bottom: 1px solid #eee; }
+        .location-wrapper { position: relative; }
+        
+        /* Payment Popup Styles */
+        .payment-popup { text-align: center; }
+        .payment-popup h3 { margin-bottom: 15px; color: var(--primary); }
+        .payment-methods { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; }
+        .payment-method-btn { background: var(--gray); border: 2px solid #ddd; border-radius: 15px; padding: 12px; cursor: pointer; text-align: left; font-weight: 600; transition: 0.2s; }
+        .payment-method-btn.active { border-color: var(--primary); background: #e8f0fe; }
+        .payment-method-btn.selected { border-color: var(--primary); background: var(--primary); color: white; }
+        .payment-detail-fields { margin-top: 15px; padding: 15px; background: var(--gray); border-radius: 15px; }
+        .payment-detail-fields input, .payment-detail-fields select { margin: 5px 0; }
+        .confirm-payment-btn { background: var(--secondary); color: white; padding: 14px; border: none; border-radius: 15px; font-size: 14px; font-weight: bold; width: 100%; margin-top: 15px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <div class="header-section">
-        <div id="main-logo-area" class="logo-area">AMT</div>
+        <div id="main-logo-area" class="logo-area">🚕</div>
         <div class="brand-name" id="display-app-name">ADVANCE MEETER TAXI</div>
-        <div class="settings-btn" onclick="openLogin()">⚙️</div>
+        <div class="top-bar">
+            <button id="nightTopBtn" class="top-btn night-top-btn" onclick="toggleNightCharge()">🌙 NIGHT OFF</button>
+            <button class="top-btn" onclick="openLogin()">⚙️ SETTINGS</button>
+            <button class="top-btn" onclick="resetToNew()">🔄 NEW</button>
+        </div>
+    </div>
+
+    <div class="fare-card" style="margin-bottom: 15px;">
+        <small>DISTANCE</small>
+        <div class="display-km" id="disp-km">0.00 km</div>
+        <div id="gps-status" class="gps-status gps-warning">📍 WAITING FOR GPS...</div>
     </div>
 
     <div class="input-group">
         <input type="tel" id="mobile" placeholder="Customer Mobile (Optional)">
+        
+        <div class="saved-locations" id="saved-locations-container"></div>
+        
         <div class="grid-2">
-            <input id="start-loc" list="wp-towns" placeholder="Pick Up Location">
-            <input id="end-loc" list="wp-towns" placeholder="Drop Off Location">
-            <datalist id="wp-towns"></datalist>
+            <div class="location-wrapper">
+                <input id="start-loc" type="text" placeholder="Pick Up Location" autocomplete="off">
+                <div id="start-dropdown" class="autocomplete-dropdown" style="display:none"></div>
+            </div>
+            <div class="location-wrapper">
+                <input id="end-loc" type="text" placeholder="Drop Off Location" autocomplete="off">
+                <div id="end-dropdown" class="autocomplete-dropdown" style="display:none"></div>
+            </div>
         </div>
+        
         <div class="grid-2" style="align-items: center;">
-            <input type="number" id="manual-fare" placeholder="Manual Fare (Optional)" oninput="updateDisplay()">
-            <div style="display:flex; align-items:center; background:var(--gray); border-radius:15px; padding:0 10px; height: 48px;">
-                <span style="font-size:10px; font-weight:bold;">Wait:</span>
-                <select id="wait-select" onchange="updateDisplay()" style="background:transparent; border:none; width: 60px;">
-                    <option value="0">0m</option>
-                    <script>for(let i=1;i<=120;i++) document.write(`<option value="${i}">${i}m</option>`);</script>
+            <input type="number" id="manual-fare" placeholder="Manual Fare (Rs)" oninput="updateDisplay()">
+            <div style="display:flex; align-items:center; background:var(--gray); border-radius:15px; padding:0 10px; height: 44px;">
+                <span style="font-size:10px;">Wait(min):</span>
+                <select id="wait-select" onchange="updateDisplay()" style="background:transparent; border:none;">
+                    <option value="0">0</option>
+                    <script>for(let i=1;i<=120;i++) document.write(`<option value="${i}">${i}</option>`);</script>
                 </select>
             </div>
         </div>
-        <input type="number" id="discount-input" placeholder="Discount Amount (Rs.)" oninput="updateDisplay()">
+        <input type="number" id="discount-input" placeholder="Discount (Rs)" oninput="updateDisplay()">
     </div>
 
     <div class="btn-main-grid">
-        <button class="btn-start" id="startBtn" onclick="startRide()">START RIDE</button>
-        <button class="btn-end" onclick="endRide()">END RIDE</button>
+        <button class="btn-start" id="startBtn" onclick="confirmStart()">START RIDE</button>
+        <button class="btn-end" onclick="confirmEnd()">END RIDE</button>
     </div>
-    <button class="btn-new" onclick="location.reload()">+ NEW RIDE</button>
 
-    <div class="fare-display-card">
-        <small id="dist-label">DISTANCE</small>
-        <div class="display-val-km" id="disp-km">0.0 km</div>
-        <hr style="opacity:0.1">
+    <div class="fare-card" style="margin-top: 15px;">
         <small>TOTAL FARE</small>
-        <div class="display-val-fare" id="disp-fare">Rs. 0</div>
+        <div class="display-fare" id="disp-fare">Rs. 0</div>
     </div>
 </div>
 
-<div id="login-modal" class="modal"><div class="modal-content" style="max-width: 280px;"><h3 style="text-align:center;">Admin Login</h3><input type="password" id="admin-pass-input" placeholder="Enter Password" style="text-align:center;"><button style="background:var(--primary); width:100%; margin-top:10px;" onclick="checkLogin()">LOGIN</button><button style="background:#ccc; width:100%; margin-top:5px; padding:10px; color:#333;" onclick="closeM('login-modal')">CANCEL</button></div></div>
-
-<div id="settings-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeM('settings-modal')">✕</div><h3 style="text-align:center; color:var(--primary);">Settings</h3><label>App Name:</label><input type="text" id="set-app-name"><label>Receipt Header:</label><input type="text" id="set-receipt-header"><label>Logo Image (Upload):</label><input type="file" id="set-logo-upload" accept="image/*" style="padding: 10px;"><div class="grid-2"><div><label>Base (Rs):</label><input type="number" id="set-base"></div><div><label>Rate/KM:</label><input type="number" id="set-rate"></div></div><div class="grid-2"><div><label>Wait Rate:</label><input type="number" id="set-wait-rate"></div><div><label>Night %:</label><input type="number" id="set-night"></div></div><label>Town List (Comma Separated):</label><textarea id="set-towns" rows="3" style="font-size: 11px;"></textarea><label>Change Password:</label><input type="password" id="set-password"><button style="background:var(--secondary); width:100%; margin-top:10px;" onclick="saveSettings()">SAVE SETTINGS</button><hr style="margin:20px 0; opacity:0.1"><button style="background:var(--dark); width:100%; margin-bottom:5px;" onclick="openPanel('income-modal')">📊 INCOME REPORTS</button><button style="background:var(--dark); width:100%;" onclick="openPanel('history-modal')">📜 TRAVEL HISTORY</button></div></div>
-
-<div id="receiptModal" class="modal">
-    <div class="modal-content">
-        <div class="close-circle" onclick="closeM('receiptModal')">✕</div>
-        <div id="receipt-render">
-            <div class="r-header" id="r-display-header">AMT OFFICIAL RECEIPT</div>
-            <div id="r-body"></div>
-            <div class="r-total-box">TOTAL: <span id="r-total"></span></div>
-            <div id="qrcode" style="display:flex; justify-content:center; margin:15px 0;"></div>
+<!-- PAYMENT POPUP MODAL (End Ride කලාම මුලින්ම එන්නේ) -->
+<div id="payment-popup" class="modal">
+    <div class="modal-content payment-popup">
+        <div class="close-circle" onclick="closePaymentPopup()">✕</div>
+        <h3>💳 SELECT PAYMENT METHOD</h3>
+        <div class="payment-methods" id="payment-methods-list">
+            <div class="payment-method-btn" data-method="cash" onclick="selectPaymentMethod('cash')">
+                💰 Cash
+            </div>
+            <div class="payment-method-btn" data-method="card" onclick="selectPaymentMethod('card')">
+                💳 Credit/Debit Card
+            </div>
+            <div class="payment-method-btn" data-method="mobile" onclick="selectPaymentMethod('mobile')">
+                📱 Mobile Payment (Frimi/mCash/Genie)
+            </div>
+            <div class="payment-method-btn" data-method="bank" onclick="selectPaymentMethod('bank')">
+                🏦 Bank Transfer
+            </div>
         </div>
-        <div class="receipt-btns">
-            <button class="btn-wa" onclick="shareWhatsApp()">WHATSAPP</button>
-            <button class="btn-gm" onclick="sendGmail()">GMAIL</button>
+        
+        <div id="payment-detail-fields" class="payment-detail-fields" style="display: none;">
+            <!-- Cash Details -->
+            <div id="cash-fields" style="display: none;">
+                <p>💰 Cash payment selected. Collect Rs. <span id="cash-amount">0</span> from customer.</p>
+            </div>
+            <!-- Card Details -->
+            <div id="card-fields" style="display: none;">
+                <input type="text" id="card-number" placeholder="Card Number (last 4 digits)" maxlength="4">
+                <div class="grid-2">
+                    <input type="text" id="card-expiry" placeholder="MM/YY">
+                    <input type="text" id="card-cvv" placeholder="CVV" maxlength="4">
+                </div>
+            </div>
+            <!-- Mobile Details -->
+            <div id="mobile-fields" style="display: none;">
+                <select id="mobile-provider">
+                    <option value="">Select Provider</option>
+                    <option value="Frimi">Frimi</option>
+                    <option value="mCash">mCash</option>
+                    <option value="Genie">Genie</option>
+                    <option value="Vishwa">Vishwa</option>
+                    <option value="eZ Cash">eZ Cash</option>
+                </select>
+                <input type="text" id="mobile-number" placeholder="Mobile Number">
+                <input type="text" id="mobile-ref" placeholder="Reference Number (Optional)">
+            </div>
+            <!-- Bank Details -->
+            <div id="bank-fields" style="display: none;">
+                <select id="bank-name">
+                    <option value="">Select Bank</option>
+                    <option value="Commercial Bank">Commercial Bank</option>
+                    <option value="HNB">HNB</option>
+                    <option value="Sampath Bank">Sampath Bank</option>
+                    <option value="NDB">NDB</option>
+                    <option value="Peoples Bank">Peoples Bank</option>
+                    <option value="BOC">BOC</option>
+                </select>
+                <input type="text" id="bank-ref" placeholder="Reference / Slip Number">
+            </div>
         </div>
-        <button class="btn-pdf" onclick="downloadPDF()">SAVE AS PDF</button>
+        
+        <button class="confirm-payment-btn" onclick="confirmPaymentAndShowReceipt()">✅ CONFIRM & GENERATE RECEIPT</button>
     </div>
 </div>
 
-<div id="income-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="backToS('income-modal')">✕</div><h3 style="text-align:center;">Earnings</h3><canvas id="earningsChart"></canvas><div class="grid-2" style="margin-top:20px; text-align:center;"><div style="background:var(--gray); padding:10px; border-radius:10px;"><small>Today</small><br><b id="stat-today" style="color:var(--primary);">Rs. 0</b></div><div style="background:var(--gray); padding:10px; border-radius:10px;"><small>Total</small><br><b id="stat-month" style="color:var(--primary);">Rs. 0</b></div></div><button style="background:var(--primary); width:100%; margin-top:20px;" onclick="downloadCSV()">DOWNLOAD CSV</button></div></div>
-<div id="history-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="backToS('history-modal')">✕</div><h3 style="text-align:center; color:var(--primary);">Travel History</h3><div id="history-list"></div></div></div>
+<!-- Settings Modal -->
+<div id="settings-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeM('settings-modal')">✕</div><h3>Settings</h3>
+<label>App Name:</label><input type="text" id="set-app-name">
+<label>Receipt Header:</label><input type="text" id="set-receipt-header">
+<label>Logo URL:</label><input type="text" id="set-logo-url" placeholder="Image URL">
+<div class="grid-2"><div><label>Base Fare:</label><input type="number" id="set-base"></div><div><label>Rate/KM:</label><input type="number" id="set-rate"></div></div>
+<div class="grid-2"><div><label>Wait/min:</label><input type="number" id="set-wait"></div><div><label>Night %:</label><input type="number" id="set-night"></div></div>
+<label>Saved Locations:</label><textarea id="set-locs" rows="2" placeholder="Colombo, Nugegoda, Kottawa"></textarea>
+<label>New Password:</label><input type="password" id="set-pwd">
+<button style="background:var(--secondary); width:100%; margin:10px 0; padding:12px; border:none; border-radius:15px; color:white;" onclick="saveSettings()">SAVE</button>
+<button style="background:var(--dark); width:100%; margin-bottom:5px; padding:12px; border:none; border-radius:15px; color:white;" onclick="openPanel('income-modal')">📊 REPORTS</button>
+<button style="background:var(--dark); width:100%; padding:12px; border:none; border-radius:15px; color:white;" onclick="openPanel('history-modal')">📜 HISTORY</button>
+</div></div>
+
+<div id="receiptModal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeM('receiptModal')">✕</div>
+<div id="receipt-view"><div class="r-header" id="receipt-header">TAXI RECEIPT</div><div id="receipt-body"></div><div class="r-total">TOTAL: Rs.<span id="receipt-total"></span></div><div id="receipt-qr" style="display:flex; justify-content:center; margin:15px 0;"></div></div>
+<div class="receipt-btns"><button class="btn-wa" onclick="shareWA()">WHATSAPP</button><button class="btn-gm" onclick="sendEmail()">GMAIL</button></div>
+<button class="btn-pdf" onclick="downloadReceiptPDF()">PDF</button></div></div>
+
+<div id="income-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="backToS('income-modal')">✕</div><h3>Earnings</h3><canvas id="earningsChart"></canvas><div class="grid-2" style="margin:15px 0;"><div>Today:<br><b id="stat-today">Rs.0</b></div><div>Total:<br><b id="stat-total">Rs.0</b></div></div><button class="btn-reprint" style="width:100%;" onclick="downloadCSV()">CSV</button></div></div>
+<div id="history-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="backToS('history-modal')">✕</div><h3>History</h3><div id="history-list"></div></div></div>
+<div id="login-modal" class="modal"><div class="modal-content"><h3>Admin Login</h3><input type="password" id="admin-pass" placeholder="Password"><button style="background:var(--primary); width:100%; margin-top:10px; padding:12px; border:none; border-radius:15px; color:white;" onclick="checkLogin()">LOGIN</button><button style="background:#ccc; width:100%; margin-top:5px; padding:12px; border:none; border-radius:15px;" onclick="closeM('login-modal')">CANCEL</button></div></div>
 
 <script>
-    let sTime, watchID, totalKm = 0, lastLat, lastLon, currentRID = "";
-    const DEFAULT_TOWNS = "Colombo 01, Colombo 02, Colombo 03, Colombo 04, Colombo 05, Colombo 06, Colombo 07, Colombo 08, Colombo 09, Colombo 10, Colombo 11, Colombo 12, Colombo 13, Colombo 14, Colombo 15, Dehiwala, Mount Lavinia, Ratmalana, Moratuwa, Kesbewa, Piliyandala, Maharagama, Boralesgamuwa, Nugegoda, Kottawa, Pannipitiya, Homagama, Malabe, Kaduwela, Battaramulla, Athurugiriya, Hanwella, Avissawella, Gampaha, Negombo, Katunayake, Seeduwa, Ja-Ela, Kandana, Wattala, Kelaniya, Peliyagoda, Kiribathgoda, Kadawatha, Ragama, Minuwangoda, Veyangoda, Nittambuwa, Kalutara, Panadura, Wadduwa, Beruwala, Aluthgama, Horana, Bandaragama, Matugama, Agalawatte, Ingiriya";
+    let sTime = null, watchId = null, totalMeters = 0;
+    let lastLat = null, lastLon = null, currentRID = "";
+    let nightActive = false;
+    let gpsReady = false;
+    let pendingRideData = null;  // Store ride data before payment
+    let selectedMethod = "cash";
     
-    let SETTINGS = { 
-        base: 100, rate: 80, wait: 5, night: 10, 
-        appName: "ADVANCE MEETER TAXI", receiptName: "AMT OFFICIAL RECEIPT", 
-        password: "1234", logo: "", towns: DEFAULT_TOWNS
+    let SETTINGS = {
+        base: 100, rate: 80, waitRate: 5, nightPercent: 10,
+        appName: "ADVANCE MEETER TAXI", receiptName: "OFFICIAL RECEIPT",
+        password: "1234", logoUrl: "", savedLocs: "Colombo,Nugegoda,Kottawa,Negombo"
     };
 
-    function generateReceiptID() {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = now.getMonth();
-        let finYear = (month >= 3) ? year : year - 1;
-        let yearPrefix = finYear.toString().slice(-2);
-        let monthName = now.toLocaleString('en-GB', { month: 'short' }).toUpperCase();
-        let counterKey = `amt_counter_${finYear}`;
-        let count = parseInt(localStorage.getItem(counterKey) || "0") + 1;
-        localStorage.setItem(counterKey, count);
-        return `${yearPrefix}${monthName}-${count.toString().padStart(10, '0')}`;
+    // ========== PAYMENT POPUP FUNCTIONS ==========
+    function openPaymentPopup(rideData) {
+        pendingRideData = rideData;
+        selectedMethod = "cash";
+        
+        // Reset UI
+        document.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('selected'));
+        document.querySelector('.payment-method-btn[data-method="cash"]').classList.add('selected');
+        
+        document.getElementById('payment-detail-fields').style.display = 'block';
+        document.getElementById('cash-fields').style.display = 'block';
+        document.getElementById('card-fields').style.display = 'none';
+        document.getElementById('mobile-fields').style.display = 'none';
+        document.getElementById('bank-fields').style.display = 'none';
+        
+        // Update cash amount display
+        document.getElementById('cash-amount').innerText = rideData.fare;
+        
+        document.getElementById('payment-popup').style.display = 'flex';
+    }
+    
+    function selectPaymentMethod(method) {
+        selectedMethod = method;
+        document.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('selected'));
+        document.querySelector(`.payment-method-btn[data-method="${method}"]`).classList.add('selected');
+        
+        document.getElementById('cash-fields').style.display = 'none';
+        document.getElementById('card-fields').style.display = 'none';
+        document.getElementById('mobile-fields').style.display = 'none';
+        document.getElementById('bank-fields').style.display = 'none';
+        
+        if(method === 'cash') document.getElementById('cash-fields').style.display = 'block';
+        if(method === 'card') document.getElementById('card-fields').style.display = 'block';
+        if(method === 'mobile') document.getElementById('mobile-fields').style.display = 'block';
+        if(method === 'bank') document.getElementById('bank-fields').style.display = 'block';
+    }
+    
+    function getPaymentInfo() {
+        switch(selectedMethod) {
+            case 'cash': 
+                return { method: 'Cash', detail: `Rs. ${pendingRideData.fare} collected` };
+            case 'card': 
+                return { method: 'Card', detail: `****${document.getElementById('card-number')?.value || 'XXXX'}` };
+            case 'mobile': 
+                return { method: 'Mobile Payment', detail: `${document.getElementById('mobile-provider')?.value || 'Mobile'} - ${document.getElementById('mobile-number')?.value || ''}` };
+            case 'bank': 
+                return { method: 'Bank Transfer', detail: `${document.getElementById('bank-name')?.value || 'Bank'} - ${document.getElementById('bank-ref')?.value || ''}` };
+            default: 
+                return { method: 'Cash', detail: '' };
+        }
+    }
+    
+    function closePaymentPopup() {
+        document.getElementById('payment-popup').style.display = 'none';
+        pendingRideData = null;
+    }
+    
+    function confirmPaymentAndShowReceipt() {
+        if(!pendingRideData) return;
+        
+        const payment = getPaymentInfo();
+        pendingRideData.payment = payment;
+        
+        // Save ride with payment info
+        saveRide(pendingRideData);
+        
+        // Show receipt
+        showReceipt(pendingRideData);
+        
+        // Close payment popup
+        closePaymentPopup();
+        
+        // Reset after ride
+        sTime = null;
+        setTimeout(() => startGPS(), 1000);
     }
 
+    // ========== DISTANCE CALCULATION ==========
+    function calcDistanceMeters(lat1, lon1, lat2, lon2) {
+        const R = 6371000;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    // ========== AUTOCOMPLETE ==========
+    async function setupAutocomplete(inputId, dropdownId) {
+        const input = document.getElementById(inputId);
+        const dropdown = document.getElementById(dropdownId);
+        let timer;
+        
+        input.addEventListener('input', function() {
+            clearTimeout(timer);
+            const q = this.value.trim();
+            if(q.length < 2) { dropdown.style.display = 'none'; return; }
+            
+            timer = setTimeout(async () => {
+                dropdown.innerHTML = '<div class="autocomplete-item">Searching...</div>';
+                dropdown.style.display = 'block';
+                try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5&countrycodes=lk`);
+                    const data = await res.json();
+                    dropdown.innerHTML = '';
+                    if(data.length === 0) dropdown.innerHTML = '<div class="autocomplete-item">No results</div>';
+                    data.forEach(place => {
+                        const item = document.createElement('div');
+                        item.className = 'autocomplete-item';
+                        item.innerText = place.display_name.substring(0, 50);
+                        item.onclick = () => { input.value = place.display_name; dropdown.style.display = 'none'; };
+                        dropdown.appendChild(item);
+                    });
+                } catch(e) { dropdown.innerHTML = '<div class="autocomplete-item">Error</div>'; }
+            }, 400);
+        });
+        document.addEventListener('click', (e) => { if(!input.contains(e.target)) dropdown.style.display = 'none'; });
+    }
+
+    // ========== GPS ==========
+    function startGPS() {
+        const status = document.getElementById('gps-status');
+        if(!navigator.geolocation) {
+            status.className = 'gps-status gps-error';
+            status.innerHTML = '❌ GPS not supported';
+            return;
+        }
+        
+        status.className = 'gps-status gps-warning';
+        status.innerHTML = '📍 Getting GPS...';
+        
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                if(pos.coords.accuracy < 100) {
+                    gpsReady = true;
+                    lastLat = pos.coords.latitude;
+                    lastLon = pos.coords.longitude;
+                    status.className = 'gps-status gps-ready';
+                    status.innerHTML = `✅ GPS Ready (${pos.coords.accuracy.toFixed(0)}m)`;
+                    document.getElementById('startBtn').disabled = false;
+                    document.getElementById('startBtn').classList.remove('btn-start-disabled');
+                } else {
+                    status.className = 'gps-status gps-warning';
+                    status.innerHTML = `⚠️ Weak signal (${pos.coords.accuracy.toFixed(0)}m)`;
+                    document.getElementById('startBtn').disabled = true;
+                    document.getElementById('startBtn').classList.add('btn-start-disabled');
+                    setTimeout(startGPS, 3000);
+                }
+            },
+            (err) => {
+                let msg = err.code === 1 ? 'Permission denied. Allow location.' : 'GPS error. Turn on location.';
+                status.className = 'gps-status gps-error';
+                status.innerHTML = `❌ ${msg}`;
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('startBtn').classList.add('btn-start-disabled');
+                setTimeout(startGPS, 5000);
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    }
+    
+    function trackRide() {
+        if(watchId) navigator.geolocation.clearWatch(watchId);
+        
+        watchId = navigator.geolocation.watchPosition(
+            (pos) => {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                
+                if(lastLat !== null && lastLon !== null && pos.coords.accuracy < 100) {
+                    const dist = calcDistanceMeters(lastLat, lastLon, lat, lon);
+                    if(dist > 3) {
+                        totalMeters += dist;
+                        updateDisplay();
+                        document.getElementById('gps-status').innerHTML = `📍 Moving | ${(totalMeters/1000).toFixed(2)} km`;
+                    }
+                }
+                lastLat = lat;
+                lastLon = lon;
+            },
+            (err) => { console.log("GPS track error:", err); },
+            { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+        );
+    }
+
+    // ========== RIDE FUNCTIONS ==========
+    function confirmStart() {
+        if(sTime) { alert("Ride active!"); return; }
+        if(!document.getElementById('start-loc').value.trim() || !document.getElementById('end-loc').value.trim()) {
+            alert("Enter pickup and drop locations!");
+            return;
+        }
+        if(!gpsReady) { alert("Wait for GPS signal!"); return; }
+        if(confirm("Start ride?")) startRide();
+    }
+    
+    function confirmEnd() {
+        if(!sTime) { alert("No active ride!"); return; }
+        if(confirm("End ride?")) {
+            endRideAndOpenPayment();
+        }
+    }
+    
+    function startRide() {
+        sTime = new Date();
+        totalMeters = 0;
+        document.getElementById('startBtn').innerHTML = "⏵ ACTIVE";
+        document.getElementById('startBtn').classList.add('btn-active-anim');
+        document.getElementById('start-loc').disabled = true;
+        document.getElementById('end-loc').disabled = true;
+        updateDisplay();
+        trackRide();
+    }
+    
+    function endRideAndOpenPayment() {
+        if(watchId) navigator.geolocation.clearWatch(watchId);
+        
+        document.getElementById('startBtn').innerHTML = "START RIDE";
+        document.getElementById('startBtn').classList.remove('btn-active-anim');
+        document.getElementById('start-loc').disabled = false;
+        document.getElementById('end-loc').disabled = false;
+        
+        const km = totalMeters / 1000;
+        const fare = calcFare();
+        currentRID = generateID();
+        
+        const rideData = {
+            id: currentRID,
+            fare: fare,
+            km: km,
+            from: document.getElementById('start-loc').value,
+            to: document.getElementById('end-loc').value,
+            mobile: document.getElementById('mobile').value || "N/A",
+            wait: parseInt(document.getElementById('wait-select').value),
+            disc: parseInt(document.getElementById('discount-input').value)||0,
+            manual: parseInt(document.getElementById('manual-fare').value)||0,
+            nightUsed: nightActive,
+            time: Date.now()
+        };
+        
+        // Open payment popup before saving
+        openPaymentPopup(rideData);
+    }
+    
+    function calcFare() {
+        const manual = parseInt(document.getElementById('manual-fare').value)||0;
+        const disc = parseInt(document.getElementById('discount-input').value)||0;
+        const wait = parseInt(document.getElementById('wait-select').value);
+        const waitCharge = wait * SETTINGS.waitRate;
+        const km = totalMeters / 1000;
+        
+        let total;
+        if(manual > 0) {
+            total = manual + waitCharge - disc;
+        } else {
+            total = SETTINGS.base + (Math.max(0, km - 1) * SETTINGS.rate) + waitCharge - disc;
+        }
+        
+        if(nightActive && manual === 0) {
+            total = total + (total * SETTINGS.nightPercent / 100);
+        }
+        return Math.max(0, Math.round(total));
+    }
+    
+    function updateDisplay() {
+        document.getElementById('disp-km').innerHTML = (totalMeters/1000).toFixed(2) + " km";
+        document.getElementById('disp-fare').innerHTML = "Rs. " + calcFare();
+    }
+    
+    function generateID() {
+        const n = new Date();
+        const y = n.getFullYear();
+        const m = n.getMonth();
+        const fy = (m >= 3) ? y : y - 1;
+        let c = parseInt(localStorage.getItem(`cnt_${fy}`)||0) + 1;
+        localStorage.setItem(`cnt_${fy}`, c);
+        return `${fy.toString().slice(-2)}${n.toLocaleString('en',{month:'short'}).toUpperCase()}-${c.toString().padStart(8,'0')}`;
+    }
+    
+    function saveRide(ride) {
+        let list = JSON.parse(localStorage.getItem('rides')||'[]');
+        list.push(ride);
+        localStorage.setItem('rides', JSON.stringify(list));
+    }
+    
+    function showReceipt(ride) {
+        const km = ride.km;
+        let sub = (ride.manual>0) ? ride.manual : (SETTINGS.base + (Math.max(0, km-1)*SETTINGS.rate));
+        let waitC = ride.wait * SETTINGS.waitRate;
+        
+        let rows = `<div class="r-row"><span>Receipt:</span><b>${ride.id}</b></div>
+                    <div class="r-row"><span>Date:</span><b>${new Date(ride.time).toLocaleString()}</b></div>
+                    <div class="r-row"><span>Mobile:</span><b>${ride.mobile}</b></div>
+                    <div class="r-row"><span>Route:</span><b>${ride.from} → ${ride.to}</b></div>
+                    <div class="r-row"><span>Distance:</span><b>${km.toFixed(2)} km</b></div>
+                    <div class="r-row"><span>Fare:</span><b>Rs.${sub}</b></div>`;
+        if(waitC > 0) rows += `<div class="r-row"><span>Wait(${ride.wait}m):</span><b>+Rs.${waitC}</b></div>`;
+        if(ride.disc > 0) rows += `<div class="r-row"><span>Discount:</span><b style="color:red;">-Rs.${ride.disc}</b></div>`;
+        if(ride.nightUsed) rows += `<div class="r-row"><span>Night Charge:</span><b>+${SETTINGS.nightPercent}%</b></div>`;
+        rows += `<div class="r-row"><span>Payment:</span><b>${ride.payment.method}</b></div>`;
+        if(ride.payment.detail) rows += `<div class="r-row"><span>Ref:</span><b>${ride.payment.detail}</b></div>`;
+        
+        document.getElementById('receipt-body').innerHTML = rows;
+        document.getElementById('receipt-total').innerHTML = "Rs. " + ride.fare;
+        document.getElementById('receipt-header').innerText = SETTINGS.receiptName;
+        document.getElementById('receipt-qr').innerHTML = "";
+        new QRCode(document.getElementById("receipt-qr"), { text: ride.id, width: 80, height: 80 });
+        document.getElementById('receiptModal').style.display = "flex";
+    }
+    
+    function toggleNightCharge() {
+        nightActive = !nightActive;
+        const btn = document.getElementById('nightTopBtn');
+        if(nightActive) { btn.innerHTML = '🌙 ON'; btn.classList.add('night-top-active'); }
+        else { btn.innerHTML = '🌙 OFF'; btn.classList.remove('night-top-active'); }
+        updateDisplay();
+    }
+    
+    function loadSaved() {
+        const locs = SETTINGS.savedLocs.split(',').map(s=>s.trim());
+        const container = document.getElementById('saved-locations-container');
+        container.innerHTML = locs.map(l => `<button class="saved-loc-btn" onclick="setLoc('${l.replace(/'/g,"\\'")}')">📍 ${l}</button>`).join('');
+    }
+    
+    function setLoc(l) {
+        if(document.activeElement === document.getElementById('start-loc') || document.activeElement === document.getElementById('end-loc')) {
+            document.activeElement.value = l;
+        } else {
+            confirm("Set as pickup?") ? document.getElementById('start-loc').value = l : document.getElementById('end-loc').value = l;
+        }
+    }
+    
+    function resetToNew() {
+        if(sTime && !confirm("Ride active. Reset?")) return;
+        if(watchId) navigator.geolocation.clearWatch(watchId);
+        sTime = null; totalMeters = 0; lastLat = null; lastLon = null;
+        document.getElementById('startBtn').innerHTML = "START RIDE";
+        document.getElementById('startBtn').classList.remove('btn-active-anim');
+        document.getElementById('start-loc').disabled = false;
+        document.getElementById('end-loc').disabled = false;
+        document.getElementById('start-loc').value = '';
+        document.getElementById('end-loc').value = '';
+        document.getElementById('mobile').value = '';
+        document.getElementById('manual-fare').value = '';
+        document.getElementById('discount-input').value = '';
+        document.getElementById('wait-select').value = '0';
+        updateDisplay();
+        startGPS();
+    }
+    
     function loadSettings() {
-        const saved = localStorage.getItem('amt_pro_settings');
+        const saved = localStorage.getItem('amt_settings');
         if(saved) SETTINGS = {...SETTINGS, ...JSON.parse(saved)};
         document.getElementById('display-app-name').innerText = SETTINGS.appName;
-        document.getElementById('r-display-header').innerText = SETTINGS.receiptName;
+        document.getElementById('receipt-header').innerText = SETTINGS.receiptName;
         document.getElementById('set-app-name').value = SETTINGS.appName;
         document.getElementById('set-receipt-header').value = SETTINGS.receiptName;
         document.getElementById('set-base').value = SETTINGS.base;
         document.getElementById('set-rate').value = SETTINGS.rate;
-        document.getElementById('set-wait-rate').value = SETTINGS.wait;
-        document.getElementById('set-night').value = SETTINGS.night;
-        document.getElementById('set-towns').value = SETTINGS.towns;
-        document.getElementById('wp-towns').innerHTML = SETTINGS.towns.split(',').map(t => `<option value="${t.trim()}">`).join('');
-        if(SETTINGS.logo) document.getElementById('main-logo-area').innerHTML = `<img src="${SETTINGS.logo}">`;
+        document.getElementById('set-wait').value = SETTINGS.waitRate;
+        document.getElementById('set-night').value = SETTINGS.nightPercent;
+        document.getElementById('set-locs').value = SETTINGS.savedLocs;
+        if(SETTINGS.logoUrl) document.getElementById('main-logo-area').innerHTML = `<img src="${SETTINGS.logoUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+        loadSaved();
         updateDisplay();
+        setupAutocomplete('start-loc', 'start-dropdown');
+        setupAutocomplete('end-loc', 'end-dropdown');
+        startGPS();
     }
-
+    
     function saveSettings() {
-        const fileInput = document.getElementById('set-logo-upload');
-        const file = fileInput.files[0];
-        const proceedSave = (logoData = SETTINGS.logo) => {
-            SETTINGS.appName = document.getElementById('set-app-name').value;
-            SETTINGS.receiptName = document.getElementById('set-receipt-header').value;
-            SETTINGS.base = parseInt(document.getElementById('set-base').value);
-            SETTINGS.rate = parseInt(document.getElementById('set-rate').value);
-            SETTINGS.wait = parseInt(document.getElementById('set-wait-rate').value);
-            SETTINGS.night = parseInt(document.getElementById('set-night').value);
-            SETTINGS.towns = document.getElementById('set-towns').value;
-            SETTINGS.logo = logoData;
-            if(document.getElementById('set-password').value) SETTINGS.password = document.getElementById('set-password').value;
-            localStorage.setItem('amt_pro_settings', JSON.stringify(SETTINGS));
-            loadSettings(); closeM('settings-modal');
-        };
-        if (file) { const reader = new FileReader(); reader.onload = (e) => proceedSave(e.target.result); reader.readAsDataURL(file); } 
-        else { proceedSave(); }
+        SETTINGS.appName = document.getElementById('set-app-name').value;
+        SETTINGS.receiptName = document.getElementById('set-receipt-header').value;
+        SETTINGS.base = parseInt(document.getElementById('set-base').value);
+        SETTINGS.rate = parseInt(document.getElementById('set-rate').value);
+        SETTINGS.waitRate = parseInt(document.getElementById('set-wait').value);
+        SETTINGS.nightPercent = parseInt(document.getElementById('set-night').value);
+        SETTINGS.savedLocs = document.getElementById('set-locs').value;
+        SETTINGS.logoUrl = document.getElementById('set-logo-url').value;
+        if(document.getElementById('set-pwd').value) SETTINGS.password = document.getElementById('set-pwd').value;
+        localStorage.setItem('amt_settings', JSON.stringify(SETTINGS));
+        loadSettings();
+        closeM('settings-modal');
+        alert("Saved!");
     }
-
-    function updateDisplay() {
-        let manual = parseInt(document.getElementById('manual-fare').value) ||
+    
+    function updateHistory() {
+        const rides = JSON.parse(localStorage.getItem('rides')||'[]');
+        const div = document.getElementById('history-list');
+        if(!rides.length) { div.innerHTML = "<p style='text-align:center;padding:20px;'>No rides</p>"; return; }
+        div.innerHTML = rides.slice().reverse().map((r,i) => `<div style="background:#f8f9fa;padding:12px;margin-bottom:8px;border-radius:15px;border-left:5px solid var(--primary);">
+            <div style="display:flex;justify-content:space-between;"><b>${r.id}</b><button class="btn-reprint" onclick="reprint(${rides.length-1-i})">VIEW</button></div>
+            <small>${new Date(r.time).toLocaleString()}</small><br><small>${r.from}→${r.to}</small><br><b>Rs.${r.fare}</b><br><small>💳 ${r.payment?.method || 'Cash'}</small>
+        </div>`).join('');
+    }
+    
+    function reprint(idx) {
+        const rides = JSON.parse(localStorage.getItem('rides')||'[]');
+        if(rides[idx]) showReceipt(rides[idx]);
+        closeM('history-modal');
+    }
+    
+    function updateChart() {
+        const rides = JSON.parse(localStorage.getItem('rides')||'[]');
+        const day = [0,0,0,0,0,0,0];
+        rides.forEach(r => { day[new Date(r.time).getDay()] += r.fare; });
+        if(window.mChart) window.mChart.destroy();
+        window.mChart = new Chart(document.getElementById('earningsChart'), {
+            type: 'bar',
+            data: { labels: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], datasets: [{ data: day, backgroundColor: '#1a4a9e', borderRadius: 8 }] }
+        });
+        const today = rides.filter(r => new Date(r.time).toDateString() === new Date().toDateString()).reduce((a,b)=>a+b.fare,0);
+        const total = rides.reduce((a,b)=>a+b.fare,0);
+        document.getElementById('stat-today').innerHTML = "Rs." + today;
+        document.getElementById('stat-total').innerHTML = "Rs." + total;
+    }
+    
+    function downloadCSV() {
+        const rides = JSON.parse(localStorage.getItem('rides')||'[]');
+        let csv = "Date,ID,Route,Distance,Fare,Payment\n" + rides.map(r => `${new Date(r.time).toLocaleDateString()},${r.id},${r.from}-${r.to},${r.km.toFixed(2)},${r.fare},${r.payment?.method || 'Cash'}`).join("\n");
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([csv]));
+        a.download = 'rides.csv';
+        a.click();
+    }
+    
+    async function downloadReceiptPDF() {
+        const { jsPDF } = window.jspdf;
+        const el = document.getElementById('receipt-view');
+        const canvas = await html2canvas(el, { scale: 2 });
+        const pdf = new jsPDF('p', 'mm', [80, 150]);
+        pdf.addImage(canvas.toDataURL(), 'PNG', 0, 0, 80, 150);
+        pdf.save(`${currentRID}.pdf`);
+    }
+    
+    function shareWA() { window.open(`https://wa.me/?text=Receipt: ${currentRID}`, '_blank'); }
+    function sendEmail() { window.location.href = `mailto:?subject=Receipt ${currentRID}&body=Thank you!`; }
+    function openLogin() { document.getElementById('admin-pass').value = ""; document.getElementById('login-modal').style.display = "flex"; }
+    function checkLogin() { if(document.getElementById('admin-pass').value === SETTINGS.password) { closeM('login-modal'); document.getElementById('settings-modal').style.display = "flex"; } else alert("Wrong!"); }
+    function closeM(id) { document.getElementById(id).style.display = "none"; }
+    function backToS(id) { closeM(id); document.getElementById('settings-modal').style.display = "flex"; }
+    function openPanel(id) { closeM('settings-modal'); document.getElementById(id).style.display = "flex"; if(id==='income-modal') updateChart(); if(id==='history-modal') updateHistory(); }
+    
+    window.onload = loadSettings;
+</script>
+</body>
+</html>
