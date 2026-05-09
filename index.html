@@ -141,11 +141,11 @@
         <div class="close-circle" onclick="closePaymentPopup()">✕</div>
         <h3 style="text-align:center; margin-bottom:20px;">💳 SELECT PAYMENT METHOD</h3>
         <div class="payment-methods">
-            <div class="payment-method-btn" data-method="cash" onclick="selectPaymentMethod('cash', this)">💰 Cash</div>
-            <div class="payment-method-btn" data-method="card" onclick="selectPaymentMethod('card', this)">💳 Card</div>
-            <div class="payment-method-btn" data-method="mobile" onclick="selectPaymentMethod('mobile', this)">📱 Mobile</div>
-            <div class="payment-method-btn" data-method="bank" onclick="selectPaymentMethod('bank', this)">🏦 Bank</div>
-            <div class="payment-method-btn" data-method="other" onclick="selectPaymentMethod('other', this)">📝 Other</div>
+            <div class="payment-method-btn" onclick="selectPaymentMethod('cash', this)">💰 Cash</div>
+            <div class="payment-method-btn" onclick="selectPaymentMethod('card', this)">💳 Card</div>
+            <div class="payment-method-btn" onclick="selectPaymentMethod('mobile', this)">📱 Mobile</div>
+            <div class="payment-method-btn" onclick="selectPaymentMethod('bank', this)">🏦 Bank</div>
+            <div class="payment-method-btn" onclick="selectPaymentMethod('other', this)">📝 Other</div>
         </div>
         <div id="payment-detail-fields" class="payment-detail-fields" style="display: none;">
             <div id="cash-fields" style="display: none;"><p>💰 Cash payment selected.</p></div>
@@ -314,66 +314,117 @@
     async function startRide() { if(sTime) { alert("Ride active"); return; } if(currentMode==='auto') { if(!currentLocationAddress) { alert("Wait for GPS"); return; } startLocationAddress = currentLocationAddress; } else if(currentMode==='gps') { if(!document.getElementById('start-loc').value.trim() || !document.getElementById('end-loc').value.trim()) { alert("Enter locations"); return; } startLocationAddress = document.getElementById('start-loc').value; currentDestinationAddress = document.getElementById('end-loc').value; } else if(currentMode==='manual') { if(!document.getElementById('start-loc').value.trim() || !document.getElementById('end-loc').value.trim()) { alert("Enter locations"); return; } startLocationAddress = document.getElementById('start-loc').value; currentDestinationAddress = document.getElementById('end-loc').value; } else if(currentMode==='delivery') { if(!document.getElementById('start-loc').value.trim() || !document.getElementById('end-loc').value.trim()) { alert("Enter locations"); return; } startLocationAddress = document.getElementById('start-loc').value; currentDestinationAddress = document.getElementById('end-loc').value; deliveryPickupName = document.getElementById('pickup-name').value; deliveryPickupPhone = document.getElementById('pickup-phone').value; deliveryDeliveryName = document.getElementById('delivery-name').value; deliveryDeliveryPhone = document.getElementById('delivery-phone').value; } sTime = new Date(); await requestWakeLock(); document.body.classList.add('ride-active'); if(currentMode==='auto') { totalMeters=0; if(currentLocationLat && currentLocationLon) { lastLat=currentLocationLat; lastLon=currentLocationLon; } trackRide(); } else if(currentMode==='gps' || currentMode==='delivery') { totalMeters=0; lastLat=null; lastLon=null; setTimeout(() => { if(navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => { lastLat=pos.coords.latitude; lastLon=pos.coords.longitude; }); },100); trackRide(); if(currentMode!=='auto') document.getElementById('nav-container').style.display='block'; } else { totalMeters = (parseFloat(document.getElementById('manual-km-input').value)||0)*1000; document.getElementById('nav-container').style.display='block'; } document.getElementById('startBtn').innerHTML="⏵ ACTIVE"; document.getElementById('startBtn').classList.add('btn-active-anim'); document.getElementById('startBtn').disabled=true; updateDisplay(); document.querySelectorAll('.mode-btn').forEach(btn => btn.style.pointerEvents='none'); saveRideState(); }
     function endRide() { if(!sTime) { alert("No active ride"); return; } releaseWakeLock(); document.body.classList.remove('ride-active'); if(watchId) { navigator.geolocation.clearWatch(watchId); watchId=null; } document.getElementById('startBtn').innerHTML="START RIDE"; document.getElementById('startBtn').classList.remove('btn-active-anim'); document.getElementById('startBtn').disabled=false; if(currentMode==='auto' && currentDestinationAddress) document.getElementById('nav-container').style.display='block'; else if(currentMode!=='auto') document.getElementById('nav-container').style.display='none'; document.querySelectorAll('.mode-btn').forEach(btn => { btn.style.pointerEvents='auto'; btn.style.opacity='1'; }); let from="", to=""; if(currentMode==='auto') { from=startLocationAddress; to=currentLocationAddress; } else { from=document.getElementById('start-loc').value; to=document.getElementById('end-loc').value; } let fare=calcFare(); currentRID=generateReceiptID(); let km=totalMeters/1000; pendingRideData = { id:currentRID, fare, km, from, to, mobile:document.getElementById('mobile').value||"N/A", wait:parseInt(document.getElementById('wait-select').value), disc:parseInt(document.getElementById('discount-input').value)||0, manualFare:parseInt(document.getElementById('manual-fare').value)||0, nightUsed:nightActive, mode:currentMode==='auto'?"Auto":(currentMode==='gps'?"GPS":(currentMode==='manual'?"Manual":"Delivery")), time:Date.now() }; if(currentMode==='delivery') { pendingRideData.pickupName=deliveryPickupName; pendingRideData.pickupPhone=deliveryPickupPhone; pendingRideData.deliveryName=deliveryDeliveryName; pendingRideData.deliveryPhone=deliveryDeliveryPhone; } localStorage.removeItem('amt_ride_state'); openPaymentPopup(); }
     function generateReceiptID() { let n=new Date(), y=n.getFullYear(), m=n.getMonth(); let fy=(m>=3)?y:y-1; let c=parseInt(localStorage.getItem(`cnt_${fy}`)||"0")+1; localStorage.setItem(`cnt_${fy}`,c); return `${fy.toString().slice(-2)}${n.toLocaleString('en',{month:'short'}).toUpperCase()}-${c.toString().padStart(8,'0')}`; }
-    function openPaymentPopup() { selectedMethod="cash"; document.querySelectorAll('.payment-method-btn').forEach(btn=>btn.classList.remove('selected')); document.querySelector('.payment-method-btn[data-method="cash"]')?.classList.add('selected'); document.getElementById('payment-detail-fields').style.display='block'; document.getElementById('cash-fields').style.display='block'; document.getElementById('card-fields').style.display='none'; document.getElementById('mobile-fields').style.display='none'; document.getElementById('bank-fields').style.display='none'; document.getElementById('other-fields').style.display='none'; document.getElementById('payment-popup').style.display='flex'; }
+    
+    // FIXED: Payment functions with proper working
+    function openPaymentPopup() { 
+        if(!pendingRideData) { alert("No ride data available. Please end a ride first."); return; }
+        selectedMethod = "cash"; 
+        document.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('selected')); 
+        document.querySelector('.payment-method-btn:first-child')?.classList.add('selected'); 
+        document.getElementById('payment-detail-fields').style.display = 'block'; 
+        document.getElementById('cash-fields').style.display = 'block'; 
+        document.getElementById('card-fields').style.display = 'none'; 
+        document.getElementById('mobile-fields').style.display = 'none'; 
+        document.getElementById('bank-fields').style.display = 'none'; 
+        document.getElementById('other-fields').style.display = 'none'; 
+        document.getElementById('payment-popup').style.display = 'flex'; 
+    }
+    
     function selectPaymentMethod(method, btnElement) { 
         selectedMethod = method; 
         document.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('selected')); 
         btnElement.classList.add('selected'); 
-        document.getElementById('cash-fields').style.display='none'; 
-        document.getElementById('card-fields').style.display='none'; 
-        document.getElementById('mobile-fields').style.display='none'; 
-        document.getElementById('bank-fields').style.display='none'; 
-        document.getElementById('other-fields').style.display='none'; 
-        if(method==='cash') document.getElementById('cash-fields').style.display='block'; 
-        if(method==='card') document.getElementById('card-fields').style.display='block'; 
-        if(method==='mobile') document.getElementById('mobile-fields').style.display='block'; 
-        if(method==='bank') document.getElementById('bank-fields').style.display='block'; 
-        if(method==='other') document.getElementById('other-fields').style.display='block'; 
+        document.getElementById('cash-fields').style.display = 'none'; 
+        document.getElementById('card-fields').style.display = 'none'; 
+        document.getElementById('mobile-fields').style.display = 'none'; 
+        document.getElementById('bank-fields').style.display = 'none'; 
+        document.getElementById('other-fields').style.display = 'none'; 
+        if(method === 'cash') document.getElementById('cash-fields').style.display = 'block'; 
+        if(method === 'card') document.getElementById('card-fields').style.display = 'block'; 
+        if(method === 'mobile') document.getElementById('mobile-fields').style.display = 'block'; 
+        if(method === 'bank') document.getElementById('bank-fields').style.display = 'block'; 
+        if(method === 'other') document.getElementById('other-fields').style.display = 'block'; 
     }
+    
     function getPaymentInfo() { 
         switch(selectedMethod) { 
-            case 'cash': return {method:'Cash',detail:''}; 
-            case 'card': let cd=""; if(document.getElementById('card-number')?.value) cd+=`****${document.getElementById('card-number').value}`; if(document.getElementById('card-name')?.value) cd+=` - ${document.getElementById('card-name').value}`; return {method:'Card',detail:cd||'Card'}; 
-            case 'mobile': let md=""; if(document.getElementById('mobile-provider')?.value) md+=document.getElementById('mobile-provider').value; if(document.getElementById('mobile-number')?.value) md+=` ${document.getElementById('mobile-number').value}`; return {method:'Mobile',detail:md||'Mobile'}; 
-            case 'bank': let bd=""; if(document.getElementById('bank-name')?.value) bd+=document.getElementById('bank-name').value; if(document.getElementById('bank-ref')?.value) bd+=` - Ref: ${document.getElementById('bank-ref').value}`; return {method:'Bank',detail:bd||'Bank'}; 
-            default: return {method:'Other',detail:document.getElementById('other-method')?.value||''}; 
+            case 'cash': return { method: 'Cash', detail: '' }; 
+            case 'card': 
+                let cd = ""; 
+                if(document.getElementById('card-number')?.value) cd += `****${document.getElementById('card-number').value}`; 
+                if(document.getElementById('card-name')?.value) cd += ` - ${document.getElementById('card-name').value}`; 
+                return { method: 'Card', detail: cd || 'Card payment' }; 
+            case 'mobile': 
+                let md = ""; 
+                if(document.getElementById('mobile-provider')?.value) md += document.getElementById('mobile-provider').value; 
+                if(document.getElementById('mobile-number')?.value) md += ` ${document.getElementById('mobile-number').value}`; 
+                return { method: 'Mobile', detail: md || 'Mobile payment' }; 
+            case 'bank': 
+                let bd = ""; 
+                if(document.getElementById('bank-name')?.value) bd += document.getElementById('bank-name').value; 
+                if(document.getElementById('bank-ref')?.value) bd += ` - Ref: ${document.getElementById('bank-ref').value}`; 
+                return { method: 'Bank Transfer', detail: bd || 'Bank transfer' }; 
+            default: 
+                return { method: document.getElementById('other-method')?.value || 'Other', detail: document.getElementById('other-ref')?.value || '' }; 
         } 
     }
-    function closePaymentPopup() { document.getElementById('payment-popup').style.display='none'; }
+    
+    function closePaymentPopup() { document.getElementById('payment-popup').style.display = 'none'; }
+    
+    // FIXED: Confirm and show receipt
     function confirmPaymentAndShowReceipt() { 
-        if(!pendingRideData) { alert("No ride data to confirm"); return; } 
+        if(!pendingRideData) { 
+            alert("No ride data found. Please end a ride first."); 
+            return; 
+        } 
+        
+        // Get payment info
         pendingRideData.payment = getPaymentInfo(); 
-        let list = JSON.parse(localStorage.getItem('rides')||'[]'); 
+        
+        // Save to localStorage
+        let list = JSON.parse(localStorage.getItem('rides') || '[]'); 
         list.push(pendingRideData); 
-        localStorage.setItem('rides',JSON.stringify(list)); 
-        showReceipt(pendingRideData,false); 
+        localStorage.setItem('rides', JSON.stringify(list)); 
+        
+        // Show receipt
+        showReceipt(pendingRideData, false); 
+        
+        // Close payment popup
         closePaymentPopup(); 
-        sTime=null; 
-        currentDestinationAddress=""; 
-        if(currentMode!=='manual') setTimeout(()=>startGPS(),1000); 
-        document.getElementById('nav-container').style.display='none'; 
+        
+        // Reset ride data
+        sTime = null; 
+        currentDestinationAddress = ""; 
+        if(currentMode !== 'manual') setTimeout(() => startGPS(), 1000); 
+        document.getElementById('nav-container').style.display = 'none'; 
+        
+        addSystemLog('INFO', 'Payment confirmed', `Receipt: ${pendingRideData.id}`); 
     }
-    function showReceipt(ride,isDuplicate) { 
-        let sub = (ride.manualFare>0)?ride.manualFare:(SETTINGS.base+(Math.max(0,ride.km-1)*SETTINGS.rate)); 
-        let waitC=ride.wait*SETTINGS.waitRate; 
-        let dupHtml=isDuplicate?'<div style="background:#e74c3c; color:white; text-align:center; padding:3px;">📋 COPY</div>':''; 
-        let rows=dupHtml; 
-        rows+=`<div class="r-row"><span>Receipt:</span><b>${ride.id}</b></div><div class="r-row"><span>Date:</span><b>${new Date(ride.time).toLocaleString()}</b></div><div class="r-row"><span>Mobile:</span><b>${ride.mobile}</b></div>`; 
-        if(ride.mode==='Delivery') { rows+=`<div class="r-row-full"><span class="r-label">Pickup:</span><span class="r-address">${ride.pickupName||''} ${ride.pickupPhone||''}</span></div><div class="r-row-full"><span class="r-label">Delivery:</span><span class="r-address">${ride.deliveryName||''} ${ride.deliveryPhone||''}</span></div>`; } 
-        rows+=`<div class="r-row-full"><span class="r-label">From:</span><span class="r-address">${ride.from}</span></div><div class="r-row-full"><span class="r-label">To:</span><span class="r-address">${ride.to}</span></div><div class="r-row"><span>Distance:</span><b>${ride.km.toFixed(2)} km</b></div><div class="r-row"><span>Fare:</span><b>Rs.${sub.toFixed(2)}</b></div>`; 
-        if(waitC>0) rows+=`<div class="r-row"><span>Wait(${ride.wait}m):</span><b>+Rs.${waitC.toFixed(2)}</b></div>`; 
-        if(ride.nightUsed && ride.manualFare===0) rows+=`<div class="r-row"><span>Night(${SETTINGS.nightPercent}%):</span><b>+${Math.round(ride.fare-(sub+waitC-ride.disc))}</b></div>`; 
-        if(ride.disc>0) rows+=`<div class="r-row"><span>Discount:</span><b>-Rs.${ride.disc}</b></div>`; 
-        rows+=`<div class="r-row"><span>Mode:</span><b>${ride.mode}</b></div><div class="r-row"><span>Payment:</span><b>${ride.payment.method}</b></div>`; 
-        document.getElementById('receipt-body').innerHTML=rows; 
-        document.getElementById('receipt-total').innerHTML=ride.fare.toFixed(2); 
-        document.getElementById('receipt-header').innerText=SETTINGS.receiptName; 
-        document.getElementById('receipt-words').innerHTML=numberToWords(ride.fare); 
-        let qr=document.getElementById('receipt-qr'); 
-        qr.innerHTML=""; 
-        new QRCode(qr,{ text:`${ride.id}|Rs.${ride.fare.toFixed(2)}|${ride.payment.method}`, width:85, height:85 }); 
-        document.getElementById('receiptModal').style.display="flex"; 
+    
+    function showReceipt(ride, isDuplicate) { 
+        let sub = (ride.manualFare > 0) ? ride.manualFare : (SETTINGS.base + (Math.max(0, ride.km - 1) * SETTINGS.rate)); 
+        let waitC = ride.wait * SETTINGS.waitRate; 
+        let dupHtml = isDuplicate ? '<div style="background:#e74c3c; color:white; text-align:center; padding:3px;">📋 COPY</div>' : ''; 
+        let rows = dupHtml; 
+        rows += `<div class="r-row"><span>Receipt:</span><b>${ride.id}</b></div><div class="r-row"><span>Date:</span><b>${new Date(ride.time).toLocaleString()}</b></div><div class="r-row"><span>Mobile:</span><b>${ride.mobile}</b></div>`; 
+        if(ride.mode === 'Delivery') { 
+            rows += `<div class="r-row-full"><span class="r-label">Pickup:</span><span class="r-address">${ride.pickupName || ''} ${ride.pickupPhone || ''}</span></div><div class="r-row-full"><span class="r-label">Delivery:</span><span class="r-address">${ride.deliveryName || ''} ${ride.deliveryPhone || ''}</span></div>`; 
+        } 
+        rows += `<div class="r-row-full"><span class="r-label">From:</span><span class="r-address">${ride.from}</span></div><div class="r-row-full"><span class="r-label">To:</span><span class="r-address">${ride.to}</span></div><div class="r-row"><span>Distance:</span><b>${ride.km.toFixed(2)} km</b></div><div class="r-row"><span>Fare:</span><b>Rs.${sub.toFixed(2)}</b></div>`; 
+        if(waitC > 0) rows += `<div class="r-row"><span>Wait(${ride.wait}m):</span><b>+Rs.${waitC.toFixed(2)}</b></div>`; 
+        if(ride.nightUsed && ride.manualFare === 0) rows += `<div class="r-row"><span>Night(${SETTINGS.nightPercent}%):</span><b>+${Math.round(ride.fare - (sub + waitC - ride.disc))}</b></div>`; 
+        if(ride.disc > 0) rows += `<div class="r-row"><span>Discount:</span><b>-Rs.${ride.disc}</b></div>`; 
+        rows += `<div class="r-row"><span>Mode:</span><b>${ride.mode}</b></div><div class="r-row"><span>Payment:</span><b>${ride.payment.method}</b></div>`; 
+        document.getElementById('receipt-body').innerHTML = rows; 
+        document.getElementById('receipt-total').innerHTML = ride.fare.toFixed(2); 
+        document.getElementById('receipt-header').innerText = SETTINGS.receiptName; 
+        document.getElementById('receipt-words').innerHTML = numberToWords(ride.fare); 
+        let qr = document.getElementById('receipt-qr'); 
+        qr.innerHTML = ""; 
+        new QRCode(qr, { text: `${ride.id}|Rs.${ride.fare.toFixed(2)}|${ride.payment.method}`, width: 85, height: 85 }); 
+        document.getElementById('receiptModal').style.display = "flex"; 
     }
+    
     async function shareWA() { try { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); canvas.toBlob(blob => { if(navigator.share) navigator.share({ files:[new File([blob],'receipt.png')] }); else { let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='receipt.png'; a.click(); } }); } catch(e){ downloadReceiptPDF(); } }
     async function sendEmailWithAttachment() { try { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); let {jsPDF}=window.jspdf; let pdf = new jsPDF({unit:'mm', format:'a6'}); pdf.addImage(canvas.toDataURL(),'PNG',2.5,5,100,(canvas.height*100)/canvas.width); let blob = pdf.output('blob'); if(navigator.share) navigator.share({ files:[new File([blob],'receipt.pdf')] }); else { let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='receipt.pdf'; a.click(); } } catch(e){ downloadReceiptPDF(); } }
     async function downloadReceiptPDF() { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); let {jsPDF}=window.jspdf; let pdf = new jsPDF({unit:'mm', format:'a6'}); pdf.addImage(canvas.toDataURL(),'PNG',2.5,5,100,(canvas.height*100)/canvas.width); pdf.save(`${currentRID}.pdf`); }
