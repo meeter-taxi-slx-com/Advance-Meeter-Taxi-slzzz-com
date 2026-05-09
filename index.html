@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Advance Meeter Taxi">
     <meta name="theme-color" content="#1a4a9e">
-    <title>ADVANCE MEETER TAXI 2026</title>
+    <title>ADVANCE MEETER TAXI</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -15,806 +15,107 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            font-family: 'Segoe UI', 'Poppins', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 16px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* Modern Glassmorphism Container */
-        .app-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            width: 100%;
-            max-width: 450px;
-            border-radius: 48px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            padding: 24px;
-            position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        body.ride-active .app-container {
-            border: 2px solid #2ecc71;
-            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.3), 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-
-        /* Header Section */
-        .header-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-area {
-            width: 52px;
-            height: 52px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            box-shadow: 0 10px 20px -5px rgba(102, 126, 234, 0.4);
-            color: white;
-        }
-
-        .brand-name {
-            font-size: 14px;
-            font-weight: 800;
-            text-transform: uppercase;
-            line-height: 1.3;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .settings-icon {
-            width: 44px;
-            height: 44px;
-            background: rgba(102, 126, 234, 0.1);
-            backdrop-filter: blur(5px);
-            border-radius: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid rgba(102, 126, 234, 0.2);
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', 'Poppins', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 16px; display: flex; justify-content: center; align-items: center; }
+        .app-container { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); width: 100%; max-width: 450px; border-radius: 48px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); padding: 20px; position: relative; border: 1px solid rgba(255, 255, 255, 0.2); }
+        body.ride-active .app-container { border: 2px solid #2ecc71; box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.3); }
+        .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .logo-area { width: 52px; height: 52px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 28px; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 10px 20px -5px rgba(102, 126, 234, 0.4); color: white; }
+        .brand-name { font-size: 14px; font-weight: 800; text-transform: uppercase; line-height: 1.3; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .settings-icon { width: 44px; height: 44px; background: rgba(102, 126, 234, 0.1); backdrop-filter: blur(5px); border-radius: 25px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(102, 126, 234, 0.2); }
         .settings-icon:active { transform: scale(0.95); }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .action-btn {
-            flex: 1;
-            background: rgba(102, 126, 234, 0.08);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(102, 126, 234, 0.15);
-            padding: 12px;
-            border-radius: 28px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #4a5568;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-        }
-
+        .action-buttons { display: flex; gap: 12px; margin-bottom: 20px; }
+        .action-btn { flex: 1; background: rgba(102, 126, 234, 0.08); backdrop-filter: blur(5px); border: 1px solid rgba(102, 126, 234, 0.15); padding: 12px; border-radius: 28px; font-size: 13px; font-weight: 600; color: #4a5568; cursor: pointer; text-align: center; transition: all 0.2s; }
         .action-btn:active { transform: scale(0.97); }
-
-        .night-btn {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-            color: white;
-            border: none;
-        }
-
-        .night-active {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-        }
-
-        /* Mode Selector */
-        .mode-selector {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-
-        .mode-btn {
-            flex: 1;
-            padding: 10px 8px;
-            border-radius: 28px;
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            background: white;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 11px;
-            transition: all 0.2s;
-            color: #4a5568;
-        }
-
-        .mode-btn.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border-color: transparent;
-        }
-
-        /* Input Fields */
-        input, select {
-            width: 100%;
-            padding: 14px 16px;
-            margin: 6px 0;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            border-radius: 20px;
-            background: rgba(248, 250, 252, 0.9);
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        /* Fare Card */
-        .fare-card {
-            background: linear-gradient(135deg, #ffffff, #f8faff);
-            border-radius: 32px;
-            padding: 20px;
-            margin: 16px 0;
-            border: 1px solid rgba(102, 126, 234, 0.15);
-            box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.05);
-        }
-
-        .fare-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .fare-item {
-            flex: 1;
-            text-align: center;
-        }
-
-        .fare-item small {
-            font-size: 11px;
-            color: #718096;
-            letter-spacing: 0.5px;
-        }
-
-        .fare-item .display-value {
-            font-size: 42px;
-            font-weight: 900;
-            background: linear-gradient(135deg, #2d3748, #4a5568);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1.2;
-        }
-
-        .fare-item .display-fare-value {
-            font-size: 42px;
-            font-weight: 900;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1.2;
-        }
-
-        /* Counter Animation */
-        @keyframes countSpring {
-            0% { transform: scale(1); opacity: 1; }
-            30% { transform: scale(1.25); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .count-animation {
-            animation: countSpring 0.25s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-
-        /* Manual Controls - Original Layout */
-        .manual-control {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-top: 15px;
-        }
-
-        .manual-btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            width: 52px;
-            height: 52px;
-            border-radius: 26px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.15s;
-            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
-        }
-
+        .night-btn { background: linear-gradient(135deg, #f39c12, #e67e22); color: white; border: none; }
+        .night-active { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        input, select { width: 100%; padding: 14px 16px; margin: 6px 0; border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 20px; background: rgba(248, 250, 252, 0.9); font-size: 14px; transition: all 0.2s; }
+        input:focus, select:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .mode-selector { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .mode-btn { flex: 1; padding: 10px 8px; border-radius: 28px; border: 1px solid rgba(102, 126, 234, 0.2); background: white; cursor: pointer; font-weight: 600; font-size: 11px; transition: all 0.2s; color: #4a5568; }
+        .mode-btn.active { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-color: transparent; }
+        .fare-card { background: linear-gradient(135deg, #ffffff, #f8faff); border-radius: 32px; padding: 20px; margin: 16px 0; border: 1px solid rgba(102, 126, 234, 0.15); box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.05); }
+        .fare-row { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+        .fare-item { flex: 1; text-align: center; }
+        .fare-item small { font-size: 11px; color: #718096; letter-spacing: 0.5px; }
+        .fare-item .display-value { font-size: 42px; font-weight: 900; background: linear-gradient(135deg, #2d3748, #4a5568); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2; }
+        .fare-item .display-fare-value { font-size: 42px; font-weight: 900; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2; }
+        @keyframes countSpring { 0% { transform: scale(1); } 30% { transform: scale(1.25); } 100% { transform: scale(1); } }
+        .count-animation { animation: countSpring 0.25s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+        .manual-control { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 15px; }
+        .manual-btn { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; width: 52px; height: 52px; border-radius: 26px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.15s; box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3); }
         .manual-btn:active { transform: scale(0.94); }
-
-        .manual-input {
-            width: 110px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            padding: 12px;
-            border-radius: 20px;
-            background: white;
-            border: 1px solid rgba(102, 126, 234, 0.2);
-        }
-
-        .set-distance-btn {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 12px;
-            display: inline-block;
-            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
-        }
-
-        /* Location Card */
-        .location-card {
-            background: rgba(102, 126, 234, 0.06);
-            border-radius: 24px;
-            padding: 14px;
-            margin: 12px 0;
-            border: 1px solid rgba(102, 126, 234, 0.1);
-        }
-
-        .location-title {
-            font-size: 10px;
-            font-weight: 600;
-            color: #718096;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px;
-        }
-
-        .location-address {
-            font-size: 13px;
-            font-weight: 600;
-            color: #2d3748;
-            word-break: break-word;
-        }
-
-        .refresh-location {
-            background: transparent;
-            border: 1px solid #667eea;
-            color: #667eea;
-            padding: 6px 12px;
-            border-radius: 25px;
-            font-size: 10px;
-            cursor: pointer;
-        }
-
-        /* Buttons */
-        .btn-main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            margin-top: 20px;
-        }
-
-        .btn-start {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-            border: none;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: 800;
-            color: white;
-            cursor: pointer;
-            padding: 16px;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            box-shadow: 0 8px 20px -5px rgba(46, 204, 113, 0.4);
-        }
-
-        .btn-end {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            border: none;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: 800;
-            color: white;
-            cursor: pointer;
-            padding: 16px;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            box-shadow: 0 8px 20px -5px rgba(231, 76, 60, 0.4);
-        }
-
-        .btn-active-anim {
-            animation: pulse-btn 1.5s infinite;
-        }
-
-        @keyframes pulse-btn {
-            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(46, 204, 113, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
-        }
-
-        /* Voice Button */
-        .voice-btn {
-            background: linear-gradient(135deg, #6c5ce7, #4834d4);
-            color: white;
-            border: none;
-            border-radius: 30px;
-            padding: 14px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 16px;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 8px 20px -5px rgba(108, 92, 231, 0.4);
-        }
-
-        .voice-btn.listening {
-            animation: pulse-voice 1.5s infinite;
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-        }
-
-        @keyframes pulse-voice {
-            0% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(108, 92, 231, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0); }
-        }
-
-        .voice-status {
-            font-size: 11px;
-            text-align: center;
-            margin-top: 8px;
-            padding: 6px;
-            border-radius: 20px;
-            background: rgba(102, 126, 234, 0.08);
-            color: #718096;
-        }
-
-        /* Delivery Fields */
-        .delivery-fields {
-            background: rgba(102, 126, 234, 0.05);
-            border-radius: 24px;
-            padding: 16px;
-            margin: 12px 0;
-            display: none;
-            border: 1px solid rgba(102, 126, 234, 0.1);
-        }
-
-        .delivery-fields h4 {
-            color: #667eea;
-            margin-bottom: 12px;
-            font-size: 14px;
-        }
-
-        /* Map Picker */
-        .map-picker-btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        .map-container {
-            height: 350px;
-            width: 100%;
-            border-radius: 24px;
-            margin: 12px 0;
-            background: #f0f2f5;
-        }
-
-        /* Modals - Modern Design */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            width: 90%;
-            max-width: 400px;
-            border-radius: 48px;
-            padding: 28px;
-            position: relative;
-            max-height: 85vh;
-            overflow-y: auto;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-
-        .close-circle {
-            position: absolute;
-            top: 18px;
-            right: 18px;
-            background: rgba(0, 0, 0, 0.05);
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-            transition: all 0.2s;
-        }
-
-        .close-circle:hover {
-            background: rgba(0, 0, 0, 0.1);
-        }
-
-        /* Settings Menu */
-        .settings-menu {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .settings-menu-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 16px 20px;
-            border-radius: 32px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-            box-shadow: 0 10px 20px -8px rgba(102, 126, 234, 0.4);
-        }
-
-        .settings-menu-btn:active {
-            transform: scale(0.97);
-        }
-
-        .settings-menu-btn.secondary {
-            background: linear-gradient(135deg, #2c3e50, #34495e);
-            box-shadow: 0 10px 20px -8px rgba(44, 62, 80, 0.4);
-        }
-
-        .settings-menu-btn.warning {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            box-shadow: 0 10px 20px -8px rgba(231, 76, 60, 0.4);
-        }
-
-        /* Login Modal */
-        .login-header {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        .login-header h3 {
-            font-size: 24px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .login-btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            width: 100%;
-            margin-top: 16px;
-            padding: 14px;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* Payment Methods */
-        .payment-methods {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .payment-method-btn {
-            background: rgba(102, 126, 234, 0.08);
-            border: 1px solid rgba(102, 126, 234, 0.15);
-            border-radius: 24px;
-            padding: 14px;
-            cursor: pointer;
-            text-align: left;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-
-        .payment-method-btn.selected {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border-color: transparent;
-        }
-
-        .payment-detail-fields {
-            margin-top: 15px;
-            padding: 18px;
-            background: rgba(102, 126, 234, 0.05);
-            border-radius: 24px;
-        }
-
-        .confirm-payment-btn {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-            color: white;
-            padding: 16px;
-            border: none;
-            border-radius: 32px;
-            font-size: 16px;
-            font-weight: bold;
-            width: 100%;
-            margin-top: 20px;
-            cursor: pointer;
-        }
-
-        /* History Items */
-        .history-item {
-            background: rgba(102, 126, 234, 0.05);
-            padding: 16px;
-            margin-bottom: 12px;
-            border-radius: 24px;
-            border-left: 4px solid #667eea;
-        }
-
-        .btn-reprint {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            padding: 6px 12px;
-            font-size: 11px;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-        }
-
-        /* Report Tabs */
-        .report-tabs {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-
-        .report-tab {
-            flex: 1;
-            padding: 8px;
-            border: none;
-            border-radius: 24px;
-            background: rgba(102, 126, 234, 0.1);
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-
-        .report-tab.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        /* Autocomplete */
-        .autocomplete-container {
-            position: relative;
-            width: 100%;
-        }
-
-        .autocomplete-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            border-radius: 20px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1000;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        .autocomplete-item {
-            padding: 12px;
-            cursor: pointer;
-            border-bottom: 1px solid #eee;
-            font-size: 13px;
-        }
-
-        .autocomplete-item:hover {
-            background: rgba(102, 126, 234, 0.05);
-        }
-
-        /* GPS Status */
-        .gps-status {
-            font-size: 12px;
-            text-align: center;
-            margin-top: 10px;
-            padding: 8px;
-            border-radius: 20px;
-        }
-
-        .gps-ready {
-            background: rgba(46, 204, 113, 0.15);
-            color: #27ae60;
-        }
-
-        /* System Log Entry */
-        .system-log-entry {
-            background: rgba(0, 0, 0, 0.03);
-            padding: 12px;
-            margin-bottom: 8px;
-            border-radius: 16px;
-            font-size: 11px;
-            border-left: 3px solid #e74c3c;
-        }
-
-        /* Receipt */
-        .receipt-print {
-            width: 72mm;
-            max-width: 72mm;
-            margin: 0 auto;
-            padding: 3mm;
-            font-family: 'Courier New', monospace;
-            font-size: 9pt;
-            background: white;
-            position: relative;
-        }
-
-        .r-header {
-            background: #000;
-            color: #fff;
-            padding: 5px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .r-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 3px 0;
-            border-bottom: 1px dotted #ccc;
-        }
-
-        .r-row-full {
-            display: block;
-            padding: 3px 0;
-            border-bottom: 1px dotted #ccc;
-        }
-
-        .r-label {
-            font-weight: bold;
-            display: block;
-        }
-
-        .r-address {
-            word-break: break-all;
-        }
-
-        .r-total {
-            background: #1a4a9e;
-            color: white;
-            padding: 6px;
-            text-align: center;
-            margin: 6px 0;
-        }
-
-        .receipt-seal {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            border: 2px solid #e74c3c;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.9);
-            transform: rotate(-15deg);
-        }
-
-        .receipt-seal:before {
-            content: "✓ PAID";
-            font-size: 7px;
-            font-weight: bold;
-            color: #e74c3c;
-        }
-
-        .receipt-btns {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 15px;
-        }
-
-        .btn-wa, .btn-gm, .btn-pdf, .btn-print {
-            padding: 12px;
-            border-radius: 20px;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .btn-wa { background: #25D366; color: white; }
-        .btn-gm { background: #EA4335; color: white; }
-        .btn-pdf { background: #34495e; color: white; }
-        .btn-print { background: #9b59b6; color: white; }
+        .manual-input { width: 110px; text-align: center; font-size: 20px; font-weight: bold; padding: 12px; border-radius: 20px; background: white; border: 1px solid rgba(102, 126, 234, 0.2); }
+        .set-distance-btn { background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; border: none; padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: bold; cursor: pointer; margin-top: 12px; display: inline-block; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); }
+        .location-card { background: rgba(102, 126, 234, 0.06); border-radius: 24px; padding: 14px; margin: 12px 0; border: 1px solid rgba(102, 126, 234, 0.1); }
+        .location-title { font-size: 10px; font-weight: 600; color: #718096; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .location-address { font-size: 13px; font-weight: 600; color: #2d3748; word-break: break-word; }
+        .refresh-location { background: transparent; border: 1px solid #667eea; color: #667eea; padding: 6px 12px; border-radius: 25px; font-size: 10px; cursor: pointer; }
+        .map-picker-btn { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 12px; border-radius: 20px; font-size: 12px; cursor: pointer; width: 100%; }
+        .delivery-fields { background: rgba(102, 126, 234, 0.05); border-radius: 24px; padding: 16px; margin: 12px 0; display: none; border: 1px solid rgba(102, 126, 234, 0.1); }
+        .delivery-fields h4 { color: #667eea; margin-bottom: 12px; font-size: 14px; }
+        .btn-main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
+        .btn-start { background: linear-gradient(135deg, #2ecc71, #27ae60); border: none; border-radius: 30px; font-size: 16px; font-weight: 800; color: white; cursor: pointer; padding: 16px; transition: all 0.2s; text-transform: uppercase; box-shadow: 0 8px 20px -5px rgba(46, 204, 113, 0.4); }
+        .btn-end { background: linear-gradient(135deg, #e74c3c, #c0392b); border: none; border-radius: 30px; font-size: 16px; font-weight: 800; color: white; cursor: pointer; padding: 16px; transition: all 0.2s; text-transform: uppercase; box-shadow: 0 8px 20px -5px rgba(231, 76, 60, 0.4); }
+        .btn-active-anim { animation: pulse-btn 1.5s infinite; }
+        @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(46, 204, 113, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); } }
+        .voice-container { text-align: center; margin-top: 12px; }
+        .voice-btn { background: linear-gradient(135deg, #6c5ce7, #4834d4); color: white; border: none; border-radius: 40px; padding: 8px 16px; font-size: 12px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3); }
+        .voice-btn.listening { animation: pulse-voice 1.5s infinite; background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        @keyframes pulse-voice { 0% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(108, 92, 231, 0); } 100% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0); } }
+        .voice-status { font-size: 9px; text-align: center; margin-top: 4px; padding: 4px; border-radius: 20px; background: rgba(102, 126, 234, 0.08); color: #718096; }
+        .voice-commands-guide { font-size: 9px; text-align: center; margin-top: 4px; color: #a0aec0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+        .gps-status { font-size: 12px; text-align: center; margin-top: 8px; padding: 8px; border-radius: 20px; }
+        .gps-ready { background: rgba(46, 204, 113, 0.15); color: #27ae60; }
+        .map-container { height: 350px; width: 100%; border-radius: 24px; margin: 12px 0; background: #f0f2f5; }
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); align-items: center; justify-content: center; }
+        .modal-content { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); width: 90%; max-width: 400px; border-radius: 48px; padding: 24px; position: relative; max-height: 85vh; overflow-y: auto; border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .close-circle { position: absolute; top: 18px; right: 18px; background: rgba(0, 0, 0, 0.05); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; }
+        .back-btn { position: absolute; top: 18px; left: 18px; background: rgba(0, 0, 0, 0.05); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; transition: all 0.2s; }
+        .back-btn:hover { background: rgba(0, 0, 0, 0.1); }
+        .settings-menu { display: flex; flex-direction: column; gap: 12px; }
+        .settings-menu-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 16px 20px; border-radius: 32px; font-size: 16px; font-weight: 600; cursor: pointer; text-align: center; box-shadow: 0 10px 20px -8px rgba(102, 126, 234, 0.4); }
+        .settings-menu-btn:active { transform: scale(0.97); }
+        .settings-menu-btn.secondary { background: linear-gradient(135deg, #2c3e50, #34495e); }
+        .settings-menu-btn.warning { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .payment-methods { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; }
+        .payment-method-btn { background: rgba(102, 126, 234, 0.08); border: 1px solid rgba(102, 126, 234, 0.15); border-radius: 24px; padding: 14px; cursor: pointer; text-align: left; font-weight: 600; transition: all 0.2s; }
+        .payment-method-btn.selected { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-color: transparent; }
+        .payment-detail-fields { margin-top: 15px; padding: 18px; background: rgba(102, 126, 234, 0.05); border-radius: 24px; }
+        .confirm-payment-btn { background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; padding: 16px; border: none; border-radius: 32px; font-size: 16px; font-weight: bold; width: 100%; margin-top: 20px; cursor: pointer; }
+        .history-item { background: rgba(102, 126, 234, 0.05); padding: 16px; margin-bottom: 12px; border-radius: 24px; border-left: 4px solid #667eea; }
+        .btn-reprint { background: linear-gradient(135deg, #667eea, #764ba2); padding: 6px 12px; font-size: 11px; color: white; border: none; border-radius: 20px; cursor: pointer; }
+        .receipt-print { width: 72mm; max-width: 72mm; margin: 0 auto; padding: 3mm; font-family: 'Courier New', monospace; font-size: 9pt; background: white; position: relative; }
+        .r-header { background: #000; color: #fff; padding: 5px; text-align: center; font-weight: bold; }
+        .r-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px dotted #ccc; }
+        .r-row-full { display: block; padding: 3px 0; border-bottom: 1px dotted #ccc; }
+        .r-label { font-weight: bold; display: block; }
+        .r-address { word-break: break-all; }
+        .r-total { background: #1a4a9e; color: white; padding: 6px; text-align: center; margin: 6px 0; }
+        .receipt-seal { position: absolute; bottom: 5px; right: 5px; width: 35px; height: 35px; border-radius: 50%; border: 2px solid #e74c3c; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.9); transform: rotate(-15deg); }
+        .receipt-seal:before { content: "✓ PAID"; font-size: 7px; font-weight: bold; color: #e74c3c; }
+        .receipt-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+        .btn-wa { background: #25D366; color: white; padding: 12px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-gm { background: #EA4335; color: white; padding: 12px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-pdf { background: #34495e; color: white; padding: 12px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-print { background: #9b59b6; color: white; padding: 12px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; }
+        .report-tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+        .report-tab { flex: 1; padding: 8px; border: none; border-radius: 24px; background: rgba(102, 126, 234, 0.1); cursor: pointer; font-weight: 600; }
+        .report-tab.active { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
+        .system-log-entry { background: rgba(0, 0, 0, 0.03); padding: 12px; margin-bottom: 8px; border-radius: 16px; font-size: 11px; border-left: 3px solid #e74c3c; }
+        .autocomplete-container { position: relative; width: 100%; }
+        .autocomplete-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 20px; max-height: 200px; overflow-y: auto; z-index: 1000; }
+        .autocomplete-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 13px; }
+        .restore-banner { background: #ffc107; color: #856404; padding: 12px; border-radius: 24px; margin-bottom: 12px; text-align: center; font-size: 12px; display: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div id="restore-banner" class="restore-banner" style="background:#ffc107; color:#856404; padding:12px; border-radius:24px; margin-bottom:12px; text-align:center; font-size:12px; display:none; cursor:pointer;" onclick="restorePreviousRide()">🔄 Previous ride found! Click to restore</div>
+    <div id="restore-banner" class="restore-banner" onclick="restorePreviousRide()">🔄 Previous ride found! Click to restore</div>
     
     <div class="header-section">
         <div class="header-left">
@@ -838,10 +139,7 @@
 
     <div id="auto-location-card" class="location-card">
         <div style="display: flex; justify-content: space-between;">
-            <div style="flex:1;">
-                <div class="location-title">📍 CURRENT LOCATION</div>
-                <div id="current-location-address" class="location-address">Waiting for GPS...</div>
-            </div>
+            <div style="flex:1;"><div class="location-title">📍 CURRENT LOCATION</div><div id="current-location-address" class="location-address">Waiting for GPS...</div></div>
             <button class="refresh-location" onclick="refreshCurrentLocation()">⟳</button>
         </div>
     </div>
@@ -854,36 +152,19 @@
         <div class="grid-2"><button class="map-picker-btn" onclick="openMapPicker('start')">🗺️ Pickup Map</button><button class="map-picker-btn" onclick="openMapPicker('end')">🗺️ Drop Map</button></div>
     </div>
 
-    <!-- Delivery Fields -->
     <div id="delivery-fields" class="delivery-fields">
         <h4>📦 Pickup Person Details</h4>
-        <div class="grid-2">
-            <input type="text" id="pickup-name" placeholder="Pickup person name">
-            <input type="tel" id="pickup-phone" placeholder="Pickup phone number">
-        </div>
+        <div class="grid-2"><input type="text" id="pickup-name" placeholder="Pickup person name"><input type="tel" id="pickup-phone" placeholder="Pickup phone number"></div>
         <h4>📍 Delivery Person Details</h4>
-        <div class="grid-2">
-            <input type="text" id="delivery-name" placeholder="Delivery person name">
-            <input type="tel" id="delivery-phone" placeholder="Delivery phone number">
-        </div>
+        <div class="grid-2"><input type="text" id="delivery-name" placeholder="Delivery person name"><input type="tel" id="delivery-phone" placeholder="Delivery phone number"></div>
     </div>
 
     <div class="fare-card">
         <div class="fare-row">
-            <div class="fare-item">
-                <small>DISTANCE</small>
-                <div class="display-value" id="disp-km">0.00</div>
-                <small style="font-size:9px;">km</small>
-            </div>
-            <div class="fare-item">
-                <small>TOTAL FARE</small>
-                <div class="display-fare-value" id="disp-fare">Rs.0</div>
-                <small id="night-indicator" style="display:none; font-size:9px;">🌙 Night</small>
-            </div>
+            <div class="fare-item"><small>DISTANCE</small><div class="display-value" id="disp-km">0.00</div><small>km</small></div>
+            <div class="fare-item"><small>TOTAL FARE</small><div class="display-fare-value" id="disp-fare">Rs.0.00</div><small id="night-indicator" style="display:none;">🌙 Night</small></div>
         </div>
         <div id="gps-status" class="gps-status">📍 Checking GPS...</div>
-        
-        <!-- Manual Controls - Original Layout -->
         <div id="manual-controls" style="display:none;">
             <div class="manual-control">
                 <button class="manual-btn" onclick="manualAddDistance(-1)">-1</button>
@@ -892,36 +173,26 @@
                 <button class="manual-btn" onclick="manualAddDistance(0.5)">+0.5</button>
                 <button class="manual-btn" onclick="manualAddDistance(1)">+1</button>
             </div>
-            <div style="text-align:center;">
-                <button class="set-distance-btn" onclick="setManualDistance()">✓ SET</button>
-            </div>
+            <div style="text-align:center;"><button class="set-distance-btn" onclick="setManualDistance()">✓ SET</button></div>
         </div>
     </div>
 
     <div id="nav-container" style="display:none;"><button class="map-picker-btn" style="background:linear-gradient(135deg,#3498db,#2980b9); margin-top:8px;" onclick="openPhoneNavigation()">🧭 OPEN MAPS NAVIGATION</button></div>
 
-    <div>
-        <input type="tel" id="mobile" placeholder="Customer Mobile">
-        <div class="grid-2">
-            <input type="number" id="manual-fare" placeholder="Manual Fare (Rs)" oninput="updateDisplay()">
-            <div style="display:flex; background:rgba(102,126,234,0.05); border-radius:20px; padding:0 15px; align-items:center;">
-                <span style="font-size:12px;">⏱️ Wait:</span>
-                <select id="wait-select" onchange="updateDisplay()" style="background:transparent; border:none; width:70px;">
-                    <option value="0">0 min</option>
-                    <script>for(let i=1;i<=120;i++) document.write(`<option value="${i}">${i} min</option>`);</script>
-                </select>
-            </div>
+    <div><input type="tel" id="mobile" placeholder="Customer Mobile">
+        <div class="grid-2"><input type="number" id="manual-fare" placeholder="Manual Fare (Rs)" oninput="updateDisplay()">
+            <div style="display:flex; background:rgba(102,126,234,0.05); border-radius:20px; padding:0 15px; align-items:center;"><span style="font-size:12px;">⏱️ Wait:</span><select id="wait-select" onchange="updateDisplay()" style="background:transparent; border:none; width:70px;"><option value="0">0 min</option><script>for(let i=1;i<=120;i++) document.write(`<option value="${i}">${i} min</option>`);</script></select></div>
         </div>
         <input type="number" id="discount-input" placeholder="Discount (Rs)" oninput="updateDisplay()">
     </div>
 
-    <div class="btn-main-grid">
-        <button class="btn-start" id="startBtn" onclick="startRide()">START RIDE</button>
-        <button class="btn-end" onclick="endRide()">END RIDE</button>
-    </div>
+    <div class="btn-main-grid"><button class="btn-start" id="startBtn" onclick="startRide()">START RIDE</button><button class="btn-end" onclick="endRide()">END RIDE</button></div>
 
-    <button id="voiceBtn" class="voice-btn" onclick="toggleVoiceCommand()">🎤 VOICE COMMANDS (OFF)</button>
-    <div id="voiceStatus" class="voice-status">⚪ Tap to enable voice commands</div>
+    <div class="voice-container">
+        <button id="voiceBtn" class="voice-btn" onclick="toggleVoiceCommand()">🎤 VOICE (OFF)</button>
+        <div id="voiceStatus" class="voice-status">⚪ Tap to enable</div>
+        <div class="voice-commands-guide">Commands: SR | ER | NAV | RP | FL | RPL | TR | NIGHT ON/OFF</div>
+    </div>
 </div>
 
 <!-- Payment Popup -->
@@ -930,47 +201,34 @@
         <div class="close-circle" onclick="closePaymentPopup()">✕</div>
         <h3 style="text-align:center; margin-bottom:20px;">💳 SELECT PAYMENT METHOD</h3>
         <div class="payment-methods">
-            <div class="payment-method-btn" data-method="cash" onclick="selectPaymentMethod('cash')">💰 Cash</div>
-            <div class="payment-method-btn" data-method="card" onclick="selectPaymentMethod('card')">💳 Card</div>
-            <div class="payment-method-btn" data-method="mobile" onclick="selectPaymentMethod('mobile')">📱 Mobile</div>
-            <div class="payment-method-btn" data-method="bank" onclick="selectPaymentMethod('bank')">🏦 Bank</div>
-            <div class="payment-method-btn" data-method="other" onclick="selectPaymentMethod('other')">📝 Other</div>
+            <div class="payment-method-btn" onclick="selectPaymentMethod('cash')">💰 Cash</div>
+            <div class="payment-method-btn" onclick="selectPaymentMethod('card')">💳 Card</div>
+            <div class="payment-method-btn" onclick="selectPaymentMethod('mobile')">📱 Mobile</div>
+            <div class="payment-method-btn" onclick="selectPaymentMethod('bank')">🏦 Bank</div>
+            <div class="payment-method-btn" onclick="selectPaymentMethod('other')">📝 Other</div>
         </div>
         <div id="payment-detail-fields" class="payment-detail-fields" style="display: none;">
-            <div id="cash-fields" style="display: none;"><p>💰 Cash payment selected. Collect cash from customer.</p></div>
-            <div id="card-fields" style="display: none;">
-                <input type="text" id="card-number" placeholder="Card last 4 digits" maxlength="4">
-                <div class="grid-2"><input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5"><input type="text" id="card-cvv" placeholder="CVV" maxlength="4"></div>
-                <input type="text" id="card-name" placeholder="Cardholder Name">
-            </div>
-            <div id="mobile-fields" style="display: none;">
-                <select id="mobile-provider"><option>Select Provider</option><option>Frimi</option><option>mCash</option><option>Genie</option><option>Vishwa</option><option>eZ Cash</option><option>Dialog</option><option>Mobitel</option></select>
-                <input type="text" id="mobile-number" placeholder="Mobile Number">
-            </div>
-            <div id="bank-fields" style="display: none;">
-                <select id="bank-name"><option>Select Bank</option><option>Commercial Bank</option><option>HNB</option><option>Sampath Bank</option><option>NDB</option><option>Peoples Bank</option><option>BOC</option><option>DFCC</option><option>Nations Trust</option><option>Union Bank</option><option>Cargills Bank</option></select>
-                <input type="text" id="bank-ref" placeholder="Reference Number">
-            </div>
-            <div id="other-fields" style="display: none;">
-                <input type="text" id="other-method" placeholder="Payment method name">
-                <input type="text" id="other-ref" placeholder="Reference">
-            </div>
+            <div id="cash-fields" style="display: none;"><p>💰 Cash payment selected.</p></div>
+            <div id="card-fields" style="display: none;"><input type="text" id="card-number" placeholder="Last 4 digits" maxlength="4"><div class="grid-2"><input type="text" id="card-expiry" placeholder="MM/YY"><input type="text" id="card-cvv" placeholder="CVV"></div><input type="text" id="card-name" placeholder="Cardholder Name"></div>
+            <div id="mobile-fields" style="display: none;"><select id="mobile-provider"><option>Frimi</option><option>mCash</option><option>Genie</option><option>eZ Cash</option></select><input type="text" id="mobile-number" placeholder="Mobile Number"></div>
+            <div id="bank-fields" style="display: none;"><select id="bank-name"><option>Commercial</option><option>HNB</option><option>Sampath</option></select><input type="text" id="bank-ref" placeholder="Reference No"></div>
+            <div id="other-fields" style="display: none;"><input type="text" id="other-method" placeholder="Method"><input type="text" id="other-ref" placeholder="Reference"></div>
         </div>
-        <button class="confirm-payment-btn" onclick="confirmPaymentAndShowReceipt()">✅ CONFIRM & SHOW RECEIPT</button>
+        <button class="confirm-payment-btn" id="confirmPaymentBtn" onclick="confirmPaymentAndShowReceipt()">✅ CONFIRM & SHOW RECEIPT</button>
     </div>
 </div>
 
-<!-- Settings Modal - Main Menu Style -->
+<!-- Settings Modal - Main Menu -->
 <div id="settings-modal" class="modal">
     <div class="modal-content">
-        <div class="close-circle" onclick="closeM('settings-modal')">✕</div>
+        <div class="close-circle" onclick="closeSettingsAndLogout()">✕</div>
         <h3 style="text-align:center; margin-bottom:24px;">⚙️ SETTINGS MENU</h3>
         <div class="settings-menu">
             <button class="settings-menu-btn" onclick="openAppSettings()">📱 APPLICATION SETTINGS</button>
             <button class="settings-menu-btn secondary" onclick="openFuelLogModal()">⛽ FUEL LOG</button>
             <button class="settings-menu-btn secondary" onclick="openRepairLogModal()">🔧 REPAIR LOG</button>
             <button class="settings-menu-btn secondary" onclick="openReportsMenu()">📊 REPORTS</button>
-            <button class="settings-menu-btn warning" onclick="openSystemLogModal()">📋 SYSTEM LOG (errors)</button>
+            <button class="settings-menu-btn warning" onclick="openSystemLogModal()">📋 SYSTEM LOG</button>
         </div>
     </div>
 </div>
@@ -978,120 +236,100 @@
 <!-- Application Settings Modal -->
 <div id="app-settings-modal" class="modal">
     <div class="modal-content">
+        <div class="back-btn" onclick="goBackToSettingsMenu()">←</div>
         <div class="close-circle" onclick="closeM('app-settings-modal')">✕</div>
-        <h3 style="text-align:center; margin-bottom:20px;">📱 APPLICATION SETTINGS</h3>
+        <h3 style="text-align:center; margin-bottom:20px;">📱 APP SETTINGS</h3>
         <label>App Name:</label><input id="set-app-name">
         <label>Receipt Header:</label><input id="set-receipt-header">
-        <label>Logo Upload:</label><input type="file" id="logo-upload" accept="image/*">
+        <label>Logo:</label><input type="file" id="logo-upload" accept="image/*">
         <div class="grid-2"><div><label>Base Fare:</label><input id="set-base" type="number"></div><div><label>Rate/KM:</label><input id="set-rate" type="number"></div></div>
         <div class="grid-2"><div><label>Wait/min:</label><input id="set-wait" type="number"></div><div><label>Night %:</label><input id="set-night" type="number"></div></div>
         <label>New Password:</label><input id="set-pwd" type="password">
-        <button class="confirm-payment-btn" style="margin-top:20px;" onclick="saveSettings()">💾 SAVE SETTINGS</button>
+        <button class="confirm-payment-btn" onclick="saveSettings()">💾 SAVE</button>
     </div>
 </div>
 
 <!-- Fuel Log Modal -->
 <div id="fuel-modal" class="modal">
     <div class="modal-content">
+        <div class="back-btn" onclick="goBackToSettingsMenu()">←</div>
         <div class="close-circle" onclick="closeM('fuel-modal')">✕</div>
         <h3 style="text-align:center;">⛽ FUEL LOG</h3>
-        <div class="grid-2"><input type="date" id="fuel-date"><input type="number" id="fuel-liters" placeholder="Liters" step="0.1"></div>
-        <div class="grid-2"><input type="number" id="fuel-price" placeholder="Price/liter" step="0.01"><input type="number" id="fuel-total" placeholder="Total cost" readonly style="background:#e0e6ed;"></div>
+        <div class="grid-2"><input type="date" id="fuel-date"><input type="number" id="fuel-liters" placeholder="Liters"></div>
+        <div class="grid-2"><input type="number" id="fuel-price" placeholder="Price/liter"><input type="number" id="fuel-total" placeholder="Total" readonly></div>
         <input type="text" id="fuel-notes" placeholder="Notes">
-        <button class="confirm-payment-btn" style="margin-top:15px; background:linear-gradient(135deg,#2ecc71,#27ae60);" onclick="addFuelLog()">➕ ADD FUEL</button>
-        <button class="settings-menu-btn secondary" style="margin-top:10px;" onclick="openFuelReport()">📊 VIEW FUEL REPORT</button>
-        <div id="fuel-list" style="margin-top:15px; max-height:200px; overflow-y:auto;"></div>
+        <button class="confirm-payment-btn" onclick="addFuelLog()">➕ ADD</button>
+        <button class="settings-menu-btn secondary" style="margin-top:10px;" onclick="openFuelReport()">📊 REPORT</button>
+        <div id="fuel-list" style="margin-top:15px; max-height:150px; overflow-y:auto;"></div>
     </div>
 </div>
 
 <!-- Repair Log Modal -->
 <div id="repair-modal" class="modal">
     <div class="modal-content">
+        <div class="back-btn" onclick="goBackToSettingsMenu()">←</div>
         <div class="close-circle" onclick="closeM('repair-modal')">✕</div>
         <h3 style="text-align:center;">🔧 REPAIR LOG</h3>
         <div class="grid-2"><input type="date" id="repair-date"><input type="text" id="repair-desc" placeholder="Description"></div>
-        <div class="grid-2"><input type="number" id="repair-cost" placeholder="Cost (Rs)"><input type="text" id="repair-garage" placeholder="Garage name"></div>
+        <div class="grid-2"><input type="number" id="repair-cost" placeholder="Cost"><input type="text" id="repair-garage" placeholder="Garage"></div>
         <input type="text" id="repair-notes" placeholder="Notes">
-        <button class="confirm-payment-btn" style="margin-top:15px; background:linear-gradient(135deg,#2ecc71,#27ae60);" onclick="addRepairLog()">➕ ADD REPAIR</button>
-        <button class="settings-menu-btn secondary" style="margin-top:10px;" onclick="openRepairReport()">📊 VIEW REPAIR REPORT</button>
-        <div id="repair-list" style="margin-top:15px; max-height:200px; overflow-y:auto;"></div>
+        <button class="confirm-payment-btn" onclick="addRepairLog()">➕ ADD</button>
+        <button class="settings-menu-btn secondary" style="margin-top:10px;" onclick="openRepairReport()">📊 REPORT</button>
+        <div id="repair-list" style="margin-top:15px; max-height:150px; overflow-y:auto;"></div>
     </div>
 </div>
 
 <!-- Reports Menu Modal -->
 <div id="reports-menu-modal" class="modal">
     <div class="modal-content">
+        <div class="back-btn" onclick="goBackToSettingsMenu()">←</div>
         <div class="close-circle" onclick="closeM('reports-menu-modal')">✕</div>
-        <h3 style="text-align:center; margin-bottom:24px;">📊 REPORTS</h3>
+        <h3 style="text-align:center;">📊 REPORTS</h3>
         <div class="settings-menu">
-            <button class="settings-menu-btn" onclick="openPanel('report-modal')">📊 PAYMENTS REPORT</button>
+            <button class="settings-menu-btn" onclick="openPanel('report-modal')">📊 PAYMENTS</button>
             <button class="settings-menu-btn secondary" onclick="openPanel('income-modal')">📈 EARNINGS</button>
             <button class="settings-menu-btn secondary" onclick="openPanel('history-modal')">📜 HISTORY</button>
-            <button class="settings-menu-btn secondary" onclick="openTravelReport()">📍 TRAVEL REPORT</button>
+            <button class="settings-menu-btn secondary" onclick="openTravelReport()">📍 TRAVEL</button>
         </div>
     </div>
 </div>
 
 <!-- Fuel Report Modal -->
-<div id="fuel-report-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeM('fuel-report-modal')">✕</div><h3>⛽ FUEL REPORT</h3><div class="report-tabs"><button class="report-tab active" onclick="showFuelReportTab('daily')">Daily</button><button class="report-tab" onclick="showFuelReportTab('monthly')">Monthly</button><button class="report-tab" onclick="showFuelReportTab('yearly')">Yearly</button><button class="report-tab" onclick="showFuelReportTab('range')">Date Range</button></div><div id="fuel-date-range-panel" style="display:none;"><div class="grid-2"><input type="date" id="fuel-start-date"><input type="date" id="fuel-end-date"></div><button class="map-picker-btn" style="margin-top:10px;" onclick="updateFuelReport()">Apply</button></div><div id="fuel-report-container"></div><button class="btn-reprint" style="margin-top:15px; width:100%;" onclick="exportFuelCSV()">📥 CSV Export</button></div></div>
+<div id="fuel-report-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToFuelLog()">←</div><div class="close-circle" onclick="closeM('fuel-report-modal')">✕</div><h3>⛽ FUEL REPORT</h3><div class="report-tabs"><button class="report-tab active" onclick="showFuelReportTab('daily')">Daily</button><button class="report-tab" onclick="showFuelReportTab('monthly')">Monthly</button><button class="report-tab" onclick="showFuelReportTab('yearly')">Yearly</button><button class="report-tab" onclick="showFuelReportTab('range')">Range</button></div><div id="fuel-date-range-panel" style="display:none;"><div class="grid-2"><input type="date" id="fuel-start-date"><input type="date" id="fuel-end-date"></div><button class="map-picker-btn" onclick="updateFuelReport()">Apply</button></div><div id="fuel-report-container"></div><button class="btn-reprint" onclick="exportFuelCSV()">📥 CSV</button></div></div>
 
 <!-- Repair Report Modal -->
-<div id="repair-report-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeM('repair-report-modal')">✕</div><h3>🔧 REPAIR REPORT</h3><div class="report-tabs"><button class="report-tab active" onclick="showRepairReportTab('daily')">Daily</button><button class="report-tab" onclick="showRepairReportTab('monthly')">Monthly</button><button class="report-tab" onclick="showRepairReportTab('yearly')">Yearly</button><button class="report-tab" onclick="showRepairReportTab('range')">Date Range</button></div><div id="repair-date-range-panel" style="display:none;"><div class="grid-2"><input type="date" id="repair-start-date"><input type="date" id="repair-end-date"></div><button class="map-picker-btn" style="margin-top:10px;" onclick="updateRepairReport()">Apply</button></div><div id="repair-report-container"></div><button class="btn-reprint" style="margin-top:15px; width:100%;" onclick="exportRepairCSV()">📥 CSV Export</button></div></div>
+<div id="repair-report-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToRepairLog()">←</div><div class="close-circle" onclick="closeM('repair-report-modal')">✕</div><h3>🔧 REPAIR REPORT</h3><div class="report-tabs"><button class="report-tab active" onclick="showRepairReportTab('daily')">Daily</button><button class="report-tab" onclick="showRepairReportTab('monthly')">Monthly</button><button class="report-tab" onclick="showRepairReportTab('yearly')">Yearly</button><button class="report-tab" onclick="showRepairReportTab('range')">Range</button></div><div id="repair-date-range-panel" style="display:none;"><div class="grid-2"><input type="date" id="repair-start-date"><input type="date" id="repair-end-date"></div><button class="map-picker-btn" onclick="updateRepairReport()">Apply</button></div><div id="repair-report-container"></div><button class="btn-reprint" onclick="exportRepairCSV()">📥 CSV</button></div></div>
 
 <!-- Travel Report Modal -->
-<div id="travel-report-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeM('travel-report-modal')">✕</div><h3>📍 TRAVEL REPORT</h3><div class="report-tabs"><button class="report-tab active" onclick="showTravelReportTab('daily')">Daily</button><button class="report-tab" onclick="showTravelReportTab('monthly')">Monthly</button><button class="report-tab" onclick="showTravelReportTab('yearly')">Yearly</button><button class="report-tab" onclick="showTravelReportTab('range')">Date Range</button></div><div id="travel-date-range-panel" style="display:none;"><div class="grid-2"><input type="date" id="travel-start-date"><input type="date" id="travel-end-date"></div><button class="map-picker-btn" style="margin-top:10px;" onclick="updateTravelReport()">Apply</button></div><div id="travel-report-container"></div><button class="btn-reprint" style="margin-top:15px; width:100%;" onclick="exportTravelCSV()">📥 CSV Export</button><button class="btn-pdf" style="margin-top:10px; width:100%;" onclick="printTravelReceipt()">🖨️ PRINT RECEIPT</button></div></div>
+<div id="travel-report-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToReportsMenu()">←</div><div class="close-circle" onclick="closeM('travel-report-modal')">✕</div><h3>📍 TRAVEL REPORT</h3><div class="report-tabs"><button class="report-tab active" onclick="showTravelReportTab('daily')">Daily</button><button class="report-tab" onclick="showTravelReportTab('monthly')">Monthly</button><button class="report-tab" onclick="showTravelReportTab('yearly')">Yearly</button><button class="report-tab" onclick="showTravelReportTab('range')">Range</button></div><div id="travel-date-range-panel" style="display:none;"><div class="grid-2"><input type="date" id="travel-start-date"><input type="date" id="travel-end-date"></div><button class="map-picker-btn" onclick="updateTravelReport()">Apply</button></div><div id="travel-report-container"></div><button class="btn-reprint" onclick="exportTravelCSV()">📥 CSV</button><button class="btn-pdf" onclick="printTravelReceipt()">🖨️ PRINT</button></div></div>
 
 <!-- Payment Report Modal -->
-<div id="report-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="backToS('report-modal')">✕</div><h3>📊 Payment Reports</h3><div class="report-tabs"><button class="report-tab active" onclick="showReportTab('daily')">Daily</button><button class="report-tab" onclick="showReportTab('monthly')">Monthly</button><button class="report-tab" onclick="showReportTab('yearly')">Yearly</button></div><div id="report-container"></div><button class="btn-reprint" style="margin-top:15px; width:100%;" onclick="exportReportCSV()">📥 CSV</button></div></div>
+<div id="report-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToReportsMenu()">←</div><div class="close-circle" onclick="closeM('report-modal')">✕</div><h3>📊 Payment Reports</h3><div class="report-tabs"><button class="report-tab active" onclick="showReportTab('daily')">Daily</button><button class="report-tab" onclick="showReportTab('monthly')">Monthly</button><button class="report-tab" onclick="showReportTab('yearly')">Yearly</button></div><div id="report-container"></div><button class="btn-reprint" onclick="exportReportCSV()">📥 CSV</button></div></div>
 
 <!-- Earnings Modal -->
-<div id="income-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="backToS('income-modal')">✕</div><h3>📈 Earnings</h3><canvas id="earningsChart"></canvas><div class="grid-2" style="margin:15px 0;"><div>Today:<br><b id="stat-today">Rs.0</b></div><div>Total:<br><b id="stat-total">Rs.0</b></div></div><button class="btn-reprint" style="width:100%;" onclick="downloadCSV()">📥 CSV</button></div></div>
+<div id="income-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToReportsMenu()">←</div><div class="close-circle" onclick="closeM('income-modal')">✕</div><h3>📈 Earnings</h3><canvas id="earningsChart"></canvas><div class="grid-2"><div>Today:<br><b id="stat-today">Rs.0.00</b></div><div>Total:<br><b id="stat-total">Rs.0.00</b></div></div><button class="btn-reprint" onclick="downloadCSV()">📥 CSV</button></div></div>
 
 <!-- History Modal -->
-<div id="history-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="backToS('history-modal')">✕</div><h3>📜 Ride History</h3><div id="history-list"></div></div></div>
+<div id="history-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToReportsMenu()">←</div><div class="close-circle" onclick="closeM('history-modal')">✕</div><h3>📜 Ride History</h3><div id="history-list"></div></div></div>
 
 <!-- System Log Modal -->
-<div id="system-log-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeM('system-log-modal')">✕</div><h3>📋 SYSTEM ERROR LOGS</h3><div id="system-log-list" style="max-height:400px; overflow-y:auto;"></div><button class="btn-reprint" style="margin-top:15px; width:100%;" onclick="exportSystemLogCSV()">📥 Export CSV</button><button class="settings-menu-btn warning" style="margin-top:10px;" onclick="clearSystemLog()">🗑️ CLEAR LOGS</button></div></div>
+<div id="system-log-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToSettingsMenu()">←</div><div class="close-circle" onclick="closeM('system-log-modal')">✕</div><h3>📋 SYSTEM LOGS</h3><div id="system-log-list" style="max-height:350px; overflow-y:auto;"></div><button class="btn-reprint" onclick="exportSystemLogCSV()">📥 CSV</button><button class="settings-menu-btn warning" style="margin-top:10px;" onclick="clearSystemLog()">🗑️ CLEAR</button></div></div>
 
 <!-- Receipt Modal -->
 <div id="receiptModal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeM('receiptModal')">✕</div><div id="receipt-view" class="receipt-print"><div class="r-header" id="receipt-header">TAXI RECEIPT</div><div id="receipt-body"></div><div class="r-total">TOTAL: Rs.<span id="receipt-total"></span></div><div id="receipt-qr"></div><div class="receipt-seal"></div></div><div class="receipt-btns"><button class="btn-wa" onclick="shareWA()">WhatsApp</button><button class="btn-gm" onclick="sendEmailWithAttachment()">Gmail</button></div><button class="btn-pdf" onclick="downloadReceiptPDF()">PDF</button><button class="btn-print" onclick="printViaBluetooth()">Print</button></div></div>
 
 <!-- Map Modal -->
-<div id="map-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeMapModal()">✕</div><h4 id="map-title">Select Location</h4><input type="text" id="map-search" placeholder="Search in Sri Lanka..."><div id="search-results" class="search-results" style="display:none;"></div><div id="map" class="map-container"></div><input id="selected-address" readonly><div class="grid-2"><button class="map-picker-btn" style="background:#2ecc71;" onclick="useMapLocation()">✓ Use</button><button class="map-picker-btn" style="background:#e74c3c;" onclick="getCurrentMapLocation()">📍 My Location</button></div></div></div>
+<div id="map-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeMapModal()">✕</div><h4 id="map-title">Select Location</h4><input type="text" id="map-search" placeholder="Search in Sri Lanka..."><div id="search-results" style="display:none;"></div><div id="map" class="map-container"></div><input id="selected-address" readonly><div class="grid-2"><button class="map-picker-btn" style="background:#2ecc71;" onclick="useMapLocation()">✓ Use</button><button class="map-picker-btn" style="background:#e74c3c;" onclick="getCurrentMapLocation()">📍 My Location</button></div></div></div>
 
 <!-- Login Modal -->
-<div id="login-modal" class="modal">
-    <div class="modal-content">
-        <div class="close-circle" onclick="closeM('login-modal')">✕</div>
-        <div class="login-header">
-            <div class="logo-area" style="margin:0 auto 15px; width:60px; height:60px; font-size:32px;">🚕</div>
-            <h3>ADVANCE MEETER TAXI</h3>
-            <p style="color:#718096; font-size:13px;">Enter admin password</p>
-        </div>
-        <input type="password" id="admin-pass" placeholder="Password" style="text-align:center;">
-        <button class="login-btn" onclick="checkLogin()">LOGIN</button>
-        <button class="settings-menu-btn secondary" style="margin-top:10px;" onclick="closeM('login-modal')">CANCEL</button>
-    </div>
-</div>
+<div id="login-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeM('login-modal')">✕</div><div style="text-align:center;"><div class="logo-area" style="margin:0 auto 15px; width:60px; height:60px; font-size:32px;">🚕</div><h3>ADVANCE MEETER TAXI</h3><p style="color:#718096;">Enter admin password</p></div><input type="password" id="admin-pass" placeholder="Password" style="text-align:center;"><button class="login-btn" style="background:linear-gradient(135deg,#667eea,#764ba2); color:white; width:100%; margin-top:15px; padding:14px; border:none; border-radius:30px;" onclick="checkLogin()">LOGIN</button><button class="settings-menu-btn secondary" style="margin-top:10px;" onclick="closeM('login-modal')">CANCEL</button></div></div>
 
 <script>
     // ========== SYSTEM LOG ==========
     let systemLogs = JSON.parse(localStorage.getItem('system_logs') || '[]');
-    function addSystemLog(type, message, details) {
-        let log = { id: Date.now(), date: new Date().toISOString(), type, message, details: details || '' };
-        systemLogs.unshift(log);
-        if (systemLogs.length > 200) systemLogs = systemLogs.slice(0, 200);
-        localStorage.setItem('system_logs', JSON.stringify(systemLogs));
-    }
-    function openSystemLogModal() {
-        let container = document.getElementById('system-log-list');
-        if (!container) return;
-        container.innerHTML = systemLogs.map(log => `<div class="system-log-entry"><small>${new Date(log.date).toLocaleString()}</small><br><strong>${log.type}</strong>: ${log.message}<br><small>${log.details}</small></div>`).join('');
-        if (systemLogs.length === 0) container.innerHTML = '<div style="text-align:center;padding:20px;">No errors logged</div>';
-        closeM('settings-modal');
-        document.getElementById('system-log-modal').style.display = 'flex';
-    }
-    function clearSystemLog() { if (confirm('Clear all error logs?')) { systemLogs = []; localStorage.setItem('system_logs', JSON.stringify(systemLogs)); alert('Logs cleared'); openSystemLogModal(); } }
+    function addSystemLog(type, message, details) { let log = { id: Date.now(), date: new Date().toISOString(), type, message, details: details || '' }; systemLogs.unshift(log); if (systemLogs.length > 200) systemLogs = systemLogs.slice(0, 200); localStorage.setItem('system_logs', JSON.stringify(systemLogs)); }
+    function openSystemLogModal() { let container = document.getElementById('system-log-list'); if(container) { container.innerHTML = systemLogs.map(log => `<div class="system-log-entry"><small>${new Date(log.date).toLocaleString()}</small><br><strong>${log.type}</strong>: ${log.message}<br><small>${log.details}</small></div>`).join('') || '<div style="text-align:center;padding:20px;">No logs</div>'; closeM('settings-modal'); document.getElementById('system-log-modal').style.display = 'flex'; } }
+    function clearSystemLog() { if(confirm('Clear all logs?')) { systemLogs = []; localStorage.setItem('system_logs', JSON.stringify(systemLogs)); alert('Cleared'); openSystemLogModal(); } }
     function exportSystemLogCSV() { let csv = "Date,Type,Message,Details\n" + systemLogs.map(l => `${l.date},${l.type},${l.message},${l.details}`).join("\n"); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'system_logs.csv'; a.click(); }
     
     // ========== WAKE LOCK ==========
@@ -1102,212 +340,178 @@
     // ========== VOICE COMMANDS ==========
     let voiceActive = false, recognition = null;
     function initVoiceRecognition() {
-        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { document.getElementById('voiceStatus').innerHTML = '❌ Voice not supported'; return false; }
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { document.getElementById('voiceStatus').innerHTML = '❌ Not supported'; return false; }
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognition = new SpeechRecognition(); recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
         recognition.onresult = function(event) { let transcript = ''; for (let i = event.resultIndex; i < event.results.length; i++) { transcript += event.results[i][0].transcript; } transcript = transcript.toLowerCase().trim(); document.getElementById('voiceStatus').innerHTML = `🗣️ "${transcript}"`; processVoiceCommand(transcript); };
-        recognition.onerror = function(event) { addSystemLog('WARNING', 'Voice recognition error', event.error); document.getElementById('voiceStatus').innerHTML = `⚠️ ${event.error}`; if(voiceActive) setTimeout(() => { try { recognition.start(); } catch(e) {} }, 2000); };
-        recognition.onend = function() { if (voiceActive) { try { recognition.start(); } catch(e) { voiceActive = false; document.getElementById('voiceBtn').innerHTML = '🎤 VOICE COMMANDS (OFF)'; document.getElementById('voiceBtn').classList.remove('listening'); } } };
+        recognition.onerror = function(event) { addSystemLog('WARNING', 'Voice error', event.error); document.getElementById('voiceStatus').innerHTML = `⚠️ Error`; if(voiceActive) setTimeout(() => { try { recognition.start(); } catch(e) {} }, 2000); };
+        recognition.onend = function() { if (voiceActive) { try { recognition.start(); } catch(e) { voiceActive = false; document.getElementById('voiceBtn').innerHTML = '🎤 VOICE (OFF)'; document.getElementById('voiceBtn').classList.remove('listening'); } } };
         return true;
     }
     function toggleVoiceCommand() {
         if (!voiceActive) {
             if (!recognition && !initVoiceRecognition()) return;
             navigator.permissions.query({name:'microphone'}).then(result => {
-                if (result.state === 'denied') { alert('Please allow microphone permission'); return; }
-                try { recognition.start(); voiceActive = true; document.getElementById('voiceBtn').innerHTML = '🎤 VOICE (LISTENING...)'; document.getElementById('voiceBtn').classList.add('listening'); document.getElementById('voiceStatus').innerHTML = '🎤 Listening... Say command'; } catch(e) { alert('Could not start'); addSystemLog('ERROR', 'Voice start failed', e.message); }
-            }).catch(() => { try { recognition.start(); voiceActive = true; } catch(e) { alert('Microphone access denied'); } });
-        } else { if (recognition) recognition.stop(); voiceActive = false; document.getElementById('voiceBtn').innerHTML = '🎤 VOICE COMMANDS (OFF)'; document.getElementById('voiceBtn').classList.remove('listening'); document.getElementById('voiceStatus').innerHTML = '⚪ Tap to enable'; }
+                if (result.state === 'denied') { alert('Microphone permission needed'); return; }
+                try { recognition.start(); voiceActive = true; document.getElementById('voiceBtn').innerHTML = '🎤 LISTENING...'; document.getElementById('voiceBtn').classList.add('listening'); document.getElementById('voiceStatus').innerHTML = '🎤 Listening...'; } catch(e) { alert('Start failed'); }
+            }).catch(() => { try { recognition.start(); voiceActive = true; } catch(e) { alert('Access denied'); } });
+        } else { if (recognition) recognition.stop(); voiceActive = false; document.getElementById('voiceBtn').innerHTML = '🎤 VOICE (OFF)'; document.getElementById('voiceBtn').classList.remove('listening'); document.getElementById('voiceStatus').innerHTML = '⚪ Tap to enable'; }
     }
     function processVoiceCommand(cmd) {
-        if (cmd.includes('start ride')) { if (!sTime) startRide(); else speakText('Ride active'); }
-        else if (cmd.includes('end ride')) { if (sTime) endRide(); else speakText('No active ride'); }
-        else if (cmd.includes('navigate') && currentDestinationAddress) openPhoneNavigation();
-        else if (cmd.includes('show report')) openReportsMenu();
-        else if (cmd.includes('show earnings')) openPanel('income-modal');
-        else if (cmd.includes('show history')) openPanel('history-modal');
-        else if (cmd.includes('night on') && !nightActive) toggleNightCharge();
-        else if (cmd.includes('night off') && nightActive) toggleNightCharge();
-        else if (cmd.includes('fuel')) openFuelLogModal();
-        else if (cmd.includes('repair')) openRepairLogModal();
-        else if (cmd.includes('travel')) openTravelReport();
+        if (cmd === 'sr' || cmd.includes('start ride')) { if (!sTime) startRide(); else speakText('Ride active'); }
+        else if (cmd === 'er' || cmd.includes('end ride')) { if (sTime) endRide(); else speakText('No active ride'); }
+        else if (cmd === 'nav' || cmd.includes('navigate')) { if (currentDestinationAddress) openPhoneNavigation(); else speakText('No destination'); }
+        else if (cmd === 'rp' || cmd.includes('report')) { openReportsMenu(); speakText('Opening reports'); }
+        else if (cmd === 'fl' || cmd.includes('fuel')) { openFuelLogModal(); speakText('Opening fuel log'); }
+        else if (cmd === 'rpl' || cmd.includes('repair')) { openRepairLogModal(); speakText('Opening repair log'); }
+        else if (cmd === 'tr' || cmd.includes('travel')) { openTravelReport(); speakText('Opening travel report'); }
+        else if (cmd.includes('night on')) { if (!nightActive) toggleNightCharge(); speakText('Night mode on'); }
+        else if (cmd.includes('night off')) { if (nightActive) toggleNightCharge(); speakText('Night mode off'); }
     }
     function speakText(t) { if (!voiceActive) return; let utterance = new SpeechSynthesisUtterance(t); utterance.lang = 'en-US'; window.speechSynthesis.speak(utterance); }
     
     // ========== FUEL LOG ==========
     let fuelLogs = JSON.parse(localStorage.getItem('fuel_logs') || '[]');
     function saveFuelLogs() { localStorage.setItem('fuel_logs', JSON.stringify(fuelLogs)); updateFuelList(); }
-    function addFuelLog() {
-        let date = document.getElementById('fuel-date').value || new Date().toISOString().split('T')[0];
-        let liters = parseFloat(document.getElementById('fuel-liters').value);
-        let price = parseFloat(document.getElementById('fuel-price').value);
-        if (!liters || !price) { alert("Enter liters and price"); return; }
-        let total = liters * price;
-        fuelLogs.push({ id: Date.now(), date, liters, price, total, notes: document.getElementById('fuel-notes').value });
-        saveFuelLogs();
-        document.getElementById('fuel-liters').value = ''; document.getElementById('fuel-price').value = ''; document.getElementById('fuel-notes').value = '';
-        alert("Fuel added!");
-        addSystemLog('INFO', `Fuel added: ${liters}L @ Rs.${price} = Rs.${total}`, '');
-    }
-    function updateFuelList() {
-        let container = document.getElementById('fuel-list'); if (!container) return;
-        container.innerHTML = fuelLogs.slice().reverse().slice(0,10).map(l => `<div style="padding:8px; border-bottom:1px solid #eee;">${l.date} | ${l.liters}L @ Rs.${l.price} = Rs.${l.total}</div>`).join('');
-        let fuelTotal = document.getElementById('fuel-total');
-        if (fuelTotal && document.getElementById('fuel-liters').value && document.getElementById('fuel-price').value) {
-            fuelTotal.value = (parseFloat(document.getElementById('fuel-liters').value || 0) * parseFloat(document.getElementById('fuel-price').value || 0)).toFixed(2);
-        }
-    }
-    function getFuelByDateRange(start, end) { return fuelLogs.filter(l => l.date >= start && l.date <= end); }
-    function showFuelReportTab(type) {
-        document.querySelectorAll('#fuel-report-modal .report-tab').forEach(t => t.classList.remove('active'));
-        if(event && event.target) event.target.classList.add('active');
-        document.getElementById('fuel-date-range-panel').style.display = type === 'range' ? 'block' : 'none';
-        let now = new Date(), start = '', end = '';
-        if(type === 'daily') { start = end = now.toISOString().split('T')[0]; }
-        else if(type === 'monthly') { start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]; end = new Date(now.getFullYear(), now.getMonth()+1, 0).toISOString().split('T')[0]; }
-        else if(type === 'yearly') { start = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0]; end = new Date(now.getFullYear(), 11, 31).toISOString().split('T')[0]; }
-        let logs = getFuelByDateRange(start, end);
-        let totalLiters = logs.reduce((s,r)=>s+r.liters,0);
-        let totalCost = logs.reduce((s,r)=>s+r.total,0);
-        document.getElementById('fuel-report-container').innerHTML = `<div style="text-align:center; padding:10px;"><strong>${type.toUpperCase()} REPORT</strong><br>Total Liters: ${totalLiters.toFixed(2)}L | Total Cost: Rs.${totalCost.toFixed(2)}</div><div class="payment-stats">${logs.map(r=>`<div class="stat-row"><span>${r.date}</span><span>${r.liters}L @ Rs.${r.price} = Rs.${r.total}</span></div>`).join('')}</div>`;
-    }
-    function updateFuelReport() { let start = document.getElementById('fuel-start-date').value, end = document.getElementById('fuel-end-date').value; if(!start || !end) return; let logs = getFuelByDateRange(start, end); let totalLiters = logs.reduce((s,r)=>s+r.liters,0); let totalCost = logs.reduce((s,r)=>s+r.total,0); document.getElementById('fuel-report-container').innerHTML = `<div style="text-align:center;"><strong>${start} to ${end}</strong><br>Total Liters: ${totalLiters.toFixed(2)}L | Total Cost: Rs.${totalCost.toFixed(2)}</div><div class="payment-stats">${logs.map(r=>`<div class="stat-row"><span>${r.date}</span><span>${r.liters}L @ Rs.${r.price} = Rs.${r.total}</span></div>`).join('')}</div>`; }
-    function exportFuelCSV() { let csv = "Date,Liters,Price/L,Total,Notes\n" + fuelLogs.map(r => `${r.date},${r.liters},${r.price},${r.total},${r.notes || ''}`).join("\n"); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'fuel_report.csv'; a.click(); }
+    function addFuelLog() { let date = document.getElementById('fuel-date').value || new Date().toISOString().split('T')[0]; let liters = parseFloat(document.getElementById('fuel-liters').value); let price = parseFloat(document.getElementById('fuel-price').value); if (!liters || !price) { alert("Enter liters and price"); return; } let total = liters * price; fuelLogs.push({ id: Date.now(), date, liters, price, total, notes: document.getElementById('fuel-notes').value }); saveFuelLogs(); document.getElementById('fuel-liters').value = ''; document.getElementById('fuel-price').value = ''; alert("Fuel added!"); addSystemLog('INFO', `Fuel: ${liters}L @ Rs.${price}`, ''); }
+    function updateFuelList() { let c = document.getElementById('fuel-list'); if(c) c.innerHTML = fuelLogs.slice().reverse().slice(0,10).map(l => `<div style="padding:8px; border-bottom:1px solid #eee;">${l.date} | ${l.liters}L @ Rs.${l.price} = Rs.${l.total.toFixed(2)}</div>`).join(''); let ft = document.getElementById('fuel-total'); if(ft && document.getElementById('fuel-liters').value && document.getElementById('fuel-price').value) ft.value = (parseFloat(document.getElementById('fuel-liters').value||0) * parseFloat(document.getElementById('fuel-price').value||0)).toFixed(2); }
+    function getFuelByDateRange(s,e) { return fuelLogs.filter(l => l.date >= s && l.date <= e); }
+    function showFuelReportTab(t) { document.querySelectorAll('#fuel-report-modal .report-tab').forEach(tb=>tb.classList.remove('active')); if(event&&event.target) event.target.classList.add('active'); document.getElementById('fuel-date-range-panel').style.display = t==='range'?'block':'none'; let now=new Date(), s='', e=''; if(t==='daily') { s=e=now.toISOString().split('T')[0]; } else if(t==='monthly') { s=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0]; e=new Date(now.getFullYear(),now.getMonth()+1,0).toISOString().split('T')[0]; } else if(t==='yearly') { s=new Date(now.getFullYear(),0,1).toISOString().split('T')[0]; e=new Date(now.getFullYear(),11,31).toISOString().split('T')[0]; } let logs = getFuelByDateRange(s,e); let totalL = logs.reduce((a,b)=>a+b.liters,0); let totalC = logs.reduce((a,b)=>a+b.total,0); document.getElementById('fuel-report-container').innerHTML = `<div style="text-align:center; padding:10px;"><strong>${t.toUpperCase()}</strong><br>Total: ${totalL.toFixed(2)}L | Rs.${totalC.toFixed(2)}</div><div class="payment-stats">${logs.map(r=>`<div class="stat-row"><span>${r.date}</span><span>${r.liters}L @ Rs.${r.price}=Rs.${r.total.toFixed(2)}</span></div>`).join('')}</div>`; }
+    function updateFuelReport() { let s=document.getElementById('fuel-start-date').value, e=document.getElementById('fuel-end-date').value; if(!s||!e) return; let logs=getFuelByDateRange(s,e); let totalL=logs.reduce((a,b)=>a+b.liters,0); let totalC=logs.reduce((a,b)=>a+b.total,0); document.getElementById('fuel-report-container').innerHTML = `<div style="text-align:center;"><strong>${s} to ${e}</strong><br>Total: ${totalL.toFixed(2)}L | Rs.${totalC.toFixed(2)}</div><div class="payment-stats">${logs.map(r=>`<div class="stat-row"><span>${r.date}</span><span>${r.liters}L @ Rs.${r.price}=Rs.${r.total.toFixed(2)}</span></div>`).join('')}</div>`; }
+    function exportFuelCSV() { let csv = "Date,Liters,Price/L,Total,Notes\n" + fuelLogs.map(r => `${r.date},${r.liters},${r.price},${r.total.toFixed(2)},${r.notes||''}`).join("\n"); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'fuel_report.csv'; a.click(); }
     
     // ========== REPAIR LOG ==========
     let repairLogs = JSON.parse(localStorage.getItem('repair_logs') || '[]');
     function saveRepairLogs() { localStorage.setItem('repair_logs', JSON.stringify(repairLogs)); updateRepairList(); }
-    function addRepairLog() {
-        let date = document.getElementById('repair-date').value || new Date().toISOString().split('T')[0];
-        let desc = document.getElementById('repair-desc').value;
-        let cost = parseFloat(document.getElementById('repair-cost').value);
-        if (!desc || !cost) { alert("Enter description and cost"); return; }
-        repairLogs.push({ id: Date.now(), date, desc, cost, garage: document.getElementById('repair-garage').value, notes: document.getElementById('repair-notes').value });
-        saveRepairLogs();
-        document.getElementById('repair-desc').value = ''; document.getElementById('repair-cost').value = ''; document.getElementById('repair-garage').value = ''; document.getElementById('repair-notes').value = '';
-        alert("Repair added!");
-        addSystemLog('INFO', `Repair added: ${desc} - Rs.${cost}`, '');
-    }
-    function updateRepairList() {
-        let container = document.getElementById('repair-list'); if (!container) return;
-        container.innerHTML = repairLogs.slice().reverse().slice(0,10).map(r => `<div style="padding:8px; border-bottom:1px solid #eee;">${r.date} | ${r.desc} | Rs.${r.cost}</div>`).join('');
-    }
-    function getRepairByDateRange(start, end) { return repairLogs.filter(r => r.date >= start && r.date <= end); }
-    function showRepairReportTab(type) {
-        document.querySelectorAll('#repair-report-modal .report-tab').forEach(t => t.classList.remove('active'));
-        if(event && event.target) event.target.classList.add('active');
-        document.getElementById('repair-date-range-panel').style.display = type === 'range' ? 'block' : 'none';
-        let now = new Date(), start = '', end = '';
-        if(type === 'daily') { start = end = now.toISOString().split('T')[0]; }
-        else if(type === 'monthly') { start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]; end = new Date(now.getFullYear(), now.getMonth()+1, 0).toISOString().split('T')[0]; }
-        else if(type === 'yearly') { start = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0]; end = new Date(now.getFullYear(), 11, 31).toISOString().split('T')[0]; }
-        let logs = getRepairByDateRange(start, end);
-        let totalCost = logs.reduce((s,r)=>s+r.cost,0);
-        document.getElementById('repair-report-container').innerHTML = `<div style="text-align:center; padding:10px;"><strong>${type.toUpperCase()} REPORT</strong><br>Total Repair Cost: Rs.${totalCost.toFixed(2)}</div><div class="payment-stats">${logs.map(r=>`<div class="stat-row"><span>${r.date}</span><span>${r.desc} - Rs.${r.cost}</span></div>`).join('')}</div>`;
-    }
-    function updateRepairReport() { let start = document.getElementById('repair-start-date').value, end = document.getElementById('repair-end-date').value; if(!start || !end) return; let logs = getRepairByDateRange(start, end); let totalCost = logs.reduce((s,r)=>s+r.cost,0); document.getElementById('repair-report-container').innerHTML = `<div style="text-align:center;"><strong>${start} to ${end}</strong><br>Total Repair Cost: Rs.${totalCost.toFixed(2)}</div><div class="payment-stats">${logs.map(r=>`<div class="stat-row"><span>${r.date}</span><span>${r.desc} - Rs.${r.cost}</span></div>`).join('')}</div>`; }
-    function exportRepairCSV() { let csv = "Date,Description,Cost,Garage,Notes\n" + repairLogs.map(r => `${r.date},${r.desc},${r.cost},${r.garage||''},${r.notes||''}`).join("\n"); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'repair_report.csv'; a.click(); }
+    function addRepairLog() { let date = document.getElementById('repair-date').value || new Date().toISOString().split('T')[0]; let desc = document.getElementById('repair-desc').value; let cost = parseFloat(document.getElementById('repair-cost').value); if (!desc || !cost) { alert("Enter description and cost"); return; } repairLogs.push({ id: Date.now(), date, desc, cost, garage: document.getElementById('repair-garage').value, notes: document.getElementById('repair-notes').value }); saveRepairLogs(); document.getElementById('repair-desc').value = ''; document.getElementById('repair-cost').value = ''; alert("Repair added!"); addSystemLog('INFO', `Repair: ${desc} - Rs.${cost}`, ''); }
+    function updateRepairList() { let c = document.getElementById('repair-list'); if(c) c.innerHTML = repairLogs.slice().reverse().slice(0,10).map(r => `<div style="padding:8px; border-bottom:1px solid #eee;">${r.date} | ${r.desc} | Rs.${r.cost.toFixed(2)}</div>`).join(''); }
+    function getRepairByDateRange(s,e) { return repairLogs.filter(r => r.date >= s && r.date <= e); }
+    function showRepairReportTab(t) { document.querySelectorAll('#repair-report-modal .report-tab').forEach(tb=>tb.classList.remove('active')); if(event&&event.target) event.target.classList.add('active'); document.getElementById('repair-date-range-panel').style.display = t==='range'?'block':'none'; let now=new Date(), s='', e=''; if(t==='daily') { s=e=now.toISOString().split('T')[0]; } else if(t==='monthly') { s=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0]; e=new Date(now.getFullYear(),now.getMonth()+1,0).toISOString().split('T')[0]; } else if(t==='yearly') { s=new Date(now.getFullYear(),0,1).toISOString().split('T')[0]; e=new Date(now.getFullYear(),11,31).toISOString().split('T')[0]; } let logs = getRepairByDateRange(s,e); let totalC = logs.reduce((a,b)=>a+b.cost,0); document.getElementById('repair-report-container').innerHTML = `<div style="text-align:center; padding:10px;"><strong>${t.toUpperCase()}</strong><br>Total: Rs.${totalC.toFixed(2)}</div><div class="payment-stats">${logs.map(r=>`<div class="stat-row"><span>${r.date}</span><span>${r.desc} - Rs.${r.cost.toFixed(2)}</span></div>`).join('')}</div>`; }
+    function updateRepairReport() { let s=document.getElementById('repair-start-date').value, e=document.getElementById('repair-end-date').value; if(!s||!e) return; let logs=getRepairByDateRange(s,e); let totalC=logs.reduce((a,b)=>a+b.cost,0); document.getElementById('repair-report-container').innerHTML = `<div style="text-align:center;"><strong>${s} to ${e}</strong><br>Total: Rs.${totalC.toFixed(2)}</div><div class="payment-stats">${logs.map(r=>`<div class="stat-row"><span>${r.date}</span><span>${r.desc} - Rs.${r.cost.toFixed(2)}</span></div>`).join('')}</div>`; }
+    function exportRepairCSV() { let csv = "Date,Description,Cost,Garage,Notes\n" + repairLogs.map(r => `${r.date},${r.desc},${r.cost.toFixed(2)},${r.garage||''},${r.notes||''}`).join("\n"); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'repair_report.csv'; a.click(); }
     
     // ========== TRAVEL REPORT ==========
-    function getTravelRidesByDateRange(start, end) {
-        let allRides = JSON.parse(localStorage.getItem('rides') || '[]');
-        return allRides.filter(r => { let d = new Date(r.time).toISOString().split('T')[0]; return d >= start && d <= end; });
-    }
-    function showTravelReportTab(type) {
-        document.querySelectorAll('#travel-report-modal .report-tab').forEach(t => t.classList.remove('active'));
-        if(event && event.target) event.target.classList.add('active');
-        document.getElementById('travel-date-range-panel').style.display = type === 'range' ? 'block' : 'none';
-        let now = new Date(), start = '', end = '';
-        if(type === 'daily') { start = end = now.toISOString().split('T')[0]; }
-        else if(type === 'monthly') { start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]; end = new Date(now.getFullYear(), now.getMonth()+1, 0).toISOString().split('T')[0]; }
-        else if(type === 'yearly') { start = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0]; end = new Date(now.getFullYear(), 11, 31).toISOString().split('T')[0]; }
-        let rides = getTravelRidesByDateRange(start, end);
-        let totalDist = rides.reduce((s,r)=>s+r.km,0);
-        document.getElementById('travel-report-container').innerHTML = `<div style="text-align:center; padding:10px;"><strong>${type.toUpperCase()} TRAVEL REPORT</strong><br>Total Distance: ${totalDist.toFixed(2)} km | Rides: ${rides.length}</div><div class="payment-stats">${rides.map(r=>`<div class="stat-row"><span>${new Date(r.time).toLocaleDateString()}</span><span>${r.from.substring(0,25)} → ${r.to.substring(0,25)}</span><span>${r.km.toFixed(2)} km</span><span>Rs.${r.fare}</span></div>`).join('')}</div>`;
-    }
-    function updateTravelReport() { let start = document.getElementById('travel-start-date').value, end = document.getElementById('travel-end-date').value; if(!start || !end) return; let rides = getTravelRidesByDateRange(start, end); let totalDist = rides.reduce((s,r)=>s+r.km,0); document.getElementById('travel-report-container').innerHTML = `<div style="text-align:center;"><strong>${start} to ${end}</strong><br>Total Distance: ${totalDist.toFixed(2)} km | Rides: ${rides.length}</div><div class="payment-stats">${rides.map(r=>`<div class="stat-row"><span>${new Date(r.time).toLocaleDateString()}</span><span>${r.from.substring(0,30)} → ${r.to.substring(0,30)}</span><span>${r.km.toFixed(2)} km</span><span>Rs.${r.fare}</span></div>`).join('')}</div>`; }
-    function exportTravelCSV() { let rides = JSON.parse(localStorage.getItem('rides') || '[]'); let csv = "Date,From,To,Distance(km),Fare,Payment\n" + rides.map(r => `${new Date(r.time).toLocaleDateString()},${r.from},${r.to},${r.km},${r.fare},${r.payment?.method||'Cash'}`).join("\n"); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'travel_report.csv'; a.click(); }
-    async function printTravelReceipt() { let rides = JSON.parse(localStorage.getItem('rides') || '[]'); let totalDist = rides.reduce((s,r)=>s+r.km,0); let totalFare = rides.reduce((s,r)=>s+r.fare,0); let html = `<div class="receipt-print"><div class="r-header">TRAVEL SUMMARY</div><div class="r-row"><span>Total Rides:</span><b>${rides.length}</b></div><div class="r-row"><span>Total Distance:</span><b>${totalDist.toFixed(2)} km</b></div><div class="r-row"><span>Total Earnings:</span><b>Rs.${totalFare}</b></div><div class="r-divider">-------------------</div>${rides.slice().reverse().slice(0,50).map(r=>`<div class="r-row-full"><span class="r-label">From:</span><span class="r-address">${r.from.substring(0,50)}</span><span class="r-label">To:</span><span class="r-address">${r.to.substring(0,50)}</span><span>${r.km.toFixed(2)} km | Rs.${r.fare}</span></div>`).join('')}<div class="r-divider">Thank you! 🚕</div></div>`; let win = window.open('', '_blank'); win.document.write(html); win.document.close(); win.print(); }
+    function getTravelRidesByDateRange(s,e) { let all = JSON.parse(localStorage.getItem('rides') || '[]'); return all.filter(r => { let d = new Date(r.time).toISOString().split('T')[0]; return d >= s && d <= e; }); }
+    function showTravelReportTab(t) { document.querySelectorAll('#travel-report-modal .report-tab').forEach(tb=>tb.classList.remove('active')); if(event&&event.target) event.target.classList.add('active'); document.getElementById('travel-date-range-panel').style.display = t==='range'?'block':'none'; let now=new Date(), s='', e=''; if(t==='daily') { s=e=now.toISOString().split('T')[0]; } else if(t==='monthly') { s=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0]; e=new Date(now.getFullYear(),now.getMonth()+1,0).toISOString().split('T')[0]; } else if(t==='yearly') { s=new Date(now.getFullYear(),0,1).toISOString().split('T')[0]; e=new Date(now.getFullYear(),11,31).toISOString().split('T')[0]; } let rides = getTravelRidesByDateRange(s,e); let totalDist = rides.reduce((a,b)=>a+b.km,0); document.getElementById('travel-report-container').innerHTML = `<div style="text-align:center; padding:10px;"><strong>${t.toUpperCase()}</strong><br>Total: ${totalDist.toFixed(2)} km | Rides: ${rides.length}</div><div class="payment-stats">${rides.map(r=>`<div class="stat-row"><span>${new Date(r.time).toLocaleDateString()}</span><span>${r.from.substring(0,25)}→${r.to.substring(0,25)}</span><span>${r.km.toFixed(2)} km</span><span>Rs.${r.fare.toFixed(2)}</span></div>`).join('')}</div>`; }
+    function updateTravelReport() { let s=document.getElementById('travel-start-date').value, e=document.getElementById('travel-end-date').value; if(!s||!e) return; let rides=getTravelRidesByDateRange(s,e); let totalDist=rides.reduce((a,b)=>a+b.km,0); document.getElementById('travel-report-container').innerHTML = `<div style="text-align:center;"><strong>${s} to ${e}</strong><br>Total: ${totalDist.toFixed(2)} km | Rides: ${rides.length}</div><div class="payment-stats">${rides.map(r=>`<div class="stat-row"><span>${new Date(r.time).toLocaleDateString()}</span><span>${r.from.substring(0,30)}→${r.to.substring(0,30)}</span><span>${r.km.toFixed(2)} km</span><span>Rs.${r.fare.toFixed(2)}</span></div>`).join('')}</div>`; }
+    function exportTravelCSV() { let rides = JSON.parse(localStorage.getItem('rides') || '[]'); let csv = "Date,From,To,Distance,Fare,Payment\n" + rides.map(r => `${new Date(r.time).toLocaleDateString()},${r.from},${r.to},${r.km.toFixed(2)},${r.fare.toFixed(2)},${r.payment?.method||'Cash'}`).join("\n"); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'travel_report.csv'; a.click(); }
+    async function printTravelReceipt() { let rides = JSON.parse(localStorage.getItem('rides') || '[]'); let totalDist = rides.reduce((s,r)=>s+r.km,0); let totalFare = rides.reduce((s,r)=>s+r.fare,0); let html = `<div class="receipt-print"><div class="r-header">TRAVEL SUMMARY</div><div class="r-row"><span>Total Rides:</span><b>${rides.length}</b></div><div class="r-row"><span>Total Distance:</span><b>${totalDist.toFixed(2)} km</b></div><div class="r-row"><span>Total Earnings:</span><b>Rs.${totalFare.toFixed(2)}</b></div><div class="r-divider">-------------------</div>${rides.slice().reverse().slice(0,50).map(r=>`<div class="r-row-full"><span class="r-label">From:</span><span class="r-address">${r.from.substring(0,50)}</span><span class="r-label">To:</span><span class="r-address">${r.to.substring(0,50)}</span><span>${r.km.toFixed(2)} km | Rs.${r.fare.toFixed(2)}</span></div>`).join('')}<div class="r-divider">Thank you! 🚕</div></div>`; let win = window.open('', '_blank'); win.document.write(html); win.document.close(); win.print(); }
     
     // ========== NUMBER TO WORDS ==========
     function numberToWords(num) { if (num === 0) return "Zero Rupees Only"; const ones = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen']; const tens = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety']; function convert(n) { if (n < 20) return ones[n]; if (n < 100) return tens[Math.floor(n/10)] + (n%10 ? " "+ones[n%10] : ""); if (n < 1000) return ones[Math.floor(n/100)] + " Hundred" + (n%100 ? " "+convert(n%100) : ""); if (n < 100000) return convert(Math.floor(n/1000)) + " Thousand" + (n%1000 ? " "+convert(n%1000) : ""); return convert(Math.floor(n/100000)) + " Lakh" + (n%100000 ? " "+convert(n%100000) : ""); } return convert(Math.floor(num)) + " Rupees Only"; }
     
-    // ========== GLOBAL VARIABLES ==========
-    let sTime = null, watchId = null, totalMeters = 0, lastLat = null, lastLon = null, currentRID = "", nightActive = false, gpsReady = false, currentMode = "auto", pendingRideData = null, selectedMethod = "cash", currentLocationAddress = "", currentLocationLat = null, currentLocationLon = null, startLocationAddress = "", endLocationAddress = "", currentDestinationAddress = "", mapPickerField = null, mapObj = null, mapMarker = null;
-    let deliveryPickupName = "", deliveryPickupPhone = "", deliveryDeliveryName = "", deliveryDeliveryPhone = "";
+    // ========== GLOBAL ==========
+    let sTime = null, watchId = null, totalMeters = 0, lastLat = null, lastLon = null, currentRID = "", nightActive = false, gpsReady = false, currentMode = "auto", pendingRideData = null, selectedMethod = "cash", currentLocationAddress = "", currentLocationLat = null, currentLocationLon = null, startLocationAddress = "", currentDestinationAddress = "", mapPickerField = null, mapObj = null, mapMarker = null, deliveryPickupName="", deliveryPickupPhone="", deliveryDeliveryName="", deliveryDeliveryPhone="";
     let SETTINGS = { base:100, rate:80, waitRate:5, nightPercent:10, appName:"ADVANCE MEETER TAXI", receiptName:"OFFICIAL RECEIPT", password:"1234", logo:null };
     let currentReportType = "daily";
     
-    // Save/Load State
+    // Navigation/Back functions for Settings
+    function goBackToSettingsMenu() { 
+        closeM('app-settings-modal'); closeM('fuel-modal'); closeM('repair-modal'); closeM('reports-menu-modal'); closeM('system-log-modal');
+        closeM('fuel-report-modal'); closeM('repair-report-modal'); closeM('travel-report-modal'); closeM('report-modal'); closeM('income-modal'); closeM('history-modal');
+        document.getElementById('settings-modal').style.display = 'flex'; 
+    }
+    function goBackToFuelLog() { closeM('fuel-report-modal'); document.getElementById('fuel-modal').style.display = 'flex'; }
+    function goBackToRepairLog() { closeM('repair-report-modal'); document.getElementById('repair-modal').style.display = 'flex'; }
+    function goBackToReportsMenu() { closeM('report-modal'); closeM('income-modal'); closeM('history-modal'); closeM('travel-report-modal'); document.getElementById('reports-menu-modal').style.display = 'flex'; }
+    
     function saveRideState() { if(sTime) localStorage.setItem('amt_ride_state', JSON.stringify({ isRideActive:true, startTime:sTime, totalMeters, lastLat, lastLon, currentMode, nightActive, startLocationAddress, currentLocationAddress, gpsReady:true, destinationAddress:currentDestinationAddress, deliveryPickupName, deliveryPickupPhone, deliveryDeliveryName, deliveryDeliveryPhone })); else localStorage.removeItem('amt_ride_state'); }
-    function loadRideState() { let saved = localStorage.getItem('amt_ride_state'); if(saved) try { let state = JSON.parse(saved); if(state.isRideActive && state.startTime) { document.getElementById('restore-banner').style.display = 'block'; return true; } } catch(e){ addSystemLog('ERROR', 'Failed to load ride state', e.message); } return false; }
-    function restorePreviousRide() { let saved = localStorage.getItem('amt_ride_state'); if(!saved) return; try { let state = JSON.parse(saved); sTime = state.startTime; totalMeters = state.totalMeters||0; lastLat = state.lastLat; lastLon = state.lastLon; currentMode = state.currentMode||"auto"; nightActive = state.nightActive||false; startLocationAddress = state.startLocationAddress||""; currentLocationAddress = state.currentLocationAddress||""; currentDestinationAddress = state.destinationAddress||""; deliveryPickupName = state.deliveryPickupName||""; deliveryPickupPhone = state.deliveryPickupPhone||""; deliveryDeliveryName = state.deliveryDeliveryName||""; deliveryDeliveryPhone = state.deliveryDeliveryPhone||""; gpsReady = true; setMode(currentMode); let nightBtn = document.getElementById('nightBtn'); if(nightActive) { nightBtn.innerHTML = '🌙 NIGHT ON'; nightBtn.classList.add('night-active'); } else { nightBtn.innerHTML = '🌙 NIGHT OFF'; nightBtn.classList.remove('night-active'); } updateDisplay(); if(currentMode === 'auto' && currentLocationAddress) document.getElementById('current-location-address').innerHTML = currentLocationAddress; if(currentMode === 'manual') document.getElementById('manual-km-input').value = (totalMeters/1000).toFixed(2); if(currentMode === 'delivery') { document.getElementById('pickup-name').value = deliveryPickupName; document.getElementById('pickup-phone').value = deliveryPickupPhone; document.getElementById('delivery-name').value = deliveryDeliveryName; document.getElementById('delivery-phone').value = deliveryDeliveryPhone; } if(sTime) { document.getElementById('startBtn').innerHTML = "⏵ ACTIVE"; document.getElementById('startBtn').classList.add('btn-active-anim'); document.getElementById('startBtn').disabled = true; document.body.classList.add('ride-active'); requestWakeLock(); trackRide(); if(currentMode !== 'auto') document.getElementById('nav-container').style.display = 'block'; } document.getElementById('restore-banner').style.display = 'none'; document.querySelectorAll('.mode-btn').forEach(btn => btn.style.pointerEvents = 'none'); alert(`Restored: ${(totalMeters/1000).toFixed(2)} km`); addSystemLog('INFO', 'Ride restored successfully', `Distance: ${(totalMeters/1000).toFixed(2)} km`); } catch(e){ addSystemLog('ERROR', 'Restore ride failed', e.message); } }
-    function calculateDistanceMeters(lat1,lon1,lat2,lon2) { const R = 6371000; const dLat = (lat2-lat1)*Math.PI/180; const dLon = (lon2-lon1)*Math.PI/180; const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); }
+    function loadRideState() { let saved = localStorage.getItem('amt_ride_state'); if(saved) try { let state = JSON.parse(saved); if(state.isRideActive && state.startTime) { document.getElementById('restore-banner').style.display = 'block'; return true; } } catch(e){} return false; }
+    function restorePreviousRide() { let saved = localStorage.getItem('amt_ride_state'); if(!saved) return; try { let state = JSON.parse(saved); sTime = state.startTime; totalMeters = state.totalMeters||0; lastLat = state.lastLat; lastLon = state.lastLon; currentMode = state.currentMode||"auto"; nightActive = state.nightActive||false; startLocationAddress = state.startLocationAddress||""; currentLocationAddress = state.currentLocationAddress||""; currentDestinationAddress = state.destinationAddress||""; deliveryPickupName=state.deliveryPickupName||""; deliveryPickupPhone=state.deliveryPickupPhone||""; deliveryDeliveryName=state.deliveryDeliveryName||""; deliveryDeliveryPhone=state.deliveryDeliveryPhone||""; gpsReady=true; setMode(currentMode); let nightBtn=document.getElementById('nightBtn'); if(nightActive) { nightBtn.innerHTML='🌙 NIGHT ON'; nightBtn.classList.add('night-active'); } else { nightBtn.innerHTML='🌙 NIGHT OFF'; nightBtn.classList.remove('night-active'); } updateDisplay(); if(currentMode==='auto' && currentLocationAddress) document.getElementById('current-location-address').innerHTML = currentLocationAddress; if(currentMode==='manual') document.getElementById('manual-km-input').value = (totalMeters/1000).toFixed(2); if(currentMode==='delivery') { document.getElementById('pickup-name').value=deliveryPickupName; document.getElementById('pickup-phone').value=deliveryPickupPhone; document.getElementById('delivery-name').value=deliveryDeliveryName; document.getElementById('delivery-phone').value=deliveryDeliveryPhone; } if(sTime) { document.getElementById('startBtn').innerHTML="⏵ ACTIVE"; document.getElementById('startBtn').classList.add('btn-active-anim'); document.getElementById('startBtn').disabled=true; document.body.classList.add('ride-active'); requestWakeLock(); trackRide(); if(currentMode!=='auto') document.getElementById('nav-container').style.display='block'; } document.getElementById('restore-banner').style.display='none'; document.querySelectorAll('.mode-btn').forEach(btn=>btn.style.pointerEvents='none'); alert(`Restored: ${(totalMeters/1000).toFixed(2)} km`); addSystemLog('INFO','Ride restored',''); } catch(e){ addSystemLog('ERROR','Restore failed',e.message); } }
+    function calculateDistanceMeters(lat1,lon1,lat2,lon2) { const R=6371000; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); return R*2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); }
     let lastKmValue=0, lastFareValue=0;
-    function animateCounter(id) { let el = document.getElementById(id); if(el) { el.classList.remove('count-animation'); void el.offsetWidth; el.classList.add('count-animation'); } }
-    function updateDisplay() { let km = totalMeters/1000; let fare = calcFare(); if(Math.abs(km-lastKmValue)>0.01) { animateCounter('disp-km'); lastKmValue=km; } if(fare!==lastFareValue) { animateCounter('disp-fare'); lastFareValue=fare; } document.getElementById('disp-km').innerHTML = km.toFixed(2); document.getElementById('disp-fare').innerHTML = "Rs." + fare; if(currentMode==='manual') document.getElementById('manual-km-input').value = km.toFixed(2); let ni = document.getElementById('night-indicator'); if(ni) ni.style.display = (nightActive && !document.getElementById('manual-fare').value) ? 'inline-block' : 'none'; }
-    function calcFare() { let manualFare = parseInt(document.getElementById('manual-fare').value)||0, disc = parseInt(document.getElementById('discount-input').value)||0, wait = parseInt(document.getElementById('wait-select').value), waitCharge = wait * SETTINGS.waitRate, km = totalMeters/1000, total = manualFare>0 ? manualFare+waitCharge-disc : SETTINGS.base + (Math.max(0,km-1)*SETTINGS.rate) + waitCharge - disc; if(nightActive && manualFare===0) total = total + (total*SETTINGS.nightPercent/100); return Math.max(0, Math.round(total)); }
-    function startGPS() { if(!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(pos => { let acc=pos.coords.accuracy; lastLat=pos.coords.latitude; lastLon=pos.coords.longitude; if(acc<100) { gpsReady=true; document.getElementById('gps-status').innerHTML = `✅ GPS Ready (${acc.toFixed(0)}m)`; document.getElementById('gps-status').className = 'gps-status gps-ready'; document.getElementById('startBtn').disabled=false; if(currentMode==='auto') { currentLocationLat=lastLat; currentLocationLon=lastLon; reverseGeocode(lastLat,lastLon); } } else { setTimeout(startGPS,3000); } }, err => { document.getElementById('gps-status').innerHTML = '❌ GPS permission needed'; addSystemLog('WARNING', 'GPS permission denied', err.message); setTimeout(startGPS,5000); }, {enableHighAccuracy:true, timeout:10000}); }
-    function trackRide() { if(watchId) navigator.geolocation.clearWatch(watchId); watchId = navigator.geolocation.watchPosition(pos => { if(!sTime) return; let lat=pos.coords.latitude, lon=pos.coords.longitude, acc=pos.coords.accuracy; if(acc<100 && currentMode==='auto') reverseGeocode(lat,lon); if(lastLat!==null && lastLon!==null && acc<100) { let d=calculateDistanceMeters(lastLat,lastLon,lat,lon); if(d>3 && d<200) { totalMeters += d; updateDisplay(); saveRideState(); } } lastLat=lat; lastLon=lon; }, null, {enableHighAccuracy:true, timeout:5000}); }
-    async function reverseGeocode(lat,lon) { try { let res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=en&countrycodes=lk`); let data = await res.json(); currentLocationAddress = data.display_name || `${lat.toFixed(4)},${lon.toFixed(4)}`; document.getElementById('current-location-address').innerHTML = currentLocationAddress.substring(0,80); } catch(e){ addSystemLog('ERROR', 'Reverse geocode failed', e.message); } }
+    function animateCounter(id) { let el=document.getElementById(id); if(el) { el.classList.remove('count-animation'); void el.offsetWidth; el.classList.add('count-animation'); } }
+    function updateDisplay() { let km=totalMeters/1000; let fare=calcFare(); if(Math.abs(km-lastKmValue)>0.01) { animateCounter('disp-km'); lastKmValue=km; } if(fare!==lastFareValue) { animateCounter('disp-fare'); lastFareValue=fare; } document.getElementById('disp-km').innerHTML = km.toFixed(2); document.getElementById('disp-fare').innerHTML = "Rs." + fare.toFixed(2); if(currentMode==='manual') document.getElementById('manual-km-input').value = km.toFixed(2); let ni=document.getElementById('night-indicator'); if(ni) ni.style.display = (nightActive && !document.getElementById('manual-fare').value) ? 'inline-block' : 'none'; }
+    function calcFare() { let manualFare=parseInt(document.getElementById('manual-fare').value)||0, disc=parseInt(document.getElementById('discount-input').value)||0, wait=parseInt(document.getElementById('wait-select').value), waitCharge=wait*SETTINGS.waitRate, km=totalMeters/1000, total=manualFare>0 ? manualFare+waitCharge-disc : SETTINGS.base + (Math.max(0,km-1)*SETTINGS.rate) + waitCharge - disc; if(nightActive && manualFare===0) total = total + (total*SETTINGS.nightPercent/100); return Math.max(0, Math.round(total)); }
+    function startGPS() { if(!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(pos => { let acc=pos.coords.accuracy; lastLat=pos.coords.latitude; lastLon=pos.coords.longitude; if(acc<200) { gpsReady=true; document.getElementById('gps-status').innerHTML = `✅ GPS Ready (${acc.toFixed(0)}m)`; document.getElementById('gps-status').className = 'gps-status gps-ready'; document.getElementById('startBtn').disabled=false; if(currentMode==='auto') { currentLocationLat=lastLat; currentLocationLon=lastLon; reverseGeocode(lastLat,lastLon); } } else { document.getElementById('gps-status').innerHTML = `⚠️ Low accuracy (${acc.toFixed(0)}m) - retrying...`; document.getElementById('gps-status').className = 'gps-status gps-warning'; setTimeout(startGPS,3000); } }, err => { document.getElementById('gps-status').innerHTML = '❌ GPS permission needed'; document.getElementById('gps-status').className = 'gps-status gps-error'; addSystemLog('WARNING','GPS error',err.message); setTimeout(startGPS,5000); }, {enableHighAccuracy:true, timeout:15000, maximumAge:10000}); }
+    function trackRide() { if(watchId) navigator.geolocation.clearWatch(watchId); watchId = navigator.geolocation.watchPosition(pos => { if(!sTime) return; let lat=pos.coords.latitude, lon=pos.coords.longitude, acc=pos.coords.accuracy; if(acc<200 && currentMode==='auto') reverseGeocode(lat,lon); if(lastLat!==null && lastLon!==null && acc<200) { let d=calculateDistanceMeters(lastLat,lastLon,lat,lon); if(d>3 && d<200) { totalMeters += d; updateDisplay(); saveRideState(); } } lastLat=lat; lastLon=lon; }, null, {enableHighAccuracy:true, timeout:5000, maximumAge:5000}); }
+    async function reverseGeocode(lat,lon) { try { let res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=en&countrycodes=lk`); let data = await res.json(); currentLocationAddress = data.display_name || `${lat.toFixed(4)},${lon.toFixed(4)}`; document.getElementById('current-location-address').innerHTML = currentLocationAddress.substring(0,80); } catch(e){ addSystemLog('ERROR','Geocode failed',e.message); } }
     function refreshCurrentLocation() { if(navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => reverseGeocode(pos.coords.latitude, pos.coords.longitude)); }
     function setMode(mode) { currentMode=mode; ['auto','gps','manual','delivery'].forEach(m=>document.getElementById(`mode-${m}`).classList.remove('active')); document.getElementById(`mode-${mode}`).classList.add('active'); if(mode==='auto') { document.getElementById('auto-location-card').style.display='block'; document.getElementById('location-fields').style.display='none'; document.getElementById('delivery-fields').style.display='none'; document.getElementById('manual-controls').style.display='none'; if(!sTime) startGPS(); refreshCurrentLocation(); } else if(mode==='gps') { document.getElementById('auto-location-card').style.display='none'; document.getElementById('location-fields').style.display='block'; document.getElementById('delivery-fields').style.display='none'; document.getElementById('manual-controls').style.display='none'; if(!sTime) startGPS(); setupAutocomplete('start-loc','start-loc-suggestions'); setupAutocomplete('end-loc','end-loc-suggestions'); } else if(mode==='manual') { document.getElementById('auto-location-card').style.display='none'; document.getElementById('location-fields').style.display='block'; document.getElementById('delivery-fields').style.display='none'; document.getElementById('manual-controls').style.display='block'; gpsReady=true; if(watchId) { navigator.geolocation.clearWatch(watchId); watchId=null; } document.getElementById('startBtn').disabled=false; setupAutocomplete('start-loc','start-loc-suggestions'); setupAutocomplete('end-loc','end-loc-suggestions'); } else if(mode==='delivery') { document.getElementById('auto-location-card').style.display='none'; document.getElementById('location-fields').style.display='block'; document.getElementById('delivery-fields').style.display='block'; document.getElementById('manual-controls').style.display='none'; if(!sTime) startGPS(); setupAutocomplete('start-loc','start-loc-suggestions'); setupAutocomplete('end-loc','end-loc-suggestions'); } updateDisplay(); }
-    async function searchSriLankaLocations(q) { if(!q||q.length<2) return []; try { let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q+" Sri Lanka")}&limit=8&countrycodes=lk`); return await res.json(); } catch(e){ addSystemLog('ERROR', 'Location search failed', e.message); return []; } }
+    async function searchSriLankaLocations(q) { if(!q||q.length<2) return []; try { let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q+" Sri Lanka")}&limit=8&countrycodes=lk`); return await res.json(); } catch(e){ return []; } }
     let searchTimeout;
-    function setupAutocomplete(inputId, suggestionsId) { let input = document.getElementById(inputId); let div = document.getElementById(suggestionsId); if(!input||!div) return; input.addEventListener('input', async function() { let q=this.value.trim(); if(q.length<2) { div.style.display='none'; return; } clearTimeout(searchTimeout); searchTimeout = setTimeout(async () => { let results = await searchSriLankaLocations(q); div.innerHTML = ''; if(results.length===0) div.innerHTML = '<div class="autocomplete-item">No results</div>'; else results.forEach(p => { let item = document.createElement('div'); item.className='autocomplete-item'; item.textContent=p.display_name.substring(0,80); item.onclick=() => { input.value=p.display_name; if(inputId==='end-loc') currentDestinationAddress=p.display_name; div.style.display='none'; }; div.appendChild(item); }); div.style.display='block'; }, 300); }); document.addEventListener('click', e => { if(e.target!==input) div.style.display='none'; }); }
-    function openMapPicker(field) { mapPickerField=field; document.getElementById('map-title').innerText=field==='start'?'Pickup':'Drop'; document.getElementById('map-modal').style.display='flex'; setTimeout(() => { if(mapObj) mapObj.remove(); mapObj = L.map('map').setView([7.8731,80.7718],8); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapObj); mapMarker = L.marker([7.8731,80.7718],{draggable:true}).addTo(mapObj); mapMarker.on('dragend',() => reverseMapGeocode(mapMarker.getLatLng().lat,mapMarker.getLatLng().lng)); mapObj.on('click',e => { mapMarker.setLatLng(e.latlng); reverseMapGeocode(e.latlng.lat,e.latlng.lng); }); if(navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => { mapObj.setView([pos.coords.latitude,pos.coords.longitude],14); mapMarker.setLatLng([pos.coords.latitude,pos.coords.longitude]); reverseMapGeocode(pos.coords.latitude,pos.coords.longitude); }); let search = document.getElementById('map-search'); let results = document.getElementById('search-results'); search.oninput = async function() { let q=this.value.trim(); if(q.length<2) { results.style.display='none'; return; } let data = await searchSriLankaLocations(q); results.innerHTML=''; if(data.length===0) results.innerHTML='<div class="search-item">No results</div>'; else data.forEach(place => { let div = document.createElement('div'); div.className='search-item'; div.textContent=place.display_name.substring(0,60); div.onclick=() => { mapObj.setView([place.lat,place.lon],14); mapMarker.setLatLng([place.lat,place.lon]); reverseMapGeocode(place.lat,place.lon); results.style.display='none'; search.value=place.display_name; }; results.appendChild(div); }); results.style.display='block'; }; },100); }
-    async function reverseMapGeocode(lat,lon) { try { let res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=en&countrycodes=lk`); let data = await res.json(); document.getElementById('selected-address').value = data.display_name; } catch(e){ addSystemLog('ERROR', 'Map reverse geocode failed', e.message); } }
+    function setupAutocomplete(inputId,suggestionsId) { let input=document.getElementById(inputId); let div=document.getElementById(suggestionsId); if(!input||!div) return; input.addEventListener('input', async function() { let q=this.value.trim(); if(q.length<2) { div.style.display='none'; return; } clearTimeout(searchTimeout); searchTimeout = setTimeout(async () => { let results = await searchSriLankaLocations(q); div.innerHTML=''; if(results.length===0) div.innerHTML='<div class="autocomplete-item">No results</div>'; else results.forEach(p => { let item=document.createElement('div'); item.className='autocomplete-item'; item.textContent=p.display_name.substring(0,80); item.onclick=() => { input.value=p.display_name; if(inputId==='end-loc') currentDestinationAddress=p.display_name; div.style.display='none'; }; div.appendChild(item); }); div.style.display='block'; },300); }); document.addEventListener('click',e=>{ if(e.target!==input) div.style.display='none'; }); }
+    function openMapPicker(field) { mapPickerField=field; document.getElementById('map-title').innerText=field==='start'?'Pickup':'Drop'; document.getElementById('map-modal').style.display='flex'; setTimeout(() => { if(mapObj) mapObj.remove(); mapObj = L.map('map').setView([7.8731,80.7718],8); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom:19 }).addTo(mapObj); mapMarker = L.marker([7.8731,80.7718],{draggable:true}).addTo(mapObj); mapMarker.on('dragend',() => reverseMapGeocode(mapMarker.getLatLng().lat,mapMarker.getLatLng().lng)); mapObj.on('click',e => { mapMarker.setLatLng(e.latlng); reverseMapGeocode(e.latlng.lat,e.latlng.lng); }); if(navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => { mapObj.setView([pos.coords.latitude,pos.coords.longitude],14); mapMarker.setLatLng([pos.coords.latitude,pos.coords.longitude]); reverseMapGeocode(pos.coords.latitude,pos.coords.longitude); }); let search=document.getElementById('map-search'); let results=document.getElementById('search-results'); search.oninput = async function() { let q=this.value.trim(); if(q.length<2) { results.style.display='none'; return; } let data = await searchSriLankaLocations(q); results.innerHTML=''; if(data.length===0) results.innerHTML='<div class="search-item">No results</div>'; else data.forEach(place => { let div=document.createElement('div'); div.className='search-item'; div.textContent=place.display_name.substring(0,60); div.onclick=() => { mapObj.setView([place.lat,place.lon],14); mapMarker.setLatLng([place.lat,place.lon]); reverseMapGeocode(place.lat,place.lon); results.style.display='none'; search.value=place.display_name; }; results.appendChild(div); }); results.style.display='block'; }; },100); }
+    async function reverseMapGeocode(lat,lon) { try { let res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=en&countrycodes=lk`); let data = await res.json(); document.getElementById('selected-address').value = data.display_name; } catch(e){} }
     function getCurrentMapLocation() { if(navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => { mapObj.setView([pos.coords.latitude,pos.coords.longitude],14); mapMarker.setLatLng([pos.coords.latitude,pos.coords.longitude]); reverseMapGeocode(pos.coords.latitude,pos.coords.longitude); }); }
-    function useMapLocation() { let addr = document.getElementById('selected-address').value; if(addr && mapPickerField==='start') document.getElementById('start-loc').value=addr; else if(addr && mapPickerField==='end') { document.getElementById('end-loc').value=addr; currentDestinationAddress=addr; } closeMapModal(); }
+    function useMapLocation() { let addr=document.getElementById('selected-address').value; if(addr && mapPickerField==='start') document.getElementById('start-loc').value=addr; else if(addr && mapPickerField==='end') { document.getElementById('end-loc').value=addr; currentDestinationAddress=addr; } closeMapModal(); }
     function closeMapModal() { document.getElementById('map-modal').style.display='none'; if(mapObj) mapObj.remove(); }
     function manualAddDistance(km) { if(!sTime) { alert("Start ride"); return; } if(currentMode!=='manual') { alert("Manual mode required"); return; } totalMeters = Math.max(0, totalMeters + (km*1000)); document.getElementById('manual-km-input').value = (totalMeters/1000).toFixed(2); updateDisplay(); saveRideState(); }
-    function setManualDistance() { if(!sTime) { alert("Start ride"); return; } if(currentMode!=='manual') { alert("Manual mode required"); return; } let val = parseFloat(document.getElementById('manual-km-input').value); if(!isNaN(val) && val>=0) { totalMeters = val*1000; updateDisplay(); saveRideState(); } }
-    function openPhoneNavigation() { if(!currentDestinationAddress) { alert("Enter destination"); return; } let encoded = encodeURIComponent(currentDestinationAddress); let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent); window.open(isIOS ? `http://maps.apple.com/?daddr=${encoded}` : `https://www.google.com/maps/dir/?api=1&destination=${encoded}`, '_blank'); }
-    async function startRide() { if(sTime) { alert("Ride active"); return; } if(currentMode==='auto') { if(!currentLocationAddress) { alert("Wait for GPS"); return; } startLocationAddress = currentLocationAddress; } else if(currentMode==='gps') { if(!document.getElementById('start-loc').value.trim() || !document.getElementById('end-loc').value.trim()) { alert("Enter locations"); return; } startLocationAddress = document.getElementById('start-loc').value; currentDestinationAddress = document.getElementById('end-loc').value; } else if(currentMode==='manual') { if(!document.getElementById('start-loc').value.trim() || !document.getElementById('end-loc').value.trim()) { alert("Enter locations"); return; } startLocationAddress = document.getElementById('start-loc').value; currentDestinationAddress = document.getElementById('end-loc').value; } else if(currentMode==='delivery') { if(!document.getElementById('start-loc').value.trim() || !document.getElementById('end-loc').value.trim()) { alert("Enter locations"); return; } startLocationAddress = document.getElementById('start-loc').value; currentDestinationAddress = document.getElementById('end-loc').value; deliveryPickupName = document.getElementById('pickup-name').value; deliveryPickupPhone = document.getElementById('pickup-phone').value; deliveryDeliveryName = document.getElementById('delivery-name').value; deliveryDeliveryPhone = document.getElementById('delivery-phone').value; } sTime = new Date(); await requestWakeLock(); document.body.classList.add('ride-active'); if(currentMode==='auto') { totalMeters=0; if(currentLocationLat && currentLocationLon) { lastLat=currentLocationLat; lastLon=currentLocationLon; } trackRide(); } else if(currentMode==='gps' || currentMode==='delivery') { totalMeters=0; lastLat=null; lastLon=null; setTimeout(() => { if(navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => { lastLat=pos.coords.latitude; lastLon=pos.coords.longitude; }); },100); trackRide(); if(currentMode!=='auto') document.getElementById('nav-container').style.display='block'; } else { totalMeters = (parseFloat(document.getElementById('manual-km-input').value)||0)*1000; document.getElementById('nav-container').style.display='block'; } document.getElementById('startBtn').innerHTML = "⏵ ACTIVE"; document.getElementById('startBtn').classList.add('btn-active-anim'); document.getElementById('startBtn').disabled = true; updateDisplay(); document.querySelectorAll('.mode-btn').forEach(btn => btn.style.pointerEvents = 'none'); saveRideState(); addSystemLog('INFO', 'Ride started', `Mode: ${currentMode}`); }
-    function endRide() { if(!sTime) { alert("No active ride"); return; } releaseWakeLock(); document.body.classList.remove('ride-active'); if(watchId) { navigator.geolocation.clearWatch(watchId); watchId=null; } document.getElementById('startBtn').innerHTML = "START RIDE"; document.getElementById('startBtn').classList.remove('btn-active-anim'); document.getElementById('startBtn').disabled = false; if(currentMode==='auto' && currentDestinationAddress) document.getElementById('nav-container').style.display='block'; else if(currentMode!=='auto') document.getElementById('nav-container').style.display='none'; document.querySelectorAll('.mode-btn').forEach(btn => { btn.style.pointerEvents='auto'; btn.style.opacity='1'; }); let from = "", to = ""; if(currentMode==='auto') { from = startLocationAddress; to = currentLocationAddress; } else { from = document.getElementById('start-loc').value; to = document.getElementById('end-loc').value; } let fare = calcFare(); currentRID = generateReceiptID(); let km = totalMeters/1000; pendingRideData = { id:currentRID, fare, km, from, to, mobile:document.getElementById('mobile').value||"N/A", wait:parseInt(document.getElementById('wait-select').value), disc:parseInt(document.getElementById('discount-input').value)||0, manualFare:parseInt(document.getElementById('manual-fare').value)||0, nightUsed:nightActive, mode:currentMode==='auto'?"Auto":(currentMode==='gps'?"GPS":(currentMode==='manual'?"Manual":"Delivery")), time:Date.now() }; if(currentMode==='delivery') { pendingRideData.pickupName = deliveryPickupName; pendingRideData.pickupPhone = deliveryPickupPhone; pendingRideData.deliveryName = deliveryDeliveryName; pendingRideData.deliveryPhone = deliveryDeliveryPhone; } localStorage.removeItem('amt_ride_state'); openPaymentPopup(); addSystemLog('INFO', 'Ride ended', `Fare: Rs.${fare}, Distance: ${km}km`); }
+    function setManualDistance() { if(!sTime) { alert("Start ride"); return; } if(currentMode!=='manual') { alert("Manual mode required"); return; } let val=parseFloat(document.getElementById('manual-km-input').value); if(!isNaN(val) && val>=0) { totalMeters = val*1000; updateDisplay(); saveRideState(); } }
+    function openPhoneNavigation() { if(!currentDestinationAddress) { alert("Enter destination"); return; } let encoded=encodeURIComponent(currentDestinationAddress); let isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent); window.open(isIOS ? `http://maps.apple.com/?daddr=${encoded}` : `https://www.google.com/maps/dir/?api=1&destination=${encoded}`, '_blank'); }
+    async function startRide() { if(sTime) { alert("Ride active"); return; } if(currentMode==='auto') { if(!currentLocationAddress) { alert("Wait for GPS"); return; } startLocationAddress = currentLocationAddress; } else if(currentMode==='gps') { if(!document.getElementById('start-loc').value.trim() || !document.getElementById('end-loc').value.trim()) { alert("Enter locations"); return; } startLocationAddress = document.getElementById('start-loc').value; currentDestinationAddress = document.getElementById('end-loc').value; } else if(currentMode==='manual') { if(!document.getElementById('start-loc').value.trim() || !document.getElementById('end-loc').value.trim()) { alert("Enter locations"); return; } startLocationAddress = document.getElementById('start-loc').value; currentDestinationAddress = document.getElementById('end-loc').value; } else if(currentMode==='delivery') { if(!document.getElementById('start-loc').value.trim() || !document.getElementById('end-loc').value.trim()) { alert("Enter locations"); return; } startLocationAddress = document.getElementById('start-loc').value; currentDestinationAddress = document.getElementById('end-loc').value; deliveryPickupName = document.getElementById('pickup-name').value; deliveryPickupPhone = document.getElementById('pickup-phone').value; deliveryDeliveryName = document.getElementById('delivery-name').value; deliveryDeliveryPhone = document.getElementById('delivery-phone').value; } sTime = new Date(); await requestWakeLock(); document.body.classList.add('ride-active'); if(currentMode==='auto') { totalMeters=0; if(currentLocationLat && currentLocationLon) { lastLat=currentLocationLat; lastLon=currentLocationLon; } trackRide(); } else if(currentMode==='gps' || currentMode==='delivery') { totalMeters=0; lastLat=null; lastLon=null; setTimeout(() => { if(navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => { lastLat=pos.coords.latitude; lastLon=pos.coords.longitude; }); },100); trackRide(); if(currentMode!=='auto') document.getElementById('nav-container').style.display='block'; } else { totalMeters = (parseFloat(document.getElementById('manual-km-input').value)||0)*1000; document.getElementById('nav-container').style.display='block'; } document.getElementById('startBtn').innerHTML="⏵ ACTIVE"; document.getElementById('startBtn').classList.add('btn-active-anim'); document.getElementById('startBtn').disabled=true; updateDisplay(); document.querySelectorAll('.mode-btn').forEach(btn => btn.style.pointerEvents='none'); saveRideState(); addSystemLog('INFO','Ride started',`Mode: ${currentMode}`); }
+    function endRide() { if(!sTime) { alert("No active ride"); return; } releaseWakeLock(); document.body.classList.remove('ride-active'); if(watchId) { navigator.geolocation.clearWatch(watchId); watchId=null; } document.getElementById('startBtn').innerHTML="START RIDE"; document.getElementById('startBtn').classList.remove('btn-active-anim'); document.getElementById('startBtn').disabled=false; if(currentMode==='auto' && currentDestinationAddress) document.getElementById('nav-container').style.display='block'; else if(currentMode!=='auto') document.getElementById('nav-container').style.display='none'; document.querySelectorAll('.mode-btn').forEach(btn => { btn.style.pointerEvents='auto'; btn.style.opacity='1'; }); let from="", to=""; if(currentMode==='auto') { from=startLocationAddress; to=currentLocationAddress; } else { from=document.getElementById('start-loc').value; to=document.getElementById('end-loc').value; } let fare=calcFare(); currentRID=generateReceiptID(); let km=totalMeters/1000; pendingRideData = { id:currentRID, fare, km, from, to, mobile:document.getElementById('mobile').value||"N/A", wait:parseInt(document.getElementById('wait-select').value), disc:parseInt(document.getElementById('discount-input').value)||0, manualFare:parseInt(document.getElementById('manual-fare').value)||0, nightUsed:nightActive, mode:currentMode==='auto'?"Auto":(currentMode==='gps'?"GPS":(currentMode==='manual'?"Manual":"Delivery")), time:Date.now() }; if(currentMode==='delivery') { pendingRideData.pickupName=deliveryPickupName; pendingRideData.pickupPhone=deliveryPickupPhone; pendingRideData.deliveryName=deliveryDeliveryName; pendingRideData.deliveryPhone=deliveryDeliveryPhone; } localStorage.removeItem('amt_ride_state'); openPaymentPopup(); addSystemLog('INFO','Ride ended',`Fare: Rs.${fare}, Distance: ${km}km`); }
     function generateReceiptID() { let n=new Date(), y=n.getFullYear(), m=n.getMonth(); let fy=(m>=3)?y:y-1; let c=parseInt(localStorage.getItem(`cnt_${fy}`)||"0")+1; localStorage.setItem(`cnt_${fy}`,c); return `${fy.toString().slice(-2)}${n.toLocaleString('en',{month:'short'}).toUpperCase()}-${c.toString().padStart(8,'0')}`; }
-    function openPaymentPopup() { selectedMethod="cash"; document.querySelectorAll('.payment-method-btn').forEach(btn=>btn.classList.remove('selected')); document.querySelector('.payment-method-btn[data-method="cash"]')?.classList.add('selected'); document.getElementById('payment-detail-fields').style.display='block'; document.getElementById('cash-fields').style.display='block'; document.getElementById('card-fields').style.display='none'; document.getElementById('mobile-fields').style.display='none'; document.getElementById('bank-fields').style.display='none'; document.getElementById('other-fields').style.display='none'; document.getElementById('payment-popup').style.display='flex'; }
-    function selectPaymentMethod(method) { selectedMethod=method; document.querySelectorAll('.payment-method-btn').forEach(btn=>btn.classList.remove('selected')); document.querySelector(`.payment-method-btn[data-method="${method}"]`)?.classList.add('selected'); document.getElementById('cash-fields').style.display='none'; document.getElementById('card-fields').style.display='none'; document.getElementById('mobile-fields').style.display='none'; document.getElementById('bank-fields').style.display='none'; document.getElementById('other-fields').style.display='none'; if(method==='cash') document.getElementById('cash-fields').style.display='block'; if(method==='card') document.getElementById('card-fields').style.display='block'; if(method==='mobile') document.getElementById('mobile-fields').style.display='block'; if(method==='bank') document.getElementById('bank-fields').style.display='block'; if(method==='other') document.getElementById('other-fields').style.display='block'; }
-    function getPaymentInfo() { switch(selectedMethod) { case 'cash': return {method:'Cash',detail:''}; case 'card': let cardDetail = ""; if(document.getElementById('card-number')?.value) cardDetail += `****${document.getElementById('card-number').value}`; if(document.getElementById('card-name')?.value) cardDetail += ` - ${document.getElementById('card-name').value}`; return {method:'Card',detail:cardDetail||'Card payment'}; case 'mobile': let mobileDetail = ""; if(document.getElementById('mobile-provider')?.value) mobileDetail += document.getElementById('mobile-provider').value; if(document.getElementById('mobile-number')?.value) mobileDetail += ` ${document.getElementById('mobile-number').value}`; return {method:'Mobile',detail:mobileDetail||'Mobile payment'}; case 'bank': let bankDetail = ""; if(document.getElementById('bank-name')?.value) bankDetail += document.getElementById('bank-name').value; if(document.getElementById('bank-ref')?.value) bankDetail += ` - Ref: ${document.getElementById('bank-ref').value}`; return {method:'Bank Transfer',detail:bankDetail||'Bank transfer'}; case 'other': return {method:document.getElementById('other-method')?.value||'Other',detail:document.getElementById('other-ref')?.value||''}; default: return {method:'Cash',detail:''}; } }
+    function openPaymentPopup() { selectedMethod="cash"; document.querySelectorAll('.payment-method-btn').forEach(btn=>btn.classList.remove('selected')); document.querySelector('.payment-method-btn:first-child')?.classList.add('selected'); document.getElementById('payment-detail-fields').style.display='block'; document.getElementById('cash-fields').style.display='block'; document.getElementById('card-fields').style.display='none'; document.getElementById('mobile-fields').style.display='none'; document.getElementById('bank-fields').style.display='none'; document.getElementById('other-fields').style.display='none'; document.getElementById('payment-popup').style.display='flex'; }
+    function selectPaymentMethod(m) { selectedMethod=m; document.querySelectorAll('.payment-method-btn').forEach(btn=>btn.classList.remove('selected')); event.target.classList.add('selected'); document.getElementById('cash-fields').style.display='none'; document.getElementById('card-fields').style.display='none'; document.getElementById('mobile-fields').style.display='none'; document.getElementById('bank-fields').style.display='none'; document.getElementById('other-fields').style.display='none'; if(m==='cash') document.getElementById('cash-fields').style.display='block'; if(m==='card') document.getElementById('card-fields').style.display='block'; if(m==='mobile') document.getElementById('mobile-fields').style.display='block'; if(m==='bank') document.getElementById('bank-fields').style.display='block'; if(m==='other') document.getElementById('other-fields').style.display='block'; }
+    function getPaymentInfo() { switch(selectedMethod) { case 'cash': return {method:'Cash',detail:''}; case 'card': let cd=""; if(document.getElementById('card-number')?.value) cd+=`****${document.getElementById('card-number').value}`; if(document.getElementById('card-name')?.value) cd+=` - ${document.getElementById('card-name').value}`; return {method:'Card',detail:cd||'Card'}; case 'mobile': let md=""; if(document.getElementById('mobile-provider')?.value) md+=document.getElementById('mobile-provider').value; if(document.getElementById('mobile-number')?.value) md+=` ${document.getElementById('mobile-number').value}`; return {method:'Mobile',detail:md||'Mobile'}; case 'bank': let bd=""; if(document.getElementById('bank-name')?.value) bd+=document.getElementById('bank-name').value; if(document.getElementById('bank-ref')?.value) bd+=` - Ref: ${document.getElementById('bank-ref').value}`; return {method:'Bank',detail:bd||'Bank'}; default: return {method:'Other',detail:document.getElementById('other-method')?.value||''}; } }
     function closePaymentPopup() { document.getElementById('payment-popup').style.display='none'; }
-    function confirmPaymentAndShowReceipt() { if(!pendingRideData) return; pendingRideData.payment = getPaymentInfo(); let list = JSON.parse(localStorage.getItem('rides')||'[]'); list.push(pendingRideData); localStorage.setItem('rides',JSON.stringify(list)); showReceipt(pendingRideData,false); closePaymentPopup(); sTime=null; currentDestinationAddress=""; if(currentMode!=='manual') setTimeout(()=>startGPS(),1000); document.getElementById('nav-container').style.display='none'; addSystemLog('INFO', 'Payment confirmed', `Receipt: ${pendingRideData.id}, Method: ${pendingRideData.payment.method}`); }
-    function showReceipt(ride,isDuplicate) { let sub = (ride.manualFare>0)?ride.manualFare:(SETTINGS.base+(Math.max(0,ride.km-1)*SETTINGS.rate)); let waitC = ride.wait*SETTINGS.waitRate; let duplicateHtml = isDuplicate?'<div class="duplicate-badge" style="background:#e74c3c; color:white; text-align:center; padding:3px;">COPY</div>':''; let rows = duplicateHtml; rows += `<div class="r-row"><span>Receipt:</span><b>${ride.id}</b></div><div class="r-row"><span>Date:</span><b>${new Date(ride.time).toLocaleString()}</b></div><div class="r-row"><span>Mobile:</span><b>${ride.mobile}</b></div>`; if(ride.mode === 'Delivery') { rows += `<div class="r-row-full"><span class="r-label">Pickup Person:</span><span class="r-address">${ride.pickupName || ''} ${ride.pickupPhone || ''}</span></div><div class="r-row-full"><span class="r-label">Delivery Person:</span><span class="r-address">${ride.deliveryName || ''} ${ride.deliveryPhone || ''}</span></div>`; } rows += `<div class="r-row-full"><span class="r-label">From:</span><span class="r-address">${ride.from}</span></div><div class="r-row-full"><span class="r-label">To:</span><span class="r-address">${ride.to}</span></div><div class="r-row"><span>Distance:</span><b>${ride.km.toFixed(2)} km</b></div><div class="r-row"><span>Fare:</span><b>Rs.${sub}</b></div>`; if(waitC>0) rows+=`<div class="r-row"><span>Wait(${ride.wait}m):</span><b>+Rs.${waitC}</b></div>`; if(ride.nightUsed && ride.manualFare===0) rows+=`<div class="r-row"><span>Night(${SETTINGS.nightPercent}%):</span><b>+${Math.round(ride.fare-(sub+waitC-ride.disc))}</b></div>`; if(ride.disc>0) rows+=`<div class="r-row"><span>Discount:</span><b>-Rs.${ride.disc}</b></div>`; rows+=`<div class="r-row"><span>Mode:</span><b>${ride.mode}</b></div><div class="r-row"><span>Payment:</span><b>${ride.payment.method}</b></div>`; document.getElementById('receipt-body').innerHTML = rows; document.getElementById('receipt-total').innerHTML = ride.fare; document.getElementById('receipt-header').innerText = SETTINGS.receiptName; document.getElementById('receipt-words').innerHTML = numberToWords(ride.fare); let qr = document.getElementById('receipt-qr'); qr.innerHTML = ""; new QRCode(qr, { text: `${ride.id}|Rs.${ride.fare}|${ride.payment.method}`, width:85, height:85 }); document.getElementById('receiptModal').style.display = "flex"; }
-    async function shareWA() { try { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); canvas.toBlob(blob => { if(navigator.share) navigator.share({ files:[new File([blob],'receipt.png')] }); else { let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='receipt.png'; a.click(); } }); } catch(e){ addSystemLog('ERROR', 'Share failed', e.message); downloadReceiptPDF(); } }
-    async function sendEmailWithAttachment() { try { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); let {jsPDF}=window.jspdf; let pdf = new jsPDF({unit:'mm', format:'a6'}); pdf.addImage(canvas.toDataURL(),'PNG',2.5,5,100,(canvas.height*100)/canvas.width); let blob = pdf.output('blob'); if(navigator.share) navigator.share({ files:[new File([blob],'receipt.pdf')] }); else { let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='receipt.pdf'; a.click(); } } catch(e){ addSystemLog('ERROR', 'Email send failed', e.message); downloadReceiptPDF(); } }
+    function confirmPaymentAndShowReceipt() { 
+        if(!pendingRideData) { alert("No ride data"); return; } 
+        pendingRideData.payment = getPaymentInfo(); 
+        let list = JSON.parse(localStorage.getItem('rides')||'[]'); 
+        list.push(pendingRideData); 
+        localStorage.setItem('rides',JSON.stringify(list)); 
+        showReceipt(pendingRideData,false); 
+        closePaymentPopup(); 
+        sTime=null; 
+        currentDestinationAddress=""; 
+        if(currentMode!=='manual') setTimeout(()=>startGPS(),1000); 
+        document.getElementById('nav-container').style.display='none'; 
+        addSystemLog('INFO','Payment confirmed',`Receipt: ${pendingRideData.id}`); 
+    }
+    function showReceipt(ride,isDuplicate) { 
+        let sub = (ride.manualFare>0)?ride.manualFare:(SETTINGS.base+(Math.max(0,ride.km-1)*SETTINGS.rate)); 
+        let waitC=ride.wait*SETTINGS.waitRate; 
+        let dupHtml=isDuplicate?'<div style="background:#e74c3c; color:white; text-align:center; padding:3px;">📋 COPY</div>':''; 
+        let rows=dupHtml; 
+        rows+=`<div class="r-row"><span>Receipt:</span><b>${ride.id}</b></div><div class="r-row"><span>Date:</span><b>${new Date(ride.time).toLocaleString()}</b></div><div class="r-row"><span>Mobile:</span><b>${ride.mobile}</b></div>`; 
+        if(ride.mode==='Delivery') { rows+=`<div class="r-row-full"><span class="r-label">Pickup:</span><span class="r-address">${ride.pickupName||''} ${ride.pickupPhone||''}</span></div><div class="r-row-full"><span class="r-label">Delivery:</span><span class="r-address">${ride.deliveryName||''} ${ride.deliveryPhone||''}</span></div>`; } 
+        rows+=`<div class="r-row-full"><span class="r-label">From:</span><span class="r-address">${ride.from}</span></div><div class="r-row-full"><span class="r-label">To:</span><span class="r-address">${ride.to}</span></div><div class="r-row"><span>Distance:</span><b>${ride.km.toFixed(2)} km</b></div><div class="r-row"><span>Fare:</span><b>Rs.${sub.toFixed(2)}</b></div>`; 
+        if(waitC>0) rows+=`<div class="r-row"><span>Wait(${ride.wait}m):</span><b>+Rs.${waitC.toFixed(2)}</b></div>`; 
+        if(ride.nightUsed && ride.manualFare===0) rows+=`<div class="r-row"><span>Night(${SETTINGS.nightPercent}%):</span><b>+${Math.round(ride.fare-(sub+waitC-ride.disc))}</b></div>`; 
+        if(ride.disc>0) rows+=`<div class="r-row"><span>Discount:</span><b>-Rs.${ride.disc}</b></div>`; 
+        rows+=`<div class="r-row"><span>Mode:</span><b>${ride.mode}</b></div><div class="r-row"><span>Payment:</span><b>${ride.payment.method}</b></div>`; 
+        document.getElementById('receipt-body').innerHTML=rows; 
+        document.getElementById('receipt-total').innerHTML=ride.fare.toFixed(2); 
+        document.getElementById('receipt-header').innerText=SETTINGS.receiptName; 
+        document.getElementById('receipt-words').innerHTML=numberToWords(ride.fare); 
+        let qr=document.getElementById('receipt-qr'); 
+        qr.innerHTML=""; 
+        new QRCode(qr,{ text:`${ride.id}|Rs.${ride.fare.toFixed(2)}|${ride.payment.method}`, width:85, height:85 }); 
+        document.getElementById('receiptModal').style.display="flex"; 
+    }
+    async function shareWA() { try { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); canvas.toBlob(blob => { if(navigator.share) navigator.share({ files:[new File([blob],'receipt.png')] }); else { let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='receipt.png'; a.click(); } }); } catch(e){ downloadReceiptPDF(); } }
+    async function sendEmailWithAttachment() { try { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); let {jsPDF}=window.jspdf; let pdf = new jsPDF({unit:'mm', format:'a6'}); pdf.addImage(canvas.toDataURL(),'PNG',2.5,5,100,(canvas.height*100)/canvas.width); let blob = pdf.output('blob'); if(navigator.share) navigator.share({ files:[new File([blob],'receipt.pdf')] }); else { let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='receipt.pdf'; a.click(); } } catch(e){ downloadReceiptPDF(); } }
     async function downloadReceiptPDF() { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); let {jsPDF}=window.jspdf; let pdf = new jsPDF({unit:'mm', format:'a6'}); pdf.addImage(canvas.toDataURL(),'PNG',2.5,5,100,(canvas.height*100)/canvas.width); pdf.save(`${currentRID}.pdf`); }
-    async function printViaBluetooth() { alert("PDF ready for printing"); downloadReceiptPDF(); }
+    async function printViaBluetooth() { alert("PDF ready"); downloadReceiptPDF(); }
     function toggleNightCharge() { nightActive=!nightActive; let btn=document.getElementById('nightBtn'); if(nightActive) { btn.innerHTML='🌙 NIGHT ON'; btn.classList.add('night-active'); } else { btn.innerHTML='🌙 NIGHT OFF'; btn.classList.remove('night-active'); } updateDisplay(); if(sTime) saveRideState(); }
     function resetToNew() { if(sTime && !confirm("Reset ride?")) return; if(watchId) navigator.geolocation.clearWatch(watchId); releaseWakeLock(); document.body.classList.remove('ride-active'); document.querySelectorAll('.mode-btn').forEach(btn => { btn.style.pointerEvents='auto'; btn.style.opacity='1'; }); sTime=null; totalMeters=0; lastLat=null; lastLon=null; currentDestinationAddress=""; deliveryPickupName=""; deliveryPickupPhone=""; deliveryDeliveryName=""; deliveryDeliveryPhone=""; document.getElementById('startBtn').innerHTML="START RIDE"; document.getElementById('startBtn').classList.remove('btn-active-anim'); document.getElementById('startBtn').disabled=false; document.getElementById('start-loc').value=''; document.getElementById('end-loc').value=''; document.getElementById('mobile').value=''; document.getElementById('manual-fare').value=''; document.getElementById('discount-input').value=''; document.getElementById('wait-select').value='0'; document.getElementById('manual-km-input').value='0'; document.getElementById('nav-container').style.display='none'; document.getElementById('pickup-name').value=''; document.getElementById('pickup-phone').value=''; document.getElementById('delivery-name').value=''; document.getElementById('delivery-phone').value=''; updateDisplay(); localStorage.removeItem('amt_ride_state'); if(currentMode==='auto') refreshCurrentLocation(); if(currentMode!=='manual') startGPS(); else { gpsReady=true; document.getElementById('startBtn').disabled=false; } }
-    
-    // Settings Menu Functions
-    function openAppSettings() { closeM('settings-modal'); document.getElementById('app-settings-modal').style.display = 'flex'; }
-    function openFuelLogModal() { closeM('settings-modal'); updateFuelList(); document.getElementById('fuel-modal').style.display = 'flex'; }
-    function openRepairLogModal() { closeM('settings-modal'); updateRepairList(); document.getElementById('repair-modal').style.display = 'flex'; }
-    function openReportsMenu() { closeM('settings-modal'); document.getElementById('reports-menu-modal').style.display = 'flex'; }
-    function openFuelReport() { closeM('fuel-modal'); showFuelReportTab('daily'); document.getElementById('fuel-report-modal').style.display = 'flex'; }
-    function openRepairReport() { closeM('repair-modal'); showRepairReportTab('daily'); document.getElementById('repair-report-modal').style.display = 'flex'; }
-    function openTravelReport() { closeM('settings-modal'); showTravelReportTab('daily'); document.getElementById('travel-report-modal').style.display = 'flex'; }
-    
-    function loadSettings() { let saved = localStorage.getItem('amt_settings'); if(saved) try { let parsed = JSON.parse(saved); SETTINGS = {...SETTINGS, ...parsed}; } catch(e){ addSystemLog('ERROR', 'Load settings failed', e.message); } document.getElementById('display-app-name').innerHTML = SETTINGS.appName.replace(' ','<br>'); document.getElementById('set-app-name').value = SETTINGS.appName; document.getElementById('set-receipt-header').value = SETTINGS.receiptName; document.getElementById('set-base').value = SETTINGS.base; document.getElementById('set-rate').value = SETTINGS.rate; document.getElementById('set-wait').value = SETTINGS.waitRate; document.getElementById('set-night').value = SETTINGS.nightPercent; if(SETTINGS.logo) document.getElementById('main-logo-area').innerHTML = `<img src="${SETTINGS.logo}" style="width:100%; height:100%; object-fit:cover;">`; updateDisplay(); startGPS(); loadRideState(); updateFuelList(); updateRepairList(); }
-    function saveSettings() { SETTINGS.appName = document.getElementById('set-app-name').value; SETTINGS.receiptName = document.getElementById('set-receipt-header').value; SETTINGS.base = parseInt(document.getElementById('set-base').value)||100; SETTINGS.rate = parseInt(document.getElementById('set-rate').value)||80; SETTINGS.waitRate = parseInt(document.getElementById('set-wait').value)||5; SETTINGS.nightPercent = parseInt(document.getElementById('set-night').value)||10; let file = document.getElementById('logo-upload').files[0]; let np = document.getElementById('set-pwd').value; if(np) SETTINGS.password = np; let save = () => { localStorage.setItem('amt_settings', JSON.stringify(SETTINGS)); loadSettings(); closeM('app-settings-modal'); alert("Saved!"); addSystemLog('INFO', 'Settings saved', ''); }; if(file) { let r = new FileReader(); r.onload = e => { SETTINGS.logo = e.target.result; save(); }; r.readAsDataURL(file); } else save(); }
-    function updateHistoryList() { let rides = JSON.parse(localStorage.getItem('rides')||'[]'); let c = document.getElementById('history-list'); if(!rides.length) { c.innerHTML = "<p style='text-align:center;padding:20px;'>No rides yet</p>"; return; } c.innerHTML = rides.slice().reverse().map((r,i) => `<div class="history-item"><div style="display:flex; justify-content:space-between;"><b>${r.id}</b><button class="btn-reprint" onclick="reprintRide(${rides.length-1-i})">📄 VIEW</button></div><small>${new Date(r.time).toLocaleString()}</small><br><small>${r.from.substring(0,30)} → ${r.to.substring(0,30)}</small><div><strong>Rs.${r.fare}</strong> | ${r.km.toFixed(1)}km | ${r.payment?.method||'Cash'}</div></div>`).join(''); }
+    function loadSettings() { let saved = localStorage.getItem('amt_settings'); if(saved) try { let parsed = JSON.parse(saved); SETTINGS = {...SETTINGS, ...parsed}; } catch(e){} document.getElementById('display-app-name').innerHTML = SETTINGS.appName.replace(' ','<br>'); document.getElementById('set-app-name').value = SETTINGS.appName; document.getElementById('set-receipt-header').value = SETTINGS.receiptName; document.getElementById('set-base').value = SETTINGS.base; document.getElementById('set-rate').value = SETTINGS.rate; document.getElementById('set-wait').value = SETTINGS.waitRate; document.getElementById('set-night').value = SETTINGS.nightPercent; if(SETTINGS.logo) document.getElementById('main-logo-area').innerHTML = `<img src="${SETTINGS.logo}" style="width:100%; height:100%; object-fit:cover;">`; updateDisplay(); startGPS(); loadRideState(); updateFuelList(); updateRepairList(); }
+    function saveSettings() { SETTINGS.appName = document.getElementById('set-app-name').value; SETTINGS.receiptName = document.getElementById('set-receipt-header').value; SETTINGS.base = parseInt(document.getElementById('set-base').value)||100; SETTINGS.rate = parseInt(document.getElementById('set-rate').value)||80; SETTINGS.waitRate = parseInt(document.getElementById('set-wait').value)||5; SETTINGS.nightPercent = parseInt(document.getElementById('set-night').value)||10; let file = document.getElementById('logo-upload').files[0]; let np = document.getElementById('set-pwd').value; if(np) SETTINGS.password = np; let save = () => { localStorage.setItem('amt_settings', JSON.stringify(SETTINGS)); loadSettings(); closeM('app-settings-modal'); alert("Saved!"); addSystemLog('INFO','Settings saved',''); }; if(file) { let r = new FileReader(); r.onload = e => { SETTINGS.logo = e.target.result; save(); }; r.readAsDataURL(file); } else save(); }
+    function updateHistoryList() { let rides = JSON.parse(localStorage.getItem('rides')||'[]'); let c = document.getElementById('history-list'); if(!rides.length) { c.innerHTML = "<p style='text-align:center;padding:20px;'>No rides</p>"; return; } c.innerHTML = rides.slice().reverse().map((r,i) => `<div class="history-item"><div style="display:flex; justify-content:space-between;"><b>${r.id}</b><button class="btn-reprint" onclick="reprintRide(${rides.length-1-i})">📄 VIEW</button></div><small>${new Date(r.time).toLocaleString()}</small><br><small>${r.from.substring(0,30)} → ${r.to.substring(0,30)}</small><div><strong>Rs.${r.fare.toFixed(2)}</strong> | ${r.km.toFixed(1)}km | ${r.payment?.method||'Cash'}</div></div>`).join(''); }
     function reprintRide(i) { let rides = JSON.parse(localStorage.getItem('rides')||'[]'); if(rides[i]) { showReceipt(rides[i], true); closeM('history-modal'); } }
-    function updateEarningsChart() { let rides = JSON.parse(localStorage.getItem('rides')||'[]'); let d = [0,0,0,0,0,0,0]; rides.forEach(r => d[new Date(r.time).getDay()] += r.fare); if(window.mChart) window.mChart.destroy(); window.mChart = new Chart(document.getElementById('earningsChart'), { type:'bar', data:{ labels:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], datasets:[{ data:d, backgroundColor:'#667eea' }] } }); let today = rides.filter(r => new Date(r.time).toDateString() === new Date().toDateString()).reduce((a,b)=>a+b.fare,0); let total = rides.reduce((a,b)=>a+b.fare,0); document.getElementById('stat-today').innerHTML = "Rs."+today; document.getElementById('stat-total').innerHTML = "Rs."+total; }
-    function downloadCSV() { let rides = JSON.parse(localStorage.getItem('rides')||'[]'); let csv = "Date,ID,From,To,Distance,Fare,Payment\n" + rides.map(r => `${new Date(r.time).toLocaleDateString()},${r.id},${r.from},${r.to},${r.km.toFixed(2)},${r.fare},${r.payment?.method||'Cash'}`).join("\n"); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'rides.csv'; a.click(); }
-    function getRidesByDateRange(start,end) { let rides = JSON.parse(localStorage.getItem('rides')||'[]'); return rides.filter(r => { let d = new Date(r.time).toISOString().split('T')[0]; return d >= start && d <= end; }); }
-    function showReportTab(type) { currentReportType=type; document.querySelectorAll('#report-modal .report-tab').forEach(t=>t.classList.remove('active')); if(event&&event.target) event.target.classList.add('active'); let now=new Date(), start='', end=''; if(type==='daily') { start=end=now.toISOString().split('T')[0]; } else if(type==='monthly') { start=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0]; end=new Date(now.getFullYear(),now.getMonth()+1,0).toISOString().split('T')[0]; } else { start=new Date(now.getFullYear(),0,1).toISOString().split('T')[0]; end=new Date(now.getFullYear(),11,31).toISOString().split('T')[0]; } let rides = getRidesByDateRange(start,end); let stats={}; rides.forEach(r=>{ let m=r.payment?.method||'Cash'; stats[m]=(stats[m]||0)+r.fare; }); let total=rides.reduce((s,r)=>s+r.fare,0); let html = `<div style="text-align:center; padding:10px;"><strong>${type.toUpperCase()} PAYMENT REPORT</strong><br>Rides:${rides.length} | Total:Rs.${total}</div><div class="payment-stats">`; for(let [m,a] of Object.entries(stats)) html+=`<div class="stat-row"><span>${m}</span><span>Rs.${a}</span></div>`; html+=`</div>`; document.getElementById('report-container').innerHTML = html; }
-    function exportReportCSV() { let rides = JSON.parse(localStorage.getItem('rides')||'[]'); let csv = "Date,ID,From,To,Distance,Fare,Payment\n" + rides.map(r => `${new Date(r.time).toLocaleDateString()},${r.id},${r.from},${r.to},${r.km.toFixed(2)},${r.fare},${r.payment?.method||'Cash'}`).join("\n"); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = `report_${currentReportType}.csv`; a.click(); }
+    function updateEarningsChart() { let rides = JSON.parse(localStorage.getItem('rides')||'[]'); let d=[0,0,0,0,0,0,0]; rides.forEach(r=>d[new Date(r.time).getDay()]+=r.fare); if(window.mChart) window.mChart.destroy(); window.mChart=new Chart(document.getElementById('earningsChart'),{ type:'bar', data:{ labels:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], datasets:[{ data:d, backgroundColor:'#667eea' }] } }); let today=rides.filter(r=>new Date(r.time).toDateString()===new Date().toDateString()).reduce((a,b)=>a+b.fare,0); let total=rides.reduce((a,b)=>a+b.fare,0); document.getElementById('stat-today').innerHTML="Rs."+today.toFixed(2); document.getElementById('stat-total').innerHTML="Rs."+total.toFixed(2); }
+    function downloadCSV() { let rides=JSON.parse(localStorage.getItem('rides')||'[]'); let csv="Date,ID,From,To,Distance,Fare,Payment\n"+rides.map(r=>`${new Date(r.time).toLocaleDateString()},${r.id},${r.from},${r.to},${r.km.toFixed(2)},${r.fare.toFixed(2)},${r.payment?.method||'Cash'}`).join("\n"); let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv])); a.download='rides.csv'; a.click(); }
+    function getRidesByDateRange(s,e) { let rides=JSON.parse(localStorage.getItem('rides')||'[]'); return rides.filter(r=>{ let d=new Date(r.time).toISOString().split('T')[0]; return d>=s && d<=e; }); }
+    function showReportTab(t) { currentReportType=t; document.querySelectorAll('#report-modal .report-tab').forEach(tb=>tb.classList.remove('active')); if(event&&event.target) event.target.classList.add('active'); let now=new Date(), s='', e=''; if(t==='daily') { s=e=now.toISOString().split('T')[0]; } else if(t==='monthly') { s=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0]; e=new Date(now.getFullYear(),now.getMonth()+1,0).toISOString().split('T')[0]; } else { s=new Date(now.getFullYear(),0,1).toISOString().split('T')[0]; e=new Date(now.getFullYear(),11,31).toISOString().split('T')[0]; } let rides=getRidesByDateRange(s,e); let stats={}; rides.forEach(r=>{ let m=r.payment?.method||'Cash'; stats[m]=(stats[m]||0)+r.fare; }); let total=rides.reduce((a,b)=>a+b.fare,0); let html=`<div style="text-align:center; padding:10px;"><strong>${t.toUpperCase()} PAYMENT</strong><br>Rides:${rides.length} | Total:Rs.${total.toFixed(2)}</div><div class="payment-stats">`; for(let [m,a] of Object.entries(stats)) html+=`<div class="stat-row"><span>${m}</span><span>Rs.${a.toFixed(2)}</span></div>`; html+=`</div>`; document.getElementById('report-container').innerHTML=html; }
+    function exportReportCSV() { let rides=JSON.parse(localStorage.getItem('rides')||'[]'); let csv="Date,ID,From,To,Distance,Fare,Payment\n"+rides.map(r=>`${new Date(r.time).toLocaleDateString()},${r.id},${r.from},${r.to},${r.km.toFixed(2)},${r.fare.toFixed(2)},${r.payment?.method||'Cash'}`).join("\n"); let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv])); a.download=`report_${currentReportType}.csv`; a.click(); }
     let loginAttempts=0, lockUntil=null;
-    function checkLogin() { let pwd = document.getElementById('admin-pass').value; if(lockUntil && Date.now()<lockUntil) { alert(`Try after ${Math.ceil((lockUntil-Date.now())/60000)} min`); return; } if(pwd === SETTINGS.password) { loginAttempts=0; lockUntil=null; closeM('login-modal'); document.getElementById('settings-modal').style.display='flex'; } else { loginAttempts++; if(loginAttempts>=5) { lockUntil=Date.now()+5*60*1000; alert('Locked for 5 minutes'); addSystemLog('WARNING', 'Login locked', 'Too many failed attempts'); } else { alert(`Wrong! ${5-loginAttempts} attempts left`); } } }
+    function checkLogin() { let pwd=document.getElementById('admin-pass').value; if(lockUntil && Date.now()<lockUntil) { alert(`Try after ${Math.ceil((lockUntil-Date.now())/60000)} min`); return; } if(pwd===SETTINGS.password) { loginAttempts=0; lockUntil=null; closeM('login-modal'); document.getElementById('settings-modal').style.display='flex'; } else { loginAttempts++; if(loginAttempts>=5) { lockUntil=Date.now()+5*60*1000; alert('Locked for 5 minutes'); addSystemLog('WARNING','Login locked','Too many failures'); } else { alert(`Wrong! ${5-loginAttempts} attempts left`); } } }
     function openLogin() { document.getElementById('admin-pass').value=''; document.getElementById('login-modal').style.display='flex'; }
+    function closeSettingsAndLogout() { closeM('settings-modal'); loginAttempts=0; lockUntil=null; addSystemLog('INFO','Logged out',''); }
+    function openAppSettings() { closeM('settings-modal'); document.getElementById('app-settings-modal').style.display='flex'; }
+    function openFuelLogModal() { closeM('settings-modal'); updateFuelList(); document.getElementById('fuel-modal').style.display='flex'; }
+    function openRepairLogModal() { closeM('settings-modal'); updateRepairList(); document.getElementById('repair-modal').style.display='flex'; }
+    function openReportsMenu() { closeM('settings-modal'); document.getElementById('reports-menu-modal').style.display='flex'; }
+    function openFuelReport() { closeM('fuel-modal'); showFuelReportTab('daily'); document.getElementById('fuel-report-modal').style.display='flex'; }
+    function openRepairReport() { closeM('repair-modal'); showRepairReportTab('daily'); document.getElementById('repair-report-modal').style.display='flex'; }
+    function openTravelReport() { showTravelReportTab('daily'); document.getElementById('travel-report-modal').style.display='flex'; }
     function closeM(id) { document.getElementById(id).style.display='none'; }
     function backToS(id) { closeM(id); document.getElementById('settings-modal').style.display='flex'; }
     function openPanel(id) { closeM('settings-modal'); document.getElementById(id).style.display='flex'; if(id==='income-modal') updateEarningsChart(); if(id==='history-modal') updateHistoryList(); if(id==='report-modal') showReportTab('daily'); }
-    
-    // Fuel total calculation
-    document.getElementById('fuel-liters')?.addEventListener('input', function() { let liters = parseFloat(this.value)||0; let price = parseFloat(document.getElementById('fuel-price')?.value||0); let totalField = document.getElementById('fuel-total'); if(totalField) totalField.value = (liters * price).toFixed(2); });
-    document.getElementById('fuel-price')?.addEventListener('input', function() { let liters = parseFloat(document.getElementById('fuel-liters')?.value||0); let price = parseFloat(this.value)||0; let totalField = document.getElementById('fuel-total'); if(totalField) totalField.value = (liters * price).toFixed(2); });
-    
+    document.getElementById('fuel-liters')?.addEventListener('input', function() { let l=parseFloat(this.value)||0; let p=parseFloat(document.getElementById('fuel-price')?.value||0); let t=document.getElementById('fuel-total'); if(t) t.value=(l*p).toFixed(2); });
+    document.getElementById('fuel-price')?.addEventListener('input', function() { let l=parseFloat(document.getElementById('fuel-liters')?.value||0); let p=parseFloat(this.value)||0; let t=document.getElementById('fuel-total'); if(t) t.value=(l*p).toFixed(2); });
     window.onload = function() { loadSettings(); document.getElementById('manual-km-input').value='0'; initVoiceRecognition(); };
 </script>
 </body>
