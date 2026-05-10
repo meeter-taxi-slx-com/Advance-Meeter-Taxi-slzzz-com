@@ -15,9 +15,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        /* ============================================
-           CSS VARIABLES - Premium Design System
-        ============================================ */
         :root {
             --primary: #1a4a9e;
             --primary-dark: #0e3a7d;
@@ -47,620 +44,117 @@
             --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
-            background: linear-gradient(145deg, #e2e8f0 0%, #cbd5e1 100%);
-            min-height: 100vh;
-            padding: 16px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* Premium App Container */
-        .app-container {
-            background: var(--white);
-            width: 100%;
-            max-width: 480px;
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-xl);
-            padding: 20px;
-            position: relative;
-            transition: var(--transition);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        body.ride-active .app-container {
-            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.3), var(--shadow-xl);
-        }
-
-        /* Header */
-        .header-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding: 0 4px;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-area {
-            width: 52px;
-            height: 52px;
-            background: var(--primary-gradient);
-            border-radius: var(--radius-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            color: white;
-            box-shadow: var(--shadow);
-        }
-
-        .brand-name {
-            font-size: 15px;
-            font-weight: 800;
-            text-transform: uppercase;
-            line-height: 1.3;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -0.3px;
-        }
-
-        .settings-icon {
-            width: 44px;
-            height: 44px;
-            background: rgba(26, 74, 158, 0.08);
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            cursor: pointer;
-            transition: var(--transition);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(26, 74, 158, 0.1);
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif; background: linear-gradient(145deg, #e2e8f0 0%, #cbd5e1 100%); min-height: 100vh; padding: 16px; display: flex; justify-content: center; align-items: center; }
+        .app-container { background: var(--white); width: 100%; max-width: 480px; border-radius: var(--radius-xl); box-shadow: var(--shadow-xl); padding: 20px; position: relative; transition: var(--transition); border: 1px solid rgba(255, 255, 255, 0.3); }
+        body.ride-active .app-container { box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.3), var(--shadow-xl); }
+        .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 0 4px; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .logo-area { width: 52px; height: 52px; background: var(--primary-gradient); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; box-shadow: var(--shadow); }
+        .brand-name { font-size: 15px; font-weight: 800; text-transform: uppercase; line-height: 1.3; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -0.3px; }
+        .settings-icon { width: 44px; height: 44px; background: rgba(26, 74, 158, 0.08); border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: var(--transition); backdrop-filter: blur(10px); border: 1px solid rgba(26, 74, 158, 0.1); }
         .settings-icon:active { transform: scale(0.94); background: rgba(26, 74, 158, 0.15); }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .action-btn {
-            flex: 1;
-            background: var(--gray-bg);
-            border: none;
-            padding: 12px;
-            border-radius: 32px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--dark);
-            cursor: pointer;
-            text-align: center;
-            transition: var(--transition);
-            font-family: inherit;
-        }
-
+        .action-buttons { display: flex; gap: 12px; margin-bottom: 20px; }
+        .action-btn { flex: 1; background: var(--gray-bg); border: none; padding: 12px; border-radius: 32px; font-size: 13px; font-weight: 600; color: var(--dark); cursor: pointer; text-align: center; transition: var(--transition); font-family: inherit; }
         .action-btn:active { transform: scale(0.96); background: #e2e8f0; }
-
-        .night-btn {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-            color: white;
-        }
+        .night-btn { background: linear-gradient(135deg, #f39c12, #e67e22); color: white; }
         .night-active { background: linear-gradient(135deg, #e74c3c, #c0392b) !important; }
-
-        /* Inputs */
-        input, select {
-            width: 100%;
-            padding: 14px 16px;
-            margin: 6px 0;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 20px;
-            background: var(--white);
-            font-size: 14px;
-            font-family: inherit;
-            transition: var(--transition);
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(26, 74, 158, 0.1);
-        }
-
+        input, select { width: 100%; padding: 14px 16px; margin: 6px 0; border: 1.5px solid #e2e8f0; border-radius: 20px; background: var(--white); font-size: 14px; font-family: inherit; transition: var(--transition); }
+        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26, 74, 158, 0.1); }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-        /* Mode Selector */
-        .mode-selector {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .mode-btn {
-            flex: 1;
-            padding: 10px 8px;
-            border-radius: 32px;
-            border: 1.5px solid #e2e8f0;
-            background: var(--white);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 11px;
-            text-align: center;
-            transition: var(--transition);
-            font-family: inherit;
-            color: var(--dark);
-        }
-        .mode-btn.active {
-            background: var(--primary-gradient);
-            color: white;
-            border-color: transparent;
-            box-shadow: var(--shadow);
-        }
-
-        /* Fare Card */
-        .fare-card {
-            background: linear-gradient(145deg, #ffffff, #f8fafc);
-            border-radius: var(--radius-lg);
-            padding: 24px 20px;
-            margin: 16px 0;
-            border: 1px solid rgba(26, 74, 158, 0.08);
-            box-shadow: var(--shadow);
-        }
+        .mode-selector { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .mode-btn { flex: 1; padding: 10px 8px; border-radius: 32px; border: 1.5px solid #e2e8f0; background: var(--white); cursor: pointer; font-weight: 600; font-size: 11px; text-align: center; transition: var(--transition); font-family: inherit; color: var(--dark); }
+        .mode-btn.active { background: var(--primary-gradient); color: white; border-color: transparent; box-shadow: var(--shadow); }
+        .fare-card { background: linear-gradient(145deg, #ffffff, #f8fafc); border-radius: var(--radius-lg); padding: 24px 20px; margin: 16px 0; border: 1px solid rgba(26, 74, 158, 0.08); box-shadow: var(--shadow); }
         .fare-row { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
         .fare-item { flex: 1; text-align: center; }
         .fare-item small { font-size: 11px; font-weight: 600; color: var(--gray); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; display: block; }
         .fare-item .display-value { font-size: 44px; font-weight: 800; background: linear-gradient(135deg, #1e293b, #334155); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; }
         .fare-item .display-fare-value { font-size: 44px; font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; }
-
-        /* Counter Animation */
-        @keyframes countSpring {
-            0% { transform: scale(1); opacity: 1; }
-            30% { transform: scale(1.2); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
+        @keyframes countSpring { 0% { transform: scale(1); opacity: 1; } 30% { transform: scale(1.2); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
         .count-animation { animation: countSpring 0.25s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
-
-        /* Manual Controls */
-        .manual-control {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-        .manual-btn {
-            background: var(--primary-gradient);
-            color: white;
-            border: none;
-            width: 52px;
-            height: 52px;
-            border-radius: 30px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: var(--shadow);
-        }
+        .manual-control { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 20px; }
+        .manual-btn { background: var(--primary-gradient); color: white; border: none; width: 52px; height: 52px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow); }
         .manual-btn:active { transform: scale(0.94); }
-        .manual-input {
-            width: 110px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: 600;
-            padding: 12px;
-            border-radius: 24px;
-            background: var(--white);
-            border: 1.5px solid #e2e8f0;
-        }
-        .set-distance-btn {
-            background: var(--secondary-gradient);
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 32px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 12px;
-            display: inline-block;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
+        .manual-input { width: 110px; text-align: center; font-size: 20px; font-weight: 600; padding: 12px; border-radius: 24px; background: var(--white); border: 1.5px solid #e2e8f0; }
+        .set-distance-btn { background: var(--secondary-gradient); color: white; border: none; padding: 12px 28px; border-radius: 32px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 12px; display: inline-block; box-shadow: var(--shadow); transition: var(--transition); }
         .set-distance-btn:active { transform: scale(0.96); }
-
-        /* Location Card */
-        .location-card {
-            background: var(--gray-bg);
-            border-radius: 24px;
-            padding: 14px;
-            margin: 12px 0;
-            border: 1px solid rgba(26, 74, 158, 0.08);
-        }
+        .location-card { background: var(--gray-bg); border-radius: 24px; padding: 14px; margin: 12px 0; border: 1px solid rgba(26, 74, 158, 0.08); }
         .location-title { font-size: 10px; font-weight: 600; color: var(--gray); letter-spacing: 0.5px; margin-bottom: 6px; text-transform: uppercase; }
         .location-address { font-size: 13px; font-weight: 500; color: var(--dark); word-break: break-word; }
         .refresh-location { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 6px 12px; border-radius: 25px; font-size: 10px; cursor: pointer; font-weight: 500; transition: var(--transition); }
         .refresh-location:active { background: rgba(26, 74, 158, 0.1); }
-
-        /* Map Picker */
-        .map-picker-btn {
-            background: var(--primary-gradient);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 24px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: var(--transition);
-        }
+        .map-picker-btn { background: var(--primary-gradient); color: white; border: none; padding: 12px; border-radius: 24px; font-size: 12px; font-weight: 600; cursor: pointer; width: 100%; transition: var(--transition); }
         .map-picker-btn:active { transform: scale(0.97); }
-
-        .delivery-fields {
-            background: rgba(26, 74, 158, 0.04);
-            border-radius: 24px;
-            padding: 16px;
-            margin: 12px 0;
-            display: none;
-            border: 1px solid rgba(26, 74, 158, 0.08);
-        }
+        .delivery-fields { background: rgba(26, 74, 158, 0.04); border-radius: 24px; padding: 16px; margin: 12px 0; display: none; border: 1px solid rgba(26, 74, 158, 0.08); }
         .delivery-fields h4 { color: var(--primary); margin-bottom: 12px; font-size: 14px; font-weight: 600; }
-
-        /* Main Buttons */
-        .btn-main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            margin-top: 20px;
-        }
-        .btn-start {
-            background: var(--secondary-gradient);
-            border: none;
-            border-radius: 34px;
-            font-size: 16px;
-            font-weight: 700;
-            color: white;
-            cursor: pointer;
-            padding: 16px;
-            transition: var(--transition);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: var(--shadow);
-        }
-        .btn-end {
-            background: var(--accent-gradient);
-            border: none;
-            border-radius: 34px;
-            font-size: 16px;
-            font-weight: 700;
-            color: white;
-            cursor: pointer;
-            padding: 16px;
-            transition: var(--transition);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: var(--shadow);
-        }
+        .btn-main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
+        .btn-start { background: var(--secondary-gradient); border: none; border-radius: 34px; font-size: 16px; font-weight: 700; color: white; cursor: pointer; padding: 16px; transition: var(--transition); text-transform: uppercase; letter-spacing: 0.5px; box-shadow: var(--shadow); }
+        .btn-end { background: var(--accent-gradient); border: none; border-radius: 34px; font-size: 16px; font-weight: 700; color: white; cursor: pointer; padding: 16px; transition: var(--transition); text-transform: uppercase; letter-spacing: 0.5px; box-shadow: var(--shadow); }
         .btn-start:active, .btn-end:active { transform: scale(0.97); }
         .btn-active-anim { animation: pulse-btn 1.5s infinite; }
-        @keyframes pulse-btn {
-            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
-            70% { box-shadow: 0 0 0 12px rgba(46, 204, 113, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
-        }
-
-        /* Voice Commands */
+        @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); } 70% { box-shadow: 0 0 0 12px rgba(46, 204, 113, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); } }
         .voice-container { text-align: center; margin-top: 16px; }
-        .voice-btn {
-            background: linear-gradient(135deg, #6366f1, #4f46e5);
-            color: white;
-            border: none;
-            border-radius: 40px;
-            padding: 10px 20px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: var(--transition);
-            box-shadow: var(--shadow);
-        }
+        .voice-btn { background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; border: none; border-radius: 40px; padding: 10px 20px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: var(--transition); box-shadow: var(--shadow); }
         .voice-btn.listening { animation: pulse-voice 1.5s infinite; background: linear-gradient(135deg, #e74c3c, #c0392b); }
-        @keyframes pulse-voice {
-            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
-        }
+        @keyframes pulse-voice { 0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); } 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); } }
         .voice-status { font-size: 10px; text-align: center; margin-top: 6px; color: var(--gray); }
         .voice-commands-guide { font-size: 9px; text-align: center; margin-top: 4px; color: var(--gray-light); display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-
-        /* GPS Status */
-        .gps-status {
-            font-size: 12px;
-            text-align: center;
-            margin-top: 12px;
-            padding: 8px 12px;
-            border-radius: 30px;
-            font-weight: 500;
-        }
+        .gps-status { font-size: 12px; text-align: center; margin-top: 12px; padding: 8px 12px; border-radius: 30px; font-weight: 500; }
         .gps-ready { background: rgba(46, 204, 113, 0.12); color: #27ae60; }
         .gps-warning { background: rgba(241, 196, 15, 0.12); color: #d4a00a; }
         .gps-error { background: rgba(231, 76, 60, 0.12); color: #e74c3c; }
-
-        /* Map */
         .map-container { height: 380px; width: 100%; border-radius: 28px; margin: 12px 0; background: #e2e8f0; overflow: hidden; }
-
-        /* Modals - Premium Design */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
-        .modal-content {
-            background: var(--white);
-            width: 100%;
-            max-width: 420px;
-            border-radius: 48px;
-            padding: 24px;
-            position: relative;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-xl);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        .close-circle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: var(--gray-bg);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-            transition: var(--transition);
-        }
+        .modal { display: none; position: fixed; z-index: 2000; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 16px; }
+        .modal-content { background: var(--white); width: 100%; max-width: 420px; border-radius: 48px; padding: 24px; position: relative; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-xl); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .close-circle { position: absolute; top: 20px; right: 20px; background: var(--gray-bg); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; transition: var(--transition); }
         .close-circle:active { background: #e2e8f0; transform: scale(0.94); }
-        .back-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: var(--gray-bg);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-            transition: var(--transition);
-        }
+        .back-btn { position: absolute; top: 20px; left: 20px; background: var(--gray-bg); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; transition: var(--transition); }
         .back-btn:active { background: #e2e8f0; transform: scale(0.94); }
-
-        /* Settings Menu */
         .settings-menu { display: flex; flex-direction: column; gap: 12px; }
-        .settings-menu-btn {
-            background: var(--primary-gradient);
-            color: white;
-            border: none;
-            padding: 16px 20px;
-            border-radius: 40px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            transition: var(--transition);
-            box-shadow: var(--shadow);
-        }
+        .settings-menu-btn { background: var(--primary-gradient); color: white; border: none; padding: 16px 20px; border-radius: 40px; font-size: 15px; font-weight: 600; cursor: pointer; text-align: center; transition: var(--transition); box-shadow: var(--shadow); }
         .settings-menu-btn:active { transform: scale(0.97); }
         .settings-menu-btn.secondary { background: linear-gradient(135deg, #2c3e50, #34495e); }
         .settings-menu-btn.warning { background: linear-gradient(135deg, #e74c3c, #c0392b); }
-
-        /* Payment Methods */
         .payment-methods { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; }
-        .payment-method-btn {
-            background: var(--gray-bg);
-            border: 1.5px solid #e2e8f0;
-            border-radius: 28px;
-            padding: 14px 18px;
-            cursor: pointer;
-            text-align: left;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-        .payment-method-btn.selected {
-            background: var(--primary-gradient);
-            color: white;
-            border-color: transparent;
-        }
+        .payment-method-btn { background: var(--gray-bg); border: 1.5px solid #e2e8f0; border-radius: 28px; padding: 14px 18px; cursor: pointer; text-align: left; font-weight: 600; transition: var(--transition); }
+        .payment-method-btn.selected { background: var(--primary-gradient); color: white; border-color: transparent; }
         .payment-detail-fields { margin-top: 15px; padding: 18px; background: var(--gray-bg); border-radius: 28px; }
-        .confirm-payment-btn {
-            background: var(--secondary-gradient);
-            color: white;
-            padding: 16px;
-            border: none;
-            border-radius: 40px;
-            font-size: 16px;
-            font-weight: 700;
-            width: 100%;
-            margin-top: 20px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
+        .confirm-payment-btn { background: var(--secondary-gradient); color: white; padding: 16px; border: none; border-radius: 40px; font-size: 16px; font-weight: 700; width: 100%; margin-top: 20px; cursor: pointer; transition: var(--transition); }
         .confirm-payment-btn:active { transform: scale(0.97); }
-
-        /* History Items */
-        .history-item {
-            background: var(--gray-bg);
-            padding: 16px;
-            margin-bottom: 12px;
-            border-radius: 28px;
-            border-left: 4px solid var(--primary);
-            transition: var(--transition);
-        }
-        .btn-reprint {
-            background: var(--primary-gradient);
-            padding: 6px 14px;
-            font-size: 11px;
-            font-weight: 600;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        /* Receipt */
-        .receipt-print {
-            width: 72mm;
-            max-width: 72mm;
-            margin: 0 auto;
-            padding: 4mm;
-            font-family: 'Courier New', 'SF Mono', monospace;
-            font-size: 9pt;
-            background: white;
-            position: relative;
-            border-radius: 16px;
-        }
+        .history-item { background: var(--gray-bg); padding: 16px; margin-bottom: 12px; border-radius: 28px; border-left: 4px solid var(--primary); transition: var(--transition); }
+        .btn-reprint { background: var(--primary-gradient); padding: 6px 14px; font-size: 11px; font-weight: 600; color: white; border: none; border-radius: 25px; cursor: pointer; transition: var(--transition); }
+        .receipt-print { width: 72mm; max-width: 72mm; margin: 0 auto; padding: 4mm; font-family: 'Courier New', 'SF Mono', monospace; font-size: 9pt; background: white; position: relative; border-radius: 16px; }
         .r-header { background: linear-gradient(135deg, #000, #1a1a2e); color: white; padding: 8px; text-align: center; font-weight: 800; border-radius: 12px 12px 0 0; }
         .r-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dotted #ccc; }
         .r-row-full { display: block; padding: 4px 0; border-bottom: 1px dotted #ccc; }
         .r-label { font-weight: 800; display: block; }
         .r-address { word-break: break-all; }
         .r-total { background: linear-gradient(135deg, #1a4a9e, #2563eb); color: white; padding: 8px; text-align: center; margin: 8px 0; border-radius: 12px; font-weight: 800; }
-        .receipt-seal {
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 2px solid #e74c3c;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255,255,255,0.95);
-            transform: rotate(-15deg);
-        }
+        .receipt-seal { position: absolute; bottom: 8px; right: 8px; width: 32px; height: 32px; border-radius: 50%; border: 2px solid #e74c3c; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.95); transform: rotate(-15deg); }
         .receipt-seal:before { content: "✓ PAID"; font-size: 7px; font-weight: bold; color: #e74c3c; }
-
-        /* Report Tabs */
+        .receipt-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+        .btn-wa { background: #25D366; color: white; padding: 12px; border-radius: 24px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-gm { background: #EA4335; color: white; padding: 12px; border-radius: 24px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-pdf { background: #34495e; color: white; padding: 12px; border-radius: 24px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-print { background: #9b59b6; color: white; padding: 12px; border-radius: 24px; border: none; font-weight: bold; cursor: pointer; }
         .report-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-        .report-tab {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 30px;
-            background: var(--gray-bg);
-            cursor: pointer;
-            font-weight: 600;
-            transition: var(--transition);
-            font-family: inherit;
-        }
+        .report-tab { flex: 1; padding: 10px; border: none; border-radius: 30px; background: var(--gray-bg); cursor: pointer; font-weight: 600; transition: var(--transition); font-family: inherit; }
         .report-tab.active { background: var(--primary-gradient); color: white; }
         .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e2e8f0; }
-
-        /* Profit Card */
-        .profit-card {
-            background: linear-gradient(145deg, #f0fdf4, #dcfce7);
-            border-radius: 28px;
-            padding: 20px;
-            margin: 15px 0;
-            border: 1px solid rgba(46, 204, 113, 0.2);
-        }
+        .profit-card { background: linear-gradient(145deg, #f0fdf4, #dcfce7); border-radius: 28px; padding: 20px; margin: 15px 0; border: 1px solid rgba(46, 204, 113, 0.2); }
         .profit-row { display: flex; justify-content: space-between; margin: 10px 0; }
         .profit-positive { color: #27ae60; font-weight: 700; }
         .profit-negative { color: #e74c3c; font-weight: 700; }
-
-        /* Date Filter */
         .date-filter { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-        .date-filter-btn {
-            flex: 1;
-            padding: 8px;
-            border: none;
-            border-radius: 30px;
-            background: var(--gray-bg);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 12px;
-            transition: var(--transition);
-        }
+        .date-filter-btn { flex: 1; padding: 8px; border: none; border-radius: 30px; background: var(--gray-bg); cursor: pointer; font-weight: 600; font-size: 12px; transition: var(--transition); }
         .date-filter-btn.active { background: var(--primary-gradient); color: white; }
-
-        /* System Log */
-        .system-log-entry {
-            background: rgba(0, 0, 0, 0.03);
-            padding: 12px;
-            margin-bottom: 8px;
-            border-radius: 20px;
-            font-size: 11px;
-            border-left: 3px solid #e74c3c;
-        }
-
-        /* Autocomplete */
+        .system-log-entry { background: rgba(0, 0, 0, 0.03); padding: 12px; margin-bottom: 8px; border-radius: 20px; font-size: 11px; border-left: 3px solid #e74c3c; }
         .autocomplete-container { position: relative; width: 100%; }
-        .autocomplete-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 20px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1000;
-            box-shadow: var(--shadow-md);
-        }
+        .autocomplete-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 20px; max-height: 200px; overflow-y: auto; z-index: 1000; box-shadow: var(--shadow-md); }
         .autocomplete-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 13px; transition: var(--transition); }
         .autocomplete-item:hover { background: var(--gray-bg); }
-
-        /* Restore Banner */
-        .restore-banner {
-            background: #fef3c7;
-            color: #b45309;
-            padding: 12px;
-            border-radius: 28px;
-            margin-bottom: 16px;
-            text-align: center;
-            font-size: 12px;
-            font-weight: 600;
-            display: none;
-            cursor: pointer;
-            transition: var(--transition);
-        }
+        .restore-banner { background: #fef3c7; color: #b45309; padding: 12px; border-radius: 28px; margin-bottom: 16px; text-align: center; font-size: 12px; font-weight: 600; display: none; cursor: pointer; transition: var(--transition); }
     </style>
 </head>
 <body>
@@ -669,17 +163,11 @@
     <div id="restore-banner" class="restore-banner" onclick="restorePreviousRide()">🔄 Previous ride found! Click to restore</div>
     
     <div class="header-section">
-        <div class="header-left">
-            <div id="main-logo-area" class="logo-area">🚕</div>
-            <div class="brand-name" id="display-app-name">ADVANCE<br>MEETER TAXI</div>
-        </div>
+        <div class="header-left"><div id="main-logo-area" class="logo-area">🚕</div><div class="brand-name" id="display-app-name">ADVANCE<br>MEETER TAXI</div></div>
         <div class="settings-icon" onclick="openLogin()">⚙️</div>
     </div>
 
-    <div class="action-buttons">
-        <button id="nightBtn" class="action-btn night-btn" onclick="toggleNightCharge()">🌙 NIGHT OFF</button>
-        <button class="action-btn" onclick="resetToNew()">🔄 NEW RIDE</button>
-    </div>
+    <div class="action-buttons"><button id="nightBtn" class="action-btn night-btn" onclick="toggleNightCharge()">🌙 NIGHT OFF</button><button class="action-btn" onclick="resetToNew()">🔄 NEW RIDE</button></div>
 
     <div class="mode-selector">
         <button id="mode-auto" class="mode-btn active" onclick="setMode('auto')">🎯 Auto</button>
@@ -688,90 +176,47 @@
         <button id="mode-delivery" class="mode-btn" onclick="setMode('delivery')">📦 Delivery</button>
     </div>
 
-    <div id="auto-location-card" class="location-card">
-        <div style="display: flex; justify-content: space-between;">
-            <div style="flex:1;">
-                <div class="location-title">📍 CURRENT LOCATION</div>
-                <div id="current-location-address" class="location-address">Waiting for GPS...</div>
-            </div>
-            <button class="refresh-location" onclick="refreshCurrentLocation()">⟳</button>
+    <div id="auto-location-card" class="location-card"><div style="display: flex; justify-content: space-between;"><div style="flex:1;"><div class="location-title">📍 CURRENT LOCATION</div><div id="current-location-address" class="location-address">Waiting for GPS...</div></div><button class="refresh-location" onclick="refreshCurrentLocation()">⟳</button></div></div>
+
+    <div id="location-fields" style="display: none;"><div class="grid-2"><div class="autocomplete-container"><input id="start-loc" type="text" placeholder="Pick Up Location"><div id="start-loc-suggestions" class="autocomplete-dropdown" style="display: none;"></div></div><div class="autocomplete-container"><input id="end-loc" type="text" placeholder="Drop Off Location"><div id="end-loc-suggestions" class="autocomplete-dropdown" style="display: none;"></div></div></div><div class="grid-2"><button class="map-picker-btn" onclick="openMapPicker('start')">🗺️ Pickup Map</button><button class="map-picker-btn" onclick="openMapPicker('end')">🗺️ Drop Map</button></div></div>
+
+    <div id="delivery-fields" class="delivery-fields"><h4>📦 Pickup Person</h4><div class="grid-2"><input type="text" id="pickup-name" placeholder="Name"><input type="tel" id="pickup-phone" placeholder="Phone"></div><h4>📍 Delivery Person</h4><div class="grid-2"><input type="text" id="delivery-name" placeholder="Name"><input type="tel" id="delivery-phone" placeholder="Phone"></div></div>
+
+    <div class="fare-card"><div class="fare-row"><div class="fare-item"><small>DISTANCE</small><div class="display-value" id="disp-km">0.00</div><small>km</small></div><div class="fare-item"><small>TOTAL FARE</small><div class="display-fare-value" id="disp-fare">Rs.0.00</div><small id="night-indicator" style="display:none;">🌙 Night</small></div></div><div id="gps-status" class="gps-status">📍 Checking GPS...</div><div id="manual-controls" style="display:none;"><div class="manual-control"><button class="manual-btn" onclick="manualAddDistance(-1)">-1</button><button class="manual-btn" onclick="manualAddDistance(-0.5)">-0.5</button><input type="number" id="manual-km-input" class="manual-input" value="0.00" step="0.1"><button class="manual-btn" onclick="manualAddDistance(0.5)">+0.5</button><button class="manual-btn" onclick="manualAddDistance(1)">+1</button></div><div style="text-align:center;"><button class="set-distance-btn" onclick="setManualDistance()">✓ SET</button></div></div></div>
+
+    <div id="nav-container" style="display:none;"><button class="map-picker-btn" style="background:linear-gradient(135deg,#2563eb,#1d4ed8); margin-top:8px;" onclick="openPhoneNavigation()">🧭 OPEN MAPS NAVIGATION</button></div>
+
+    <div><input type="tel" id="mobile" placeholder="Customer Mobile"><div class="grid-2"><input type="number" id="manual-fare" placeholder="Manual Fare (Rs)" oninput="updateDisplay()"><div style="display:flex; background:var(--gray-bg); border-radius:24px; padding:0 15px; align-items:center;"><span style="font-size:12px; font-weight:500;">⏱️ Wait:</span><select id="wait-select" onchange="updateDisplay()" style="background:transparent; border:none; width:70px;"><option value="0">0 min</option><script>for(let i=1;i<=120;i++) document.write(`<option value="${i}">${i} min</option>`);</script></select></div></div><input type="number" id="discount-input" placeholder="Discount (Rs)" oninput="updateDisplay()"></div>
+
+    <div class="btn-main-grid"><button class="btn-start" id="startBtn" onclick="startRide()">START RIDE</button><button class="btn-end" onclick="endRide()">END RIDE</button></div>
+
+    <div class="voice-container"><button id="voiceBtn" class="voice-btn" onclick="toggleVoiceCommand()">🎤 VOICE (OFF)</button><div id="voiceStatus" class="voice-status">⚪ Tap to enable</div><div class="voice-commands-guide">SR | ER | NAV | RP | FL | RPL | TR</div></div>
+</div>
+
+<!-- Payment Popup -->
+<div id="payment-popup" class="modal">
+    <div class="modal-content payment-popup">
+        <div class="close-circle" onclick="closePaymentPopup()">✕</div>
+        <h3 style="text-align:center; margin-bottom:20px;">💳 SELECT PAYMENT METHOD</h3>
+        <div class="payment-methods">
+            <div class="payment-method-btn" onclick="selectPaymentMethod('cash', this)">💰 Cash</div>
+            <div class="payment-method-btn" onclick="selectPaymentMethod('card', this)">💳 Card</div>
+            <div class="payment-method-btn" onclick="selectPaymentMethod('mobile', this)">📱 Mobile</div>
+            <div class="payment-method-btn" onclick="selectPaymentMethod('bank', this)">🏦 Bank</div>
+            <div class="payment-method-btn" onclick="selectPaymentMethod('other', this)">📝 Other</div>
         </div>
-    </div>
-
-    <div id="location-fields" style="display: none;">
-        <div class="grid-2">
-            <div class="autocomplete-container"><input id="start-loc" type="text" placeholder="Pick Up Location"><div id="start-loc-suggestions" class="autocomplete-dropdown" style="display: none;"></div></div>
-            <div class="autocomplete-container"><input id="end-loc" type="text" placeholder="Drop Off Location"><div id="end-loc-suggestions" class="autocomplete-dropdown" style="display: none;"></div></div>
+        <div id="payment-detail-fields" class="payment-detail-fields" style="display: none;">
+            <div id="cash-fields" style="display: none;"><p>💰 Cash payment selected.</p></div>
+            <div id="card-fields" style="display: none;"><input type="text" id="card-number" placeholder="Last 4 digits" maxlength="4"><div class="grid-2"><input type="text" id="card-expiry" placeholder="MM/YY"><input type="text" id="card-cvv" placeholder="CVV"></div><input type="text" id="card-name" placeholder="Cardholder Name"></div>
+            <div id="mobile-fields" style="display: none;"><select id="mobile-provider"><option>Select</option><option>Frimi</option><option>mCash</option><option>Genie</option><option>eZ Cash</option></select><input type="text" id="mobile-number" placeholder="Mobile Number"></div>
+            <div id="bank-fields" style="display: none;"><select id="bank-name"><option>Select</option><option>Commercial</option><option>HNB</option><option>Sampath</option></select><input type="text" id="bank-ref" placeholder="Reference No"></div>
+            <div id="other-fields" style="display: none;"><input type="text" id="other-method" placeholder="Method"><input type="text" id="other-ref" placeholder="Reference"></div>
         </div>
-        <div class="grid-2"><button class="map-picker-btn" onclick="openMapPicker('start')">🗺️ Pickup Map</button><button class="map-picker-btn" onclick="openMapPicker('end')">🗺️ Drop Map</button></div>
-    </div>
-
-    <div id="delivery-fields" class="delivery-fields">
-        <h4>📦 Pickup Person</h4>
-        <div class="grid-2"><input type="text" id="pickup-name" placeholder="Name"><input type="tel" id="pickup-phone" placeholder="Phone"></div>
-        <h4>📍 Delivery Person</h4>
-        <div class="grid-2"><input type="text" id="delivery-name" placeholder="Name"><input type="tel" id="delivery-phone" placeholder="Phone"></div>
-    </div>
-
-    <div class="fare-card">
-        <div class="fare-row">
-            <div class="fare-item">
-                <small>DISTANCE</small>
-                <div class="display-value" id="disp-km">0.00</div>
-                <small style="font-size: 10px;">kilometers</small>
-            </div>
-            <div class="fare-item">
-                <small>TOTAL FARE</small>
-                <div class="display-fare-value" id="disp-fare">Rs.0.00</div>
-                <small id="night-indicator" style="display:none;">🌙 Night</small>
-            </div>
-        </div>
-        <div id="gps-status" class="gps-status">📍 Checking GPS...</div>
-        <div id="manual-controls" style="display:none;">
-            <div class="manual-control">
-                <button class="manual-btn" onclick="manualAddDistance(-1)">-1</button>
-                <button class="manual-btn" onclick="manualAddDistance(-0.5)">-0.5</button>
-                <input type="number" id="manual-km-input" class="manual-input" value="0.00" step="0.1" placeholder="km">
-                <button class="manual-btn" onclick="manualAddDistance(0.5)">+0.5</button>
-                <button class="manual-btn" onclick="manualAddDistance(1)">+1</button>
-            </div>
-            <div style="text-align:center;"><button class="set-distance-btn" onclick="setManualDistance()">✓ SET</button></div>
-        </div>
-    </div>
-
-    <div id="nav-container" style="display:none;">
-        <button class="map-picker-btn" style="background:linear-gradient(135deg,#2563eb,#1d4ed8); margin-top:8px;" onclick="openPhoneNavigation()">🧭 OPEN MAPS NAVIGATION</button>
-    </div>
-
-    <div>
-        <input type="tel" id="mobile" placeholder="Customer Mobile">
-        <div class="grid-2">
-            <input type="number" id="manual-fare" placeholder="Manual Fare (Rs)" oninput="updateDisplay()">
-            <div style="display:flex; background:var(--gray-bg); border-radius:24px; padding:0 15px; align-items:center;">
-                <span style="font-size:12px; font-weight:500;">⏱️ Wait:</span>
-                <select id="wait-select" onchange="updateDisplay()" style="background:transparent; border:none; width:70px;">
-                    <option value="0">0 min</option><script>for(let i=1;i<=120;i++) document.write(`<option value="${i}">${i} min</option>`);</script>
-                </select>
-            </div>
-        </div>
-        <input type="number" id="discount-input" placeholder="Discount (Rs)" oninput="updateDisplay()">
-    </div>
-
-    <div class="btn-main-grid">
-        <button class="btn-start" id="startBtn" onclick="startRide()">START RIDE</button>
-        <button class="btn-end" onclick="endRide()">END RIDE</button>
-    </div>
-
-    <div class="voice-container">
-        <button id="voiceBtn" class="voice-btn" onclick="toggleVoiceCommand()">🎤 VOICE (OFF)</button>
-        <div id="voiceStatus" class="voice-status">⚪ Tap to enable</div>
-        <div class="voice-commands-guide">SR | ER | NAV | RP | FL | RPL | TR</div>
+        <button class="confirm-payment-btn" id="confirmPaymentBtn" onclick="confirmPaymentAndShowReceipt()">✅ CONFIRM & SHOW RECEIPT</button>
     </div>
 </div>
 
-<!-- All Modals remain with same structure but improved styling - preserving all functionality -->
-<div id="payment-popup" class="modal"><div class="modal-content payment-popup"><div class="close-circle" onclick="closePaymentPopup()">✕</div><h3 style="text-align:center; margin-bottom:20px;">💳 SELECT PAYMENT METHOD</h3><div class="payment-methods"><div class="payment-method-btn" onclick="selectPaymentMethod('cash', this)">💰 Cash</div><div class="payment-method-btn" onclick="selectPaymentMethod('card', this)">💳 Card</div><div class="payment-method-btn" onclick="selectPaymentMethod('mobile', this)">📱 Mobile</div><div class="payment-method-btn" onclick="selectPaymentMethod('bank', this)">🏦 Bank</div><div class="payment-method-btn" onclick="selectPaymentMethod('other', this)">📝 Other</div></div><div id="payment-detail-fields" class="payment-detail-fields" style="display: none;"><div id="cash-fields" style="display: none;"><p>💰 Cash payment selected.</p></div><div id="card-fields" style="display: none;"><input type="text" id="card-number" placeholder="Last 4 digits" maxlength="4"><div class="grid-2"><input type="text" id="card-expiry" placeholder="MM/YY"><input type="text" id="card-cvv" placeholder="CVV"></div><input type="text" id="card-name" placeholder="Cardholder Name"></div><div id="mobile-fields" style="display: none;"><select id="mobile-provider"><option>Select</option><option>Frimi</option><option>mCash</option><option>Genie</option><option>eZ Cash</option></select><input type="text" id="mobile-number" placeholder="Mobile Number"></div><div id="bank-fields" style="display: none;"><select id="bank-name"><option>Select</option><option>Commercial</option><option>HNB</option><option>Sampath</option></select><input type="text" id="bank-ref" placeholder="Reference No"></div><div id="other-fields" style="display: none;"><input type="text" id="other-method" placeholder="Method"><input type="text" id="other-ref" placeholder="Reference"></div></div><button class="confirm-payment-btn" onclick="confirmPaymentAndShowReceipt()">✅ CONFIRM & SHOW RECEIPT</button></div></div>
-
+<!-- Settings Modal -->
 <div id="settings-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeSettingsAndLogout()">✕</div><h3 style="text-align:center; margin-bottom:24px;">⚙️ SETTINGS MENU</h3><div class="settings-menu"><button class="settings-menu-btn" onclick="openAppSettings()">📱 APPLICATION SETTINGS</button><button class="settings-menu-btn secondary" onclick="openFuelLogModal()">⛽ FUEL LOG</button><button class="settings-menu-btn secondary" onclick="openRepairLogModal()">🔧 REPAIR LOG</button><button class="settings-menu-btn secondary" onclick="openReportsMenu()">📊 REPORTS</button><button class="settings-menu-btn warning" onclick="openSystemLogModal()">📋 SYSTEM LOG</button></div></div></div>
 
 <div id="app-settings-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToSettingsMenu()">←</div><div class="close-circle" onclick="closeM('app-settings-modal')">✕</div><h3 style="text-align:center;">📱 APP SETTINGS</h3><label>App Name:</label><input id="set-app-name"><label>Receipt Header:</label><input id="set-receipt-header"><label>Logo:</label><input type="file" id="logo-upload" accept="image/*"><div class="grid-2"><div><label>Base Fare:</label><input id="set-base" type="number"></div><div><label>Rate/KM:</label><input id="set-rate" type="number"></div></div><div class="grid-2"><div><label>Wait/min:</label><input id="set-wait" type="number"></div><div><label>Night %:</label><input id="set-night" type="number"></div></div><label>New Password:</label><input id="set-pwd" type="password"><button class="confirm-payment-btn" onclick="saveSettings()">💾 SAVE</button></div></div>
@@ -796,7 +241,7 @@
 
 <div id="profit-report-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToReportsMenu()">←</div><div class="close-circle" onclick="closeM('profit-report-modal')">✕</div><h3 style="text-align:center;">💰 PROFIT & EXPENSES</h3><div class="report-tabs"><button class="report-tab active" onclick="showProfitReportTab('daily')">Daily</button><button class="report-tab" onclick="showProfitReportTab('monthly')">Monthly</button><button class="report-tab" onclick="showProfitReportTab('yearly')">Yearly</button><button class="report-tab" onclick="showProfitReportTab('range')">Range</button></div><div id="profit-date-range-panel" style="display:none;"><div class="grid-2"><input type="date" id="profit-start-date"><input type="date" id="profit-end-date"></div><button class="map-picker-btn" onclick="updateProfitReport()">Apply</button></div><div id="profit-report-container"></div><div style="margin-top:15px;"><canvas id="profitChart" style="max-height:200px; width:100%;"></canvas></div><button class="btn-reprint" style="margin-top:15px; width:100%;" onclick="exportProfitCSV()">📥 Export CSV</button></div></div>
 
-<div id="receiptModal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeM('receiptModal')">✕</div><div id="receipt-view" class="receipt-print"><div class="r-header" id="receipt-header">TAXI RECEIPT</div><div id="receipt-body"></div><div class="r-total">TOTAL: Rs.<span id="receipt-total"></span></div><div id="receipt-qr"></div><div class="receipt-seal"></div></div><div class="receipt-btns" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:15px;"><button class="btn-wa" style="background:#25D366; color:white; padding:12px; border-radius:24px; border:none; font-weight:bold;" onclick="shareWA()">WhatsApp</button><button class="btn-gm" style="background:#EA4335; color:white; padding:12px; border-radius:24px; border:none; font-weight:bold;" onclick="sendEmailWithAttachment()">Gmail</button></div><button class="btn-pdf" style="background:#34495e; color:white; padding:12px; border-radius:24px; border:none; font-weight:bold; width:100%; margin-top:10px;" onclick="downloadReceiptPDF()">PDF</button><button class="btn-print" style="background:#9b59b6; color:white; padding:12px; border-radius:24px; border:none; font-weight:bold; width:100%; margin-top:10px;" onclick="printViaBluetooth()">Print</button></div></div>
+<div id="receiptModal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeM('receiptModal')">✕</div><div id="receipt-view" class="receipt-print"><div class="r-header" id="receipt-header">TAXI RECEIPT</div><div id="receipt-body"></div><div class="r-total">TOTAL: Rs.<span id="receipt-total"></span></div><div id="receipt-qr"></div><div class="receipt-seal"></div></div><div class="receipt-btns"><button class="btn-wa" onclick="shareWA()">WhatsApp</button><button class="btn-gm" onclick="sendEmailWithAttachment()">Gmail</button></div><button class="btn-pdf" onclick="downloadReceiptPDF()">PDF</button><button class="btn-print" onclick="printViaBluetooth()">Print</button></div></div>
 
 <div id="system-log-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToSettingsMenu()">←</div><div class="close-circle" onclick="closeM('system-log-modal')">✕</div><h3>📋 SYSTEM LOGS</h3><div id="system-log-list" style="max-height:350px; overflow-y:auto;"></div><button class="btn-reprint" onclick="exportSystemLogCSV()">📥 CSV</button><button class="settings-menu-btn warning" style="margin-top:10px;" onclick="clearSystemLog()">🗑️ CLEAR</button></div></div>
 
@@ -977,39 +422,223 @@
     function setManualDistance() { if(!sTime) { alert("Start ride"); return; } if(currentMode!=='manual') { alert("Manual mode required"); return; } let val=parseFloat(dom.manualKmInput.value); if(!isNaN(val) && val>=0) { totalMeters = val*1000; updateDisplay(); saveRideState(); } }
     function openPhoneNavigation() { if(!currentDestinationAddress) { alert("Enter destination"); return; } let encoded=encodeURIComponent(currentDestinationAddress); let isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent); window.open(isIOS ? `http://maps.apple.com/?daddr=${encoded}` : `https://www.google.com/maps/dir/?api=1&destination=${encoded}`, '_blank'); }
     
-    // START RIDE FUNCTION
+    // ========== START RIDE FUNCTION - FIXED ==========
     async function startRide() {
+        console.log("startRide called, currentMode:", currentMode);
         if(sTime) { alert("Ride already active!"); return; }
-        if(currentMode === 'auto') { if(!currentLocationAddress || currentLocationAddress === "Waiting for GPS...") { alert("Please wait for GPS to get current location!"); return; } startLocationAddress = currentLocationAddress; }
-        else if(currentMode === 'gps') { let startLoc = dom.startLoc.value.trim(); let endLoc = dom.endLoc.value.trim(); if(!startLoc || !endLoc) { alert("Enter pickup and drop locations!"); return; } if(!gpsReady) { alert("GPS not ready! Please wait for GPS signal."); return; } startLocationAddress = startLoc; currentDestinationAddress = endLoc; }
-        else if(currentMode === 'manual') { let startLoc = dom.startLoc.value.trim(); let endLoc = dom.endLoc.value.trim(); if(!startLoc || !endLoc) { alert("Enter pickup and drop locations!"); return; } startLocationAddress = startLoc; currentDestinationAddress = endLoc; }
-        else if(currentMode === 'delivery') { let startLoc = dom.startLoc.value.trim(); let endLoc = dom.endLoc.value.trim(); if(!startLoc || !endLoc) { alert("Enter pickup and drop locations!"); return; } startLocationAddress = startLoc; currentDestinationAddress = endLoc; deliveryPickupName = dom.pickupName.value || ""; deliveryPickupPhone = dom.pickupPhone.value || ""; deliveryDeliveryName = dom.deliveryName.value || ""; deliveryDeliveryPhone = dom.deliveryPhone.value || ""; }
-        sTime = new Date(); await requestWakeLock(); document.body.classList.add('ride-active');
-        if(currentMode === 'auto') { totalMeters = 0; if(currentLocationLat && currentLocationLon) { lastLat = currentLocationLat; lastLon = currentLocationLon; } trackRide(); }
-        else if(currentMode === 'gps') { totalMeters = 0; lastLat = null; lastLon = null; if(navigator.geolocation) { navigator.geolocation.getCurrentPosition(function(pos) { lastLat = pos.coords.latitude; lastLon = pos.coords.longitude; }); } trackRide(); dom.navContainer.style.display = 'block'; }
-        else if(currentMode === 'manual') { totalMeters = (parseFloat(dom.manualKmInput.value) || 0) * 1000; dom.navContainer.style.display = 'block'; }
-        else if(currentMode === 'delivery') { totalMeters = 0; lastLat = null; lastLon = null; if(navigator.geolocation) { navigator.geolocation.getCurrentPosition(function(pos) { lastLat = pos.coords.latitude; lastLon = pos.coords.longitude; }); } trackRide(); dom.navContainer.style.display = 'block'; }
-        dom.startBtn.innerHTML = "⏵ ACTIVE"; dom.startBtn.classList.add('btn-active-anim'); dom.startBtn.disabled = true; updateDisplay(); document.querySelectorAll('.mode-btn').forEach(btn => { btn.style.pointerEvents = 'none'; btn.style.opacity = '0.5'; }); saveRideState(); alert("Ride started successfully!");
+        
+        // Auto mode validation
+        if(currentMode === 'auto') { 
+            if(!currentLocationAddress || currentLocationAddress === "Waiting for GPS...") { 
+                alert("Please wait for GPS to get current location!"); 
+                return; 
+            } 
+            startLocationAddress = currentLocationAddress;
+        } 
+        // GPS mode validation
+        else if(currentMode === 'gps') { 
+            let startLoc = dom.startLoc.value.trim();
+            let endLoc = dom.endLoc.value.trim();
+            if(!startLoc || !endLoc) { 
+                alert("Enter pickup and drop locations!"); 
+                return; 
+            } 
+            if(!gpsReady) { 
+                alert("GPS not ready! Please wait for GPS signal."); 
+                return; 
+            } 
+            startLocationAddress = startLoc;
+            currentDestinationAddress = endLoc;
+        } 
+        // Manual mode validation
+        else if(currentMode === 'manual') { 
+            let startLoc = dom.startLoc.value.trim();
+            let endLoc = dom.endLoc.value.trim();
+            if(!startLoc || !endLoc) { 
+                alert("Enter pickup and drop locations!"); 
+                return; 
+            } 
+            startLocationAddress = startLoc;
+            currentDestinationAddress = endLoc;
+        } 
+        // Delivery mode validation
+        else if(currentMode === 'delivery') { 
+            let startLoc = dom.startLoc.value.trim();
+            let endLoc = dom.endLoc.value.trim();
+            if(!startLoc || !endLoc) { 
+                alert("Enter pickup and drop locations!"); 
+                return; 
+            } 
+            startLocationAddress = startLoc;
+            currentDestinationAddress = endLoc;
+            deliveryPickupName = dom.pickupName.value || "";
+            deliveryPickupPhone = dom.pickupPhone.value || "";
+            deliveryDeliveryName = dom.deliveryName.value || "";
+            deliveryDeliveryPhone = dom.deliveryPhone.value || "";
+        }
+        
+        sTime = new Date();
+        await requestWakeLock();
+        document.body.classList.add('ride-active');
+        
+        // Start tracking based on mode
+        if(currentMode === 'auto') {
+            totalMeters = 0;
+            if(currentLocationLat && currentLocationLon) { 
+                lastLat = currentLocationLat; 
+                lastLon = currentLocationLon; 
+            }
+            trackRide();
+        } 
+        else if(currentMode === 'gps') {
+            totalMeters = 0;
+            lastLat = null; 
+            lastLon = null;
+            if(navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(pos) {
+                    lastLat = pos.coords.latitude;
+                    lastLon = pos.coords.longitude;
+                });
+            }
+            trackRide();
+            dom.navContainer.style.display = 'block';
+        } 
+        else if(currentMode === 'manual') {
+            totalMeters = (parseFloat(dom.manualKmInput.value) || 0) * 1000;
+            dom.navContainer.style.display = 'block';
+        } 
+        else if(currentMode === 'delivery') {
+            totalMeters = 0;
+            lastLat = null; 
+            lastLon = null;
+            if(navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(pos) {
+                    lastLat = pos.coords.latitude;
+                    lastLon = pos.coords.longitude;
+                });
+            }
+            trackRide();
+            dom.navContainer.style.display = 'block';
+        }
+        
+        dom.startBtn.innerHTML = "⏵ ACTIVE";
+        dom.startBtn.classList.add('btn-active-anim');
+        dom.startBtn.disabled = true;
+        updateDisplay();
+        
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0.5';
+        });
+        
+        saveRideState();
+        addSystemLog('INFO', 'Ride started', `Mode: ${currentMode}`);
+        alert("Ride started successfully!");
     }
     
-    function endRide() { if(!sTime) { alert("No active ride"); return; } releaseWakeLock(); document.body.classList.remove('ride-active'); if(watchId) { navigator.geolocation.clearWatch(watchId); watchId=null; } dom.startBtn.innerHTML="START RIDE"; dom.startBtn.classList.remove('btn-active-anim'); dom.startBtn.disabled=false; if(currentMode==='auto' && currentDestinationAddress) dom.navContainer.style.display='block'; else if(currentMode!=='auto') dom.navContainer.style.display='none'; document.querySelectorAll('.mode-btn').forEach(btn => { btn.style.pointerEvents='auto'; btn.style.opacity='1'; }); let from="", to=""; if(currentMode==='auto') { from=startLocationAddress; to=currentLocationAddress; } else { from=dom.startLoc.value; to=dom.endLoc.value; } let fare=calcFare(); currentRID=generateReceiptID(); let km=totalMeters/1000; pendingRideData = { id:currentRID, fare, km, from, to, mobile:dom.mobileInput.value||"N/A", wait:parseInt(dom.waitSelect.value), disc:parseInt(dom.discountInput.value)||0, manualFare:parseInt(dom.manualFareInput.value)||0, nightUsed:nightActive, mode:currentMode==='auto'?"Auto":(currentMode==='gps'?"GPS":(currentMode==='manual'?"Manual":"Delivery")), time:Date.now() }; if(currentMode==='delivery') { pendingRideData.pickupName=deliveryPickupName; pendingRideData.pickupPhone=deliveryPickupPhone; pendingRideData.deliveryName=deliveryDeliveryName; pendingRideData.deliveryPhone=deliveryDeliveryPhone; } localStorage.removeItem('amt_ride_state'); openPaymentPopup(); }
+    function endRide() { 
+        if(!sTime) { alert("No active ride"); return; } 
+        releaseWakeLock(); 
+        document.body.classList.remove('ride-active'); 
+        if(watchId) { navigator.geolocation.clearWatch(watchId); watchId=null; } 
+        dom.startBtn.innerHTML="START RIDE"; 
+        dom.startBtn.classList.remove('btn-active-anim'); 
+        dom.startBtn.disabled=false; 
+        if(currentMode==='auto' && currentDestinationAddress) dom.navContainer.style.display='block'; 
+        else if(currentMode!=='auto') dom.navContainer.style.display='none'; 
+        document.querySelectorAll('.mode-btn').forEach(btn => { btn.style.pointerEvents='auto'; btn.style.opacity='1'; }); 
+        let from="", to=""; 
+        if(currentMode==='auto') { from=startLocationAddress; to=currentLocationAddress; } 
+        else { from=dom.startLoc.value; to=dom.endLoc.value; } 
+        let fare=calcFare(); 
+        currentRID=generateReceiptID(); 
+        let km=totalMeters/1000; 
+        pendingRideData = { id:currentRID, fare, km, from, to, mobile:dom.mobileInput.value||"N/A", wait:parseInt(dom.waitSelect.value), disc:parseInt(dom.discountInput.value)||0, manualFare:parseInt(dom.manualFareInput.value)||0, nightUsed:nightActive, mode:currentMode==='auto'?"Auto":(currentMode==='gps'?"GPS":(currentMode==='manual'?"Manual":"Delivery")), time:Date.now() }; 
+        if(currentMode==='delivery') { pendingRideData.pickupName=deliveryPickupName; pendingRideData.pickupPhone=deliveryPickupPhone; pendingRideData.deliveryName=deliveryDeliveryName; pendingRideData.deliveryPhone=deliveryDeliveryPhone; } 
+        localStorage.removeItem('amt_ride_state'); 
+        openPaymentPopup(); 
+        addSystemLog('INFO', 'Ride ended', `Fare: Rs.${fare}, Distance: ${km}km`);
+    }
     
     function generateReceiptID() { let n=new Date(), y=n.getFullYear(), m=n.getMonth(); let fy=(m>=3)?y:y-1; let c=parseInt(localStorage.getItem(`cnt_${fy}`)||"0")+1; localStorage.setItem(`cnt_${fy}`,c); return `${fy.toString().slice(-2)}${n.toLocaleString('en',{month:'short'}).toUpperCase()}-${c.toString().padStart(8,'0')}`; }
     
-    // Payment functions
-    function openPaymentPopup() { if(!pendingRideData) { alert("No ride data available. Please end a ride first."); return; } selectedMethod = "cash"; document.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('selected')); document.querySelector('.payment-method-btn:first-child')?.classList.add('selected'); document.getElementById('payment-detail-fields').style.display = 'block'; document.getElementById('cash-fields').style.display = 'block'; document.getElementById('card-fields').style.display = 'none'; document.getElementById('mobile-fields').style.display = 'none'; document.getElementById('bank-fields').style.display = 'none'; document.getElementById('other-fields').style.display = 'none'; document.getElementById('payment-popup').style.display = 'flex'; }
-    function selectPaymentMethod(method, btnElement) { selectedMethod = method; document.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('selected')); btnElement.classList.add('selected'); document.getElementById('cash-fields').style.display = 'none'; document.getElementById('card-fields').style.display = 'none'; document.getElementById('mobile-fields').style.display = 'none'; document.getElementById('bank-fields').style.display = 'none'; document.getElementById('other-fields').style.display = 'none'; if(method === 'cash') document.getElementById('cash-fields').style.display = 'block'; if(method === 'card') document.getElementById('card-fields').style.display = 'block'; if(method === 'mobile') document.getElementById('mobile-fields').style.display = 'block'; if(method === 'bank') document.getElementById('bank-fields').style.display = 'block'; if(method === 'other') document.getElementById('other-fields').style.display = 'block'; }
-    function getPaymentInfo() { switch(selectedMethod) { case 'cash': return { method: 'Cash', detail: '' }; case 'card': let cd = ""; if(document.getElementById('card-number')?.value) cd += `****${document.getElementById('card-number').value}`; if(document.getElementById('card-name')?.value) cd += ` - ${document.getElementById('card-name').value}`; return { method: 'Card', detail: cd || 'Card payment' }; case 'mobile': let md = ""; if(document.getElementById('mobile-provider')?.value) md += document.getElementById('mobile-provider').value; if(document.getElementById('mobile-number')?.value) md += ` ${document.getElementById('mobile-number').value}`; return { method: 'Mobile', detail: md || 'Mobile payment' }; case 'bank': let bd = ""; if(document.getElementById('bank-name')?.value) bd += document.getElementById('bank-name').value; if(document.getElementById('bank-ref')?.value) bd += ` - Ref: ${document.getElementById('bank-ref').value}`; return { method: 'Bank Transfer', detail: bd || 'Bank transfer' }; default: return { method: document.getElementById('other-method')?.value || 'Other', detail: document.getElementById('other-ref')?.value || '' }; } }
+    // ========== PAYMENT FUNCTIONS ==========
+    function openPaymentPopup() { 
+        if(!pendingRideData) { alert("No ride data available. Please end a ride first."); return; }
+        selectedMethod = "cash"; 
+        document.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('selected')); 
+        if(document.querySelector('.payment-method-btn:first-child')) document.querySelector('.payment-method-btn:first-child').classList.add('selected');
+        document.getElementById('payment-detail-fields').style.display = 'block'; 
+        document.getElementById('cash-fields').style.display = 'block'; 
+        document.getElementById('card-fields').style.display = 'none'; 
+        document.getElementById('mobile-fields').style.display = 'none'; 
+        document.getElementById('bank-fields').style.display = 'none'; 
+        document.getElementById('other-fields').style.display = 'none'; 
+        document.getElementById('payment-popup').style.display = 'flex'; 
+    }
+    
+    function selectPaymentMethod(method, btnElement) { 
+        selectedMethod = method; 
+        document.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('selected')); 
+        btnElement.classList.add('selected'); 
+        document.getElementById('cash-fields').style.display = 'none'; 
+        document.getElementById('card-fields').style.display = 'none'; 
+        document.getElementById('mobile-fields').style.display = 'none'; 
+        document.getElementById('bank-fields').style.display = 'none'; 
+        document.getElementById('other-fields').style.display = 'none'; 
+        if(method === 'cash') document.getElementById('cash-fields').style.display = 'block'; 
+        if(method === 'card') document.getElementById('card-fields').style.display = 'block'; 
+        if(method === 'mobile') document.getElementById('mobile-fields').style.display = 'block'; 
+        if(method === 'bank') document.getElementById('bank-fields').style.display = 'block'; 
+        if(method === 'other') document.getElementById('other-fields').style.display = 'block'; 
+    }
+    
+    function getPaymentInfo() { 
+        switch(selectedMethod) { 
+            case 'cash': return { method: 'Cash', detail: '' }; 
+            case 'card': let cd = ""; if(document.getElementById('card-number')?.value) cd += `****${document.getElementById('card-number').value}`; if(document.getElementById('card-name')?.value) cd += ` - ${document.getElementById('card-name').value}`; return { method: 'Card', detail: cd || 'Card payment' }; 
+            case 'mobile': let md = ""; if(document.getElementById('mobile-provider')?.value) md += document.getElementById('mobile-provider').value; if(document.getElementById('mobile-number')?.value) md += ` ${document.getElementById('mobile-number').value}`; return { method: 'Mobile', detail: md || 'Mobile payment' }; 
+            case 'bank': let bd = ""; if(document.getElementById('bank-name')?.value) bd += document.getElementById('bank-name').value; if(document.getElementById('bank-ref')?.value) bd += ` - Ref: ${document.getElementById('bank-ref').value}`; return { method: 'Bank Transfer', detail: bd || 'Bank transfer' }; 
+            default: return { method: document.getElementById('other-method')?.value || 'Other', detail: document.getElementById('other-ref')?.value || '' }; 
+        } 
+    }
+    
     function closePaymentPopup() { document.getElementById('payment-popup').style.display = 'none'; }
-    function confirmPaymentAndShowReceipt() { if(!pendingRideData) { alert("No ride data found. Please end a ride first."); return; } pendingRideData.payment = getPaymentInfo(); let list = JSON.parse(localStorage.getItem('rides') || '[]'); list.push(pendingRideData); localStorage.setItem('rides', JSON.stringify(list)); showReceipt(pendingRideData, false); closePaymentPopup(); sTime = null; currentDestinationAddress = ""; if(currentMode !== 'manual') setTimeout(() => startGPS(), 1000); dom.navContainer.style.display = 'none'; addSystemLog('INFO', 'Payment confirmed', `Receipt: ${pendingRideData.id}`); }
+    
+    // ========== CONFIRM PAYMENT & SHOW RECEIPT - FIXED ==========
+    function confirmPaymentAndShowReceipt() { 
+        if(!pendingRideData) { 
+            alert("No ride data found. Please end a ride first."); 
+            return; 
+        } 
+        
+        pendingRideData.payment = getPaymentInfo(); 
+        
+        let list = JSON.parse(localStorage.getItem('rides') || '[]'); 
+        list.push(pendingRideData); 
+        localStorage.setItem('rides', JSON.stringify(list)); 
+        
+        showReceipt(pendingRideData, false); 
+        
+        closePaymentPopup(); 
+        
+        sTime = null; 
+        currentDestinationAddress = ""; 
+        if(currentMode !== 'manual') setTimeout(() => startGPS(), 1000); 
+        dom.navContainer.style.display = 'none'; 
+        
+        addSystemLog('INFO', 'Payment confirmed', `Receipt: ${pendingRideData.id}`); 
+    }
     
     function showReceipt(ride, isDuplicate) { 
         let sub = (ride.manualFare > 0) ? ride.manualFare : (SETTINGS.base + (Math.max(0, ride.km - 1) * SETTINGS.rate)); 
         let waitC = ride.wait * SETTINGS.waitRate; 
-        let dupHtml = isDuplicate ? '<div style="background:#e74c3c; color:white; text-align:center; padding:3px;">📋 COPY</div>' : ''; 
+        let dupHtml = isDuplicate ? '<div style="background:#e74c3c; color:white; text-align:center; padding:3px; border-radius:8px;">📋 COPY</div>' : ''; 
         let rows = dupHtml; 
         rows += `<div class="r-row"><span>Receipt:</span><b>${ride.id}</b></div><div class="r-row"><span>Date:</span><b>${new Date(ride.time).toLocaleString()}</b></div><div class="r-row"><span>Mobile:</span><b>${ride.mobile}</b></div>`; 
-        if(ride.mode === 'Delivery') { rows += `<div class="r-row-full"><span class="r-label">Pickup:</span><span class="r-address">${ride.pickupName || ''} ${ride.pickupPhone || ''}</span></div><div class="r-row-full"><span class="r-label">Delivery:</span><span class="r-address">${ride.deliveryName || ''} ${ride.deliveryPhone || ''}</span></div>`; } 
+        if(ride.mode === 'Delivery') { 
+            rows += `<div class="r-row-full"><span class="r-label">Pickup:</span><span class="r-address">${ride.pickupName || ''} ${ride.pickupPhone || ''}</span></div><div class="r-row-full"><span class="r-label">Delivery:</span><span class="r-address">${ride.deliveryName || ''} ${ride.deliveryPhone || ''}</span></div>`; 
+        } 
         rows += `<div class="r-row-full"><span class="r-label">From:</span><span class="r-address">${ride.from}</span></div><div class="r-row-full"><span class="r-label">To:</span><span class="r-address">${ride.to}</span></div><div class="r-row"><span>Distance:</span><b>${ride.km.toFixed(2)} km</b></div><div class="r-row"><span>Fare:</span><b>Rs.${sub.toFixed(2)}</b></div>`; 
         if(waitC > 0) rows += `<div class="r-row"><span>Wait(${ride.wait}m):</span><b>+Rs.${waitC.toFixed(2)}</b></div>`; 
         if(ride.nightUsed && ride.manualFare === 0) rows += `<div class="r-row"><span>Night(${SETTINGS.nightPercent}%):</span><b>+${Math.round(ride.fare - (sub + waitC - ride.disc))}</b></div>`; 
@@ -1026,10 +655,12 @@
     }
     
     async function shareWA() { try { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); canvas.toBlob(blob => { if(navigator.share) navigator.share({ files:[new File([blob],'receipt.png')] }); else { let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='receipt.png'; a.click(); } }); } catch(e){ downloadReceiptPDF(); } }
-    async function sendEmailWithAttachment() { try { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); let {jsPDF}=window.jspdf; let pdf = new jsPDF({unit:'mm', format:'a6'}); pdf.addImage(canvas.toDataURL(),'PNG',2.5,5,100,(canvas.height*100)/canvas.width); let blob = pdf.output('blob'); if(navigator.share) navigator.share({ files:[new File([blob],'receipt.pdf')] }); else { let a=document.createElement('a'); a.href=URL.parseObjectURL(blob); a.download='receipt.pdf'; a.click(); } } catch(e){ downloadReceiptPDF(); } }
+    async function sendEmailWithAttachment() { try { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); let {jsPDF}=window.jspdf; let pdf = new jsPDF({unit:'mm', format:'a6'}); pdf.addImage(canvas.toDataURL(),'PNG',2.5,5,100,(canvas.height*100)/canvas.width); let blob = pdf.output('blob'); if(navigator.share) navigator.share({ files:[new File([blob],'receipt.pdf')] }); else { let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='receipt.pdf'; a.click(); } } catch(e){ downloadReceiptPDF(); } }
     async function downloadReceiptPDF() { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); let {jsPDF}=window.jspdf; let pdf = new jsPDF({unit:'mm', format:'a6'}); pdf.addImage(canvas.toDataURL(),'PNG',2.5,5,100,(canvas.height*100)/canvas.width); pdf.save(`${currentRID}.pdf`); }
     async function printViaBluetooth() { alert("PDF ready"); downloadReceiptPDF(); }
+    
     function toggleNightCharge() { nightActive=!nightActive; let btn=dom.nightBtn; if(nightActive) { btn.innerHTML='🌙 NIGHT ON'; btn.classList.add('night-active'); } else { btn.innerHTML='🌙 NIGHT OFF'; btn.classList.remove('night-active'); } updateDisplay(); if(sTime) saveRideState(); }
+    
     function resetToNew() { if(sTime && !confirm("Reset ride?")) return; if(watchId) navigator.geolocation.clearWatch(watchId); releaseWakeLock(); document.body.classList.remove('ride-active'); document.querySelectorAll('.mode-btn').forEach(btn => { btn.style.pointerEvents='auto'; btn.style.opacity='1'; }); sTime=null; totalMeters=0; lastLat=null; lastLon=null; currentDestinationAddress=""; deliveryPickupName=""; deliveryPickupPhone=""; deliveryDeliveryName=""; deliveryDeliveryPhone=""; dom.startBtn.innerHTML="START RIDE"; dom.startBtn.classList.remove('btn-active-anim'); dom.startBtn.disabled=false; dom.startLoc.value=''; dom.endLoc.value=''; dom.mobileInput.value=''; dom.manualFareInput.value=''; dom.discountInput.value=''; dom.waitSelect.value='0'; dom.manualKmInput.value='0'; dom.navContainer.style.display='none'; if(dom.pickupName) dom.pickupName.value=''; if(dom.pickupPhone) dom.pickupPhone.value=''; if(dom.deliveryName) dom.deliveryName.value=''; if(dom.deliveryPhone) dom.deliveryPhone.value=''; updateDisplay(); localStorage.removeItem('amt_ride_state'); if(currentMode==='auto') refreshCurrentLocation(); if(currentMode!=='manual') startGPS(); else { gpsReady=true; dom.startBtn.disabled=false; } }
     
     // HISTORY with Date Filter
@@ -1045,11 +676,7 @@
         else { return; }
         updateHistoryList(start, end);
     }
-    function applyCustomHistoryFilter() {
-        let start = document.getElementById('history-start-date').value;
-        let end = document.getElementById('history-end-date').value;
-        if(start && end) updateHistoryList(start, end);
-    }
+    function applyCustomHistoryFilter() { let start = document.getElementById('history-start-date').value; let end = document.getElementById('history-end-date').value; if(start && end) updateHistoryList(start, end); }
     function updateHistoryList(startDate, endDate) {
         let allRides = JSON.parse(localStorage.getItem('rides') || '[]');
         let rides = allRides.filter(r => { let d = new Date(r.time).toISOString().split('T')[0]; return d >= startDate && d <= endDate; });
