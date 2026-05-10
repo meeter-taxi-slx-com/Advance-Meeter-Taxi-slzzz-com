@@ -405,7 +405,7 @@
     function setManualDistance() { if(!sTime) { alert("Start ride"); return; } if(currentMode!=='manual') { alert("Manual mode required"); return; } let val=parseFloat(document.getElementById('manual-km-input').value); if(!isNaN(val) && val>=0) { totalMeters = val*1000; updateDisplay(); saveRideState(); } }
     function openPhoneNavigation() { if(!currentDestinationAddress) { alert("Enter destination"); return; } let encoded=encodeURIComponent(currentDestinationAddress); let isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent); window.open(isIOS ? `http://maps.apple.com/?daddr=${encoded}` : `https://www.google.com/maps/dir/?api=1&destination=${encoded}`, '_blank'); }
     
-    // ========== START RIDE FUNCTION ==========
+    // ========== START RIDE FUNCTION (WORKING) ==========
     async function startRide() {
         if(sTime) { alert("Ride already active!"); return; }
         
@@ -733,7 +733,6 @@
     function openProfitReport() { closeM('settings-modal'); showProfitReportTab('daily'); document.getElementById('profit-report-modal').style.display='flex'; }
     function closeM(id) { document.getElementById(id).style.display='none'; }
     
-    // UPDATED - openPanel with history default today (WORKING)
     function openPanel(id) { 
         closeM('settings-modal'); 
         document.getElementById(id).style.display = 'flex'; 
