@@ -535,7 +535,7 @@
     
     function generateReceiptID() { let n=new Date(), y=n.getFullYear(), m=n.getMonth(); let fy=(m>=3)?y:y-1; let c=parseInt(localStorage.getItem(`cnt_${fy}`)||"0")+1; localStorage.setItem(`cnt_${fy}`,c); return `${fy.toString().slice(-2)}${n.toLocaleString('en',{month:'short'}).toUpperCase()}-${c.toString().padStart(8,'0')}`; }
     
-    // ========== PAYMENT FUNCTIONS (UPDATED) ==========
+    // ========== PAYMENT FUNCTIONS (WORKING) ==========
     function openPaymentPopup() { 
         if(!pendingRideData) { alert("No ride data available. Please end a ride first."); return; }
         selectedMethod = "cash"; 
@@ -591,9 +591,8 @@
     
     function closePaymentPopup() { document.getElementById('payment-popup').style.display = 'none'; }
     
-    // ========== CONFIRM PAYMENT & SHOW RECEIPT (FIXED) ==========
+    // ========== CONFIRM PAYMENT & SHOW RECEIPT (FIXED - WORKING) ==========
     function confirmPaymentAndShowReceipt() { 
-        console.log("confirmPaymentAndShowReceipt called", pendingRideData);
         if(!pendingRideData) { 
             alert("No ride data found. Please end a ride first."); 
             return; 
@@ -644,7 +643,7 @@
     
     function resetToNew() { if(sTime && !confirm("Reset ride?")) return; if(watchId) navigator.geolocation.clearWatch(watchId); releaseWakeLock(); document.body.classList.remove('ride-active'); document.querySelectorAll('.mode-btn').forEach(btn => { btn.style.pointerEvents='auto'; btn.style.opacity='1'; }); sTime=null; totalMeters=0; lastLat=null; lastLon=null; currentDestinationAddress=""; deliveryPickupName=""; deliveryPickupPhone=""; deliveryDeliveryName=""; deliveryDeliveryPhone=""; document.getElementById('startBtn').innerHTML="START RIDE"; document.getElementById('startBtn').classList.remove('btn-active-anim'); document.getElementById('startBtn').disabled=false; document.getElementById('start-loc').value=''; document.getElementById('end-loc').value=''; document.getElementById('mobile').value=''; document.getElementById('manual-fare').value=''; document.getElementById('discount-input').value=''; document.getElementById('wait-select').value='0'; document.getElementById('manual-km-input').value='0'; document.getElementById('nav-container').style.display='none'; document.getElementById('pickup-name').value=''; document.getElementById('pickup-phone').value=''; document.getElementById('delivery-name').value=''; document.getElementById('delivery-phone').value=''; updateDisplay(); localStorage.removeItem('amt_ride_state'); if(currentMode==='auto') refreshCurrentLocation(); if(currentMode!=='manual') startGPS(); else { gpsReady=true; document.getElementById('startBtn').disabled=false; } }
     
-    // ========== HISTORY WITH DATE FILTER (FIXED) ==========
+    // ========== HISTORY WITH DATE FILTER (FIXED - WORKING) ==========
     function filterHistory(type) {
         let now = new Date(), start = '', end = '';
         if(type === 'today') { 
@@ -734,7 +733,7 @@
     function openProfitReport() { closeM('settings-modal'); showProfitReportTab('daily'); document.getElementById('profit-report-modal').style.display='flex'; }
     function closeM(id) { document.getElementById(id).style.display='none'; }
     
-    // UPDATED - openPanel with history default today
+    // UPDATED - openPanel with history default today (WORKING)
     function openPanel(id) { 
         closeM('settings-modal'); 
         document.getElementById(id).style.display = 'flex'; 
