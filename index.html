@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Advance Meeter Taxi">
     <meta name="theme-color" content="#1a4a9e">
-    <title>ADVANCE MEETER TAXI · Premium Edition</title>
+    <title>ADVANCE MEETER TAXI</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -27,90 +27,81 @@
             --accent-dark: #c0392b;
             --accent-gradient: linear-gradient(135deg, #e74c3c, #c0392b);
             --dark: #1e293b;
-            --dark-light: #334155;
             --gray: #64748b;
-            --gray-light: #94a3b8;
             --gray-bg: #f1f5f9;
             --white: #ffffff;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1);
             --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-            --radius-sm: 12px;
             --radius: 20px;
             --radius-lg: 28px;
             --radius-xl: 40px;
-            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            --transition: all 0.2s ease;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif; background: linear-gradient(145deg, #e2e8f0 0%, #cbd5e1 100%); min-height: 100vh; padding: 16px; display: flex; justify-content: center; align-items: center; }
-        .app-container { background: var(--white); width: 100%; max-width: 480px; border-radius: var(--radius-xl); box-shadow: var(--shadow-xl); padding: 20px; position: relative; transition: var(--transition); border: 1px solid rgba(255, 255, 255, 0.3); }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif; background: linear-gradient(145deg, #e2e8f0 0%, #cbd5e1 100%); min-height: 100vh; padding: 16px; display: flex; justify-content: center; align-items: center; }
+        .app-container { background: var(--white); width: 100%; max-width: 480px; border-radius: var(--radius-xl); box-shadow: var(--shadow-xl); padding: 20px; position: relative; transition: var(--transition); }
         body.ride-active .app-container { box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.3), var(--shadow-xl); }
-        .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 0 4px; }
+        .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .header-left { display: flex; align-items: center; gap: 12px; }
         .logo-area { width: 52px; height: 52px; background: var(--primary-gradient); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; box-shadow: var(--shadow); }
-        .brand-name { font-size: 15px; font-weight: 800; text-transform: uppercase; line-height: 1.3; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -0.3px; }
-        .settings-icon { width: 44px; height: 44px; background: rgba(26, 74, 158, 0.08); border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: var(--transition); backdrop-filter: blur(10px); border: 1px solid rgba(26, 74, 158, 0.1); }
-        .settings-icon:active { transform: scale(0.94); background: rgba(26, 74, 158, 0.15); }
+        .brand-name { font-size: 14px; font-weight: 800; text-transform: uppercase; line-height: 1.3; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .settings-icon { width: 44px; height: 44px; background: rgba(26, 74, 158, 0.08); border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: var(--transition); }
+        .settings-icon:active { transform: scale(0.95); background: rgba(26, 74, 158, 0.15); }
         .action-buttons { display: flex; gap: 12px; margin-bottom: 20px; }
-        .action-btn { flex: 1; background: var(--gray-bg); border: none; padding: 12px; border-radius: 32px; font-size: 13px; font-weight: 600; color: var(--dark); cursor: pointer; text-align: center; transition: var(--transition); font-family: inherit; }
+        .action-btn { flex: 1; background: var(--gray-bg); border: none; padding: 12px; border-radius: 32px; font-size: 13px; font-weight: 600; color: var(--dark); cursor: pointer; text-align: center; transition: var(--transition); }
         .action-btn:active { transform: scale(0.96); background: #e2e8f0; }
         .night-btn { background: linear-gradient(135deg, #f39c12, #e67e22); color: white; }
         .night-active { background: linear-gradient(135deg, #e74c3c, #c0392b) !important; }
-        input, select { width: 100%; padding: 14px 16px; margin: 6px 0; border: 1.5px solid #e2e8f0; border-radius: 20px; background: var(--white); font-size: 14px; font-family: inherit; transition: var(--transition); }
+        input, select { width: 100%; padding: 14px 16px; margin: 6px 0; border: 1.5px solid #e2e8f0; border-radius: 20px; background: var(--white); font-size: 14px; transition: var(--transition); }
         input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26, 74, 158, 0.1); }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .mode-selector { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-        .mode-btn { flex: 1; padding: 10px 8px; border-radius: 32px; border: 1.5px solid #e2e8f0; background: var(--white); cursor: pointer; font-weight: 600; font-size: 11px; text-align: center; transition: var(--transition); font-family: inherit; color: var(--dark); }
+        .mode-selector { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .mode-btn { flex: 1; padding: 10px 8px; border-radius: 32px; border: 1.5px solid #e2e8f0; background: white; cursor: pointer; font-weight: 600; font-size: 11px; text-align: center; transition: var(--transition); color: var(--dark); }
         .mode-btn.active { background: var(--primary-gradient); color: white; border-color: transparent; box-shadow: var(--shadow); }
-        .fare-card { background: linear-gradient(145deg, #ffffff, #f8fafc); border-radius: var(--radius-lg); padding: 24px 20px; margin: 16px 0; border: 1px solid rgba(26, 74, 158, 0.08); box-shadow: var(--shadow); }
+        .fare-card { background: linear-gradient(145deg, #ffffff, #f8fafc); border-radius: var(--radius-lg); padding: 20px; margin: 16px 0; border: 1px solid rgba(26, 74, 158, 0.08); box-shadow: var(--shadow); }
         .fare-row { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
         .fare-item { flex: 1; text-align: center; }
-        .fare-item small { font-size: 11px; font-weight: 600; color: var(--gray); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; display: block; }
-        .fare-item .display-value { font-size: 44px; font-weight: 800; background: linear-gradient(135deg, #1e293b, #334155); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; }
-        .fare-item .display-fare-value { font-size: 44px; font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; }
-        @keyframes countSpring { 0% { transform: scale(1); opacity: 1; } 30% { transform: scale(1.2); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
-        .count-animation { animation: countSpring 0.25s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
-        .manual-control { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 20px; }
+        .fare-item small { font-size: 11px; font-weight: 600; color: var(--gray); text-transform: uppercase; margin-bottom: 8px; display: block; }
+        .fare-item .display-value { font-size: 42px; font-weight: 800; background: linear-gradient(135deg, #1e293b, #334155); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .fare-item .display-fare-value { font-size: 42px; font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        @keyframes countSpring { 0% { transform: scale(1); } 30% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        .count-animation { animation: countSpring 0.25s ease-out; }
+        .manual-control { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 15px; }
         .manual-btn { background: var(--primary-gradient); color: white; border: none; width: 52px; height: 52px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow); }
         .manual-btn:active { transform: scale(0.94); }
-        .manual-input { width: 110px; text-align: center; font-size: 20px; font-weight: 600; padding: 12px; border-radius: 24px; background: var(--white); border: 1.5px solid #e2e8f0; }
+        .manual-input { width: 110px; text-align: center; font-size: 20px; font-weight: 600; padding: 12px; border-radius: 24px; border: 1.5px solid #e2e8f0; }
         .set-distance-btn { background: var(--secondary-gradient); color: white; border: none; padding: 12px 28px; border-radius: 32px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 12px; display: inline-block; box-shadow: var(--shadow); transition: var(--transition); }
         .set-distance-btn:active { transform: scale(0.96); }
         .location-card { background: var(--gray-bg); border-radius: 24px; padding: 14px; margin: 12px 0; border: 1px solid rgba(26, 74, 158, 0.08); }
-        .location-title { font-size: 10px; font-weight: 600; color: var(--gray); letter-spacing: 0.5px; margin-bottom: 6px; text-transform: uppercase; }
+        .location-title { font-size: 10px; font-weight: 600; color: var(--gray); text-transform: uppercase; margin-bottom: 6px; }
         .location-address { font-size: 13px; font-weight: 500; color: var(--dark); word-break: break-word; }
-        .refresh-location { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 6px 12px; border-radius: 25px; font-size: 10px; cursor: pointer; font-weight: 500; transition: var(--transition); }
-        .refresh-location:active { background: rgba(26, 74, 158, 0.1); }
+        .refresh-location { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 6px 12px; border-radius: 25px; font-size: 10px; cursor: pointer; transition: var(--transition); }
         .map-picker-btn { background: var(--primary-gradient); color: white; border: none; padding: 12px; border-radius: 24px; font-size: 12px; font-weight: 600; cursor: pointer; width: 100%; transition: var(--transition); }
         .map-picker-btn:active { transform: scale(0.97); }
         .delivery-fields { background: rgba(26, 74, 158, 0.04); border-radius: 24px; padding: 16px; margin: 12px 0; display: none; border: 1px solid rgba(26, 74, 158, 0.08); }
         .delivery-fields h4 { color: var(--primary); margin-bottom: 12px; font-size: 14px; font-weight: 600; }
         .btn-main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
-        .btn-start { background: var(--secondary-gradient); border: none; border-radius: 34px; font-size: 16px; font-weight: 700; color: white; cursor: pointer; padding: 16px; transition: var(--transition); text-transform: uppercase; letter-spacing: 0.5px; box-shadow: var(--shadow); }
-        .btn-end { background: var(--accent-gradient); border: none; border-radius: 34px; font-size: 16px; font-weight: 700; color: white; cursor: pointer; padding: 16px; transition: var(--transition); text-transform: uppercase; letter-spacing: 0.5px; box-shadow: var(--shadow); }
+        .btn-start { background: var(--secondary-gradient); border: none; border-radius: 34px; font-size: 16px; font-weight: 700; color: white; cursor: pointer; padding: 16px; transition: var(--transition); text-transform: uppercase; box-shadow: var(--shadow); }
+        .btn-end { background: var(--accent-gradient); border: none; border-radius: 34px; font-size: 16px; font-weight: 700; color: white; cursor: pointer; padding: 16px; transition: var(--transition); text-transform: uppercase; box-shadow: var(--shadow); }
         .btn-start:active, .btn-end:active { transform: scale(0.97); }
         .btn-active-anim { animation: pulse-btn 1.5s infinite; }
         @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); } 70% { box-shadow: 0 0 0 12px rgba(46, 204, 113, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); } }
-        .voice-container { text-align: center; margin-top: 16px; }
-        .voice-btn { background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; border: none; border-radius: 40px; padding: 10px 20px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: var(--transition); box-shadow: var(--shadow); }
+        .voice-container { text-align: center; margin-top: 12px; }
+        .voice-btn { background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; border: none; border-radius: 40px; padding: 8px 20px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: var(--transition); box-shadow: var(--shadow); }
         .voice-btn.listening { animation: pulse-voice 1.5s infinite; background: linear-gradient(135deg, #e74c3c, #c0392b); }
         @keyframes pulse-voice { 0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); } 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); } }
         .voice-status { font-size: 10px; text-align: center; margin-top: 6px; color: var(--gray); }
-        .voice-commands-guide { font-size: 9px; text-align: center; margin-top: 4px; color: var(--gray-light); display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-        .gps-status { font-size: 12px; text-align: center; margin-top: 12px; padding: 8px 12px; border-radius: 30px; font-weight: 500; }
+        .voice-commands-guide { font-size: 9px; text-align: center; margin-top: 4px; color: #94a3b8; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+        .gps-status { font-size: 12px; text-align: center; margin-top: 8px; padding: 8px; border-radius: 30px; font-weight: 500; }
         .gps-ready { background: rgba(46, 204, 113, 0.12); color: #27ae60; }
         .gps-warning { background: rgba(241, 196, 15, 0.12); color: #d4a00a; }
         .gps-error { background: rgba(231, 76, 60, 0.12); color: #e74c3c; }
         .map-container { height: 380px; width: 100%; border-radius: 28px; margin: 12px 0; background: #e2e8f0; overflow: hidden; }
         .modal { display: none; position: fixed; z-index: 2000; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 16px; }
-        .modal-content { background: var(--white); width: 100%; max-width: 420px; border-radius: 48px; padding: 24px; position: relative; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-xl); border: 1px solid rgba(255, 255, 255, 0.3); }
-        .close-circle { position: absolute; top: 20px; right: 20px; background: var(--gray-bg); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; transition: var(--transition); }
-        .close-circle:active { background: #e2e8f0; transform: scale(0.94); }
-        .back-btn { position: absolute; top: 20px; left: 20px; background: var(--gray-bg); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; transition: var(--transition); }
-        .back-btn:active { background: #e2e8f0; transform: scale(0.94); }
+        .modal-content { background: var(--white); width: 100%; max-width: 420px; border-radius: 48px; padding: 24px; position: relative; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-xl); }
+        .close-circle { position: absolute; top: 18px; right: 18px; background: var(--gray-bg); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; transition: var(--transition); }
+        .back-btn { position: absolute; top: 18px; left: 18px; background: var(--gray-bg); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; transition: var(--transition); }
         .settings-menu { display: flex; flex-direction: column; gap: 12px; }
         .settings-menu-btn { background: var(--primary-gradient); color: white; border: none; padding: 16px 20px; border-radius: 40px; font-size: 15px; font-weight: 600; cursor: pointer; text-align: center; transition: var(--transition); box-shadow: var(--shadow); }
         .settings-menu-btn:active { transform: scale(0.97); }
@@ -124,37 +115,37 @@
         .confirm-payment-btn:active { transform: scale(0.97); }
         .history-item { background: var(--gray-bg); padding: 16px; margin-bottom: 12px; border-radius: 28px; border-left: 4px solid var(--primary); transition: var(--transition); }
         .btn-reprint { background: var(--primary-gradient); padding: 6px 14px; font-size: 11px; font-weight: 600; color: white; border: none; border-radius: 25px; cursor: pointer; transition: var(--transition); }
-        .receipt-print { width: 72mm; max-width: 72mm; margin: 0 auto; padding: 4mm; font-family: 'Courier New', 'SF Mono', monospace; font-size: 9pt; background: white; position: relative; border-radius: 16px; }
+        .receipt-print { width: 72mm; max-width: 72mm; margin: 0 auto; padding: 3mm; font-family: 'Courier New', monospace; font-size: 9pt; background: white; position: relative; border-radius: 16px; }
         .r-header { background: linear-gradient(135deg, #000, #1a1a2e); color: white; padding: 8px; text-align: center; font-weight: 800; border-radius: 12px 12px 0 0; }
         .r-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dotted #ccc; }
         .r-row-full { display: block; padding: 4px 0; border-bottom: 1px dotted #ccc; }
         .r-label { font-weight: 800; display: block; }
         .r-address { word-break: break-all; }
         .r-total { background: linear-gradient(135deg, #1a4a9e, #2563eb); color: white; padding: 8px; text-align: center; margin: 8px 0; border-radius: 12px; font-weight: 800; }
-        .receipt-seal { position: absolute; bottom: 8px; right: 8px; width: 32px; height: 32px; border-radius: 50%; border: 2px solid #e74c3c; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.95); transform: rotate(-15deg); }
+        .receipt-seal { position: absolute; bottom: 5px; right: 5px; width: 32px; height: 32px; border-radius: 50%; border: 2px solid #e74c3c; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.95); transform: rotate(-15deg); }
         .receipt-seal:before { content: "✓ PAID"; font-size: 7px; font-weight: bold; color: #e74c3c; }
         .receipt-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
         .btn-wa { background: #25D366; color: white; padding: 12px; border-radius: 24px; border: none; font-weight: bold; cursor: pointer; }
         .btn-gm { background: #EA4335; color: white; padding: 12px; border-radius: 24px; border: none; font-weight: bold; cursor: pointer; }
         .btn-pdf { background: #34495e; color: white; padding: 12px; border-radius: 24px; border: none; font-weight: bold; cursor: pointer; }
         .btn-print { background: #9b59b6; color: white; padding: 12px; border-radius: 24px; border: none; font-weight: bold; cursor: pointer; }
-        .report-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-        .report-tab { flex: 1; padding: 10px; border: none; border-radius: 30px; background: var(--gray-bg); cursor: pointer; font-weight: 600; transition: var(--transition); font-family: inherit; }
+        .report-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .report-tab { flex: 1; padding: 10px; border: none; border-radius: 30px; background: var(--gray-bg); cursor: pointer; font-weight: 600; transition: var(--transition); }
         .report-tab.active { background: var(--primary-gradient); color: white; }
         .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e2e8f0; }
         .profit-card { background: linear-gradient(145deg, #f0fdf4, #dcfce7); border-radius: 28px; padding: 20px; margin: 15px 0; border: 1px solid rgba(46, 204, 113, 0.2); }
         .profit-row { display: flex; justify-content: space-between; margin: 10px 0; }
         .profit-positive { color: #27ae60; font-weight: 700; }
         .profit-negative { color: #e74c3c; font-weight: 700; }
-        .date-filter { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .date-filter { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
         .date-filter-btn { flex: 1; padding: 8px; border: none; border-radius: 30px; background: var(--gray-bg); cursor: pointer; font-weight: 600; font-size: 12px; transition: var(--transition); }
         .date-filter-btn.active { background: var(--primary-gradient); color: white; }
         .system-log-entry { background: rgba(0, 0, 0, 0.03); padding: 12px; margin-bottom: 8px; border-radius: 20px; font-size: 11px; border-left: 3px solid #e74c3c; }
         .autocomplete-container { position: relative; width: 100%; }
         .autocomplete-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 20px; max-height: 200px; overflow-y: auto; z-index: 1000; box-shadow: var(--shadow-md); }
-        .autocomplete-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 13px; transition: var(--transition); }
+        .autocomplete-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
         .autocomplete-item:hover { background: var(--gray-bg); }
-        .restore-banner { background: #fef3c7; color: #b45309; padding: 12px; border-radius: 28px; margin-bottom: 16px; text-align: center; font-size: 12px; font-weight: 600; display: none; cursor: pointer; transition: var(--transition); }
+        .restore-banner { background: #fef3c7; color: #b45309; padding: 12px; border-radius: 28px; margin-bottom: 16px; text-align: center; font-size: 12px; font-weight: 600; display: none; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -199,11 +190,11 @@
         <div class="close-circle" onclick="closePaymentPopup()">✕</div>
         <h3 style="text-align:center; margin-bottom:20px;">💳 SELECT PAYMENT METHOD</h3>
         <div class="payment-methods">
-            <div class="payment-method-btn" onclick="selectPaymentMethod('cash', this)">💰 Cash</div>
-            <div class="payment-method-btn" onclick="selectPaymentMethod('card', this)">💳 Card</div>
-            <div class="payment-method-btn" onclick="selectPaymentMethod('mobile', this)">📱 Mobile</div>
-            <div class="payment-method-btn" onclick="selectPaymentMethod('bank', this)">🏦 Bank</div>
-            <div class="payment-method-btn" onclick="selectPaymentMethod('other', this)">📝 Other</div>
+            <div class="payment-method-btn" data-method="cash" onclick="selectPaymentMethod('cash')">💰 Cash</div>
+            <div class="payment-method-btn" data-method="card" onclick="selectPaymentMethod('card')">💳 Card</div>
+            <div class="payment-method-btn" data-method="mobile" onclick="selectPaymentMethod('mobile')">📱 Mobile</div>
+            <div class="payment-method-btn" data-method="bank" onclick="selectPaymentMethod('bank')">🏦 Bank</div>
+            <div class="payment-method-btn" data-method="other" onclick="selectPaymentMethod('other')">📝 Other</div>
         </div>
         <div id="payment-detail-fields" class="payment-detail-fields" style="display: none;">
             <div id="cash-fields" style="display: none;"><p>💰 Cash payment selected.</p></div>
@@ -212,7 +203,7 @@
             <div id="bank-fields" style="display: none;"><select id="bank-name"><option>Select</option><option>Commercial</option><option>HNB</option><option>Sampath</option></select><input type="text" id="bank-ref" placeholder="Reference No"></div>
             <div id="other-fields" style="display: none;"><input type="text" id="other-method" placeholder="Method"><input type="text" id="other-ref" placeholder="Reference"></div>
         </div>
-        <button class="confirm-payment-btn" id="confirmPaymentBtn" onclick="confirmPaymentAndShowReceipt()">✅ CONFIRM & SHOW RECEIPT</button>
+        <button class="confirm-payment-btn" onclick="confirmPaymentAndShowReceipt()">✅ CONFIRM & SHOW RECEIPT</button>
     </div>
 </div>
 
@@ -250,30 +241,6 @@
 <div id="login-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeM('login-modal')">✕</div><div style="text-align:center;"><div class="logo-area" style="margin:0 auto 15px; width:60px; height:60px; font-size:32px;">🚕</div><h3>ADVANCE MEETER TAXI</h3><p style="color:#64748b;">Enter admin password</p></div><input type="password" id="admin-pass" placeholder="Password" style="text-align:center;"><button class="login-btn" style="background:linear-gradient(135deg,#667eea,#764ba2); color:white; width:100%; margin-top:15px; padding:14px; border:none; border-radius:30px;" onclick="checkLogin()">LOGIN</button><button class="settings-menu-btn secondary" style="margin-top:10px;" onclick="closeM('login-modal')">CANCEL</button></div></div>
 
 <script>
-    // ========== CACHED DOM ELEMENTS ==========
-    const dom = {
-        dispKm: document.getElementById('disp-km'),
-        dispFare: document.getElementById('disp-fare'),
-        startBtn: document.getElementById('startBtn'),
-        gpsStatus: document.getElementById('gps-status'),
-        nightIndicator: document.getElementById('night-indicator'),
-        nightBtn: document.getElementById('nightBtn'),
-        manualKmInput: document.getElementById('manual-km-input'),
-        mobileInput: document.getElementById('mobile'),
-        manualFareInput: document.getElementById('manual-fare'),
-        discountInput: document.getElementById('discount-input'),
-        waitSelect: document.getElementById('wait-select'),
-        navContainer: document.getElementById('nav-container'),
-        autoLocationCard: document.getElementById('auto-location-card'),
-        currentLocationAddressDiv: document.getElementById('current-location-address'),
-        startLoc: document.getElementById('start-loc'),
-        endLoc: document.getElementById('end-loc'),
-        pickupName: document.getElementById('pickup-name'),
-        pickupPhone: document.getElementById('pickup-phone'),
-        deliveryName: document.getElementById('delivery-name'),
-        deliveryPhone: document.getElementById('delivery-phone')
-    };
-    
     // ========== SYSTEM LOG ==========
     let systemLogs = JSON.parse(localStorage.getItem('system_logs') || '[]');
     function addSystemLog(type, message, details) { let log = { id: Date.now(), date: new Date().toISOString(), type, message, details: details || '' }; systemLogs.unshift(log); if (systemLogs.length > 200) systemLogs = systemLogs.slice(0, 200); localStorage.setItem('system_logs', JSON.stringify(systemLogs)); }
@@ -285,6 +252,9 @@
     let wakeLock = null;
     async function requestWakeLock() { if ('wakeLock' in navigator) { try { wakeLock = await navigator.wakeLock.request('screen'); return true; } catch(e) { return false; } } return false; }
     function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
+    
+    // ========== NUMBER TO WORDS ==========
+    function numberToWords(num) { if (num === 0) return "Zero Rupees Only"; const ones = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen']; const tens = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety']; function convert(n) { if (n < 20) return ones[n]; if (n < 100) return tens[Math.floor(n/10)] + (n%10 ? " "+ones[n%10] : ""); if (n < 1000) return ones[Math.floor(n/100)] + " Hundred" + (n%100 ? " "+convert(n%100) : ""); if (n < 100000) return convert(Math.floor(n/1000)) + " Thousand" + (n%1000 ? " "+convert(n%1000) : ""); return convert(Math.floor(n/100000)) + " Lakh" + (n%100000 ? " "+convert(n%100000) : ""); } return convert(Math.floor(num)) + " Rupees Only"; }
     
     // ========== VOICE COMMANDS ==========
     let voiceActive = false, recognition = null;
@@ -382,14 +352,10 @@
     function exportTravelCSV() { let rides = JSON.parse(localStorage.getItem('rides') || '[]'); let csv = "Date,From,To,Distance,Fare,Payment\n" + rides.map(r => `${new Date(r.time).toLocaleDateString()},${r.from},${r.to},${r.km.toFixed(2)},${r.fare.toFixed(2)},${r.payment?.method||'Cash'}`).join("\n"); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'travel_report.csv'; a.click(); }
     async function printTravelReceipt() { let rides = JSON.parse(localStorage.getItem('rides') || '[]'); let totalDist = rides.reduce((s,r)=>s+r.km,0); let totalFare = rides.reduce((s,r)=>s+r.fare,0); let html = `<div class="receipt-print"><div class="r-header">TRAVEL SUMMARY</div><div class="r-row"><span>Total Rides:</span><b>${rides.length}</b></div><div class="r-row"><span>Total Distance:</span><b>${totalDist.toFixed(2)} km</b></div><div class="r-row"><span>Total Earnings:</span><b>Rs.${totalFare.toFixed(2)}</b></div><div class="r-divider">-------------------</div>${rides.slice().reverse().slice(0,50).map(r=>`<div class="r-row-full"><span class="r-label">From:</span><span class="r-address">${r.from.substring(0,50)}</span><span class="r-label">To:</span><span class="r-address">${r.to.substring(0,50)}</span><span>${r.km.toFixed(2)} km | Rs.${r.fare.toFixed(2)}</span></div>`).join('')}<div class="r-divider">Thank you! 🚕</div></div>`; let win = window.open('', '_blank'); win.document.write(html); win.document.close(); win.print(); }
     
-    // ========== NUMBER TO WORDS ==========
-    function numberToWords(num) { if (num === 0) return "Zero Rupees Only"; const ones = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen']; const tens = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety']; function convert(n) { if (n < 20) return ones[n]; if (n < 100) return tens[Math.floor(n/10)] + (n%10 ? " "+ones[n%10] : ""); if (n < 1000) return ones[Math.floor(n/100)] + " Hundred" + (n%100 ? " "+convert(n%100) : ""); if (n < 100000) return convert(Math.floor(n/1000)) + " Thousand" + (n%1000 ? " "+convert(n%1000) : ""); return convert(Math.floor(n/100000)) + " Lakh" + (n%100000 ? " "+convert(n%100000) : ""); } return convert(Math.floor(num)) + " Rupees Only"; }
-    
     // ========== GLOBAL VARIABLES ==========
-    let sTime = null, watchId = null, totalMeters = 0, lastLat = null, lastLon = null, currentRID = "", nightActive = false, gpsReady = false, currentMode = "auto", pendingRideData = null, selectedMethod = "cash", currentLocationAddress = "", currentLocationLat = null, currentLocationLon = null, startLocationAddress = "", currentDestinationAddress = "", mapPickerField = null, mapObj = null, mapMarker = null, deliveryPickupName="", deliveryPickupPhone="", deliveryDeliveryName="", deliveryDeliveryPhone="";
+    let sTime = null, watchId = null, totalMeters = 0, lastLat = null, lastOn = null, currentRID = "", nightActive = false, gpsReady = false, currentMode = "auto", pendingRideData = null, selectedMethod = "cash", currentLocationAddress = "", currentLocationLat = null, currentLocationLon = null, startLocationAddress = "", currentDestinationAddress = "", mapPickerField = null, mapObj = null, mapMarker = null, deliveryPickupName="", deliveryPickupPhone="", deliveryDeliveryName="", deliveryDeliveryPhone="";
     let SETTINGS = { base:100, rate:80, waitRate:5, nightPercent:10, appName:"ADVANCE MEETER TAXI", receiptName:"OFFICIAL RECEIPT", password:"1234", logo:null };
     let currentReportType = "daily";
-    let currentHistoryFilter = "today";
     
     // Navigation functions
     function goBackToSettingsMenu() { closeM('app-settings-modal'); closeM('fuel-modal'); closeM('repair-modal'); closeM('reports-menu-modal'); closeM('system-log-modal'); closeM('fuel-report-modal'); closeM('repair-report-modal'); closeM('travel-report-modal'); closeM('report-modal'); closeM('income-modal'); closeM('history-modal'); closeM('profit-report-modal'); document.getElementById('settings-modal').style.display = 'flex'; }
@@ -399,35 +365,33 @@
     
     function saveRideState() { if(sTime) localStorage.setItem('amt_ride_state', JSON.stringify({ isRideActive:true, startTime:sTime, totalMeters, lastLat, lastLon, currentMode, nightActive, startLocationAddress, currentLocationAddress, gpsReady:true, destinationAddress:currentDestinationAddress, deliveryPickupName, deliveryPickupPhone, deliveryDeliveryName, deliveryDeliveryPhone })); else localStorage.removeItem('amt_ride_state'); }
     function loadRideState() { let saved = localStorage.getItem('amt_ride_state'); if(saved) try { let state = JSON.parse(saved); if(state.isRideActive && state.startTime) { document.getElementById('restore-banner').style.display = 'block'; return true; } } catch(e){} return false; }
-    function restorePreviousRide() { let saved = localStorage.getItem('amt_ride_state'); if(!saved) return; try { let state = JSON.parse(saved); sTime = state.startTime; totalMeters = state.totalMeters||0; lastLat = state.lastLat; lastLon = state.lastLon; currentMode = state.currentMode||"auto"; nightActive = state.nightActive||false; startLocationAddress = state.startLocationAddress||""; currentLocationAddress = state.currentLocationAddress||""; currentDestinationAddress = state.destinationAddress||""; deliveryPickupName=state.deliveryPickupName||""; deliveryPickupPhone=state.deliveryPickupPhone||""; deliveryDeliveryName=state.deliveryDeliveryName||""; deliveryDeliveryPhone=state.deliveryDeliveryPhone||""; gpsReady=true; setMode(currentMode); let nightBtn=document.getElementById('nightBtn'); if(nightActive) { nightBtn.innerHTML='🌙 NIGHT ON'; nightBtn.classList.add('night-active'); } else { nightBtn.innerHTML='🌙 NIGHT OFF'; nightBtn.classList.remove('night-active'); } updateDisplay(); if(currentMode==='auto' && currentLocationAddress) dom.currentLocationAddressDiv.innerHTML = currentLocationAddress; if(currentMode==='manual') dom.manualKmInput.value = (totalMeters/1000).toFixed(2); if(currentMode==='delivery') { dom.pickupName.value=deliveryPickupName; dom.pickupPhone.value=deliveryPickupPhone; dom.deliveryName.value=deliveryDeliveryName; dom.deliveryPhone.value=deliveryDeliveryPhone; } if(sTime) { dom.startBtn.innerHTML="⏵ ACTIVE"; dom.startBtn.classList.add('btn-active-anim'); dom.startBtn.disabled=true; document.body.classList.add('ride-active'); requestWakeLock(); trackRide(); if(currentMode!=='auto') dom.navContainer.style.display='block'; } document.getElementById('restore-banner').style.display='none'; document.querySelectorAll('.mode-btn').forEach(btn=>btn.style.pointerEvents='none'); alert(`Restored: ${(totalMeters/1000).toFixed(2)} km`); } catch(e){} }
+    function restorePreviousRide() { let saved = localStorage.getItem('amt_ride_state'); if(!saved) return; try { let state = JSON.parse(saved); sTime = state.startTime; totalMeters = state.totalMeters||0; lastLat = state.lastLat; lastLon = state.lastLon; currentMode = state.currentMode||"auto"; nightActive = state.nightActive||false; startLocationAddress = state.startLocationAddress||""; currentLocationAddress = state.currentLocationAddress||""; currentDestinationAddress = state.destinationAddress||""; deliveryPickupName=state.deliveryPickupName||""; deliveryPickupPhone=state.deliveryPickupPhone||""; deliveryDeliveryName=state.deliveryDeliveryName||""; deliveryDeliveryPhone=state.deliveryDeliveryPhone||""; gpsReady=true; setMode(currentMode); let nightBtn=document.getElementById('nightBtn'); if(nightActive) { nightBtn.innerHTML='🌙 NIGHT ON'; nightBtn.classList.add('night-active'); } else { nightBtn.innerHTML='🌙 NIGHT OFF'; nightBtn.classList.remove('night-active'); } updateDisplay(); if(currentMode==='auto' && currentLocationAddress) document.getElementById('current-location-address').innerHTML = currentLocationAddress; if(currentMode==='manual') document.getElementById('manual-km-input').value = (totalMeters/1000).toFixed(2); if(currentMode==='delivery') { document.getElementById('pickup-name').value=deliveryPickupName; document.getElementById('pickup-phone').value=deliveryPickupPhone; document.getElementById('delivery-name').value=deliveryDeliveryName; document.getElementById('delivery-phone').value=deliveryDeliveryPhone; } if(sTime) { document.getElementById('startBtn').innerHTML="⏵ ACTIVE"; document.getElementById('startBtn').classList.add('btn-active-anim'); document.getElementById('startBtn').disabled=true; document.body.classList.add('ride-active'); requestWakeLock(); trackRide(); if(currentMode!=='auto') document.getElementById('nav-container').style.display='block'; } document.getElementById('restore-banner').style.display='none'; document.querySelectorAll('.mode-btn').forEach(btn=>btn.style.pointerEvents='none'); alert(`Restored: ${(totalMeters/1000).toFixed(2)} km`); } catch(e){} }
     function calculateDistanceMeters(lat1,lon1,lat2,lon2) { const R=6371000; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); return R*2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); }
     let lastKmValue=0, lastFareValue=0;
     function animateCounter(id) { let el=document.getElementById(id); if(el) { el.classList.remove('count-animation'); void el.offsetWidth; el.classList.add('count-animation'); } }
-    function updateDisplay() { let km=totalMeters/1000; let fare=calcFare(); if(Math.abs(km-lastKmValue)>0.01) { animateCounter('disp-km'); lastKmValue=km; } if(fare!==lastFareValue) { animateCounter('disp-fare'); lastFareValue=fare; } dom.dispKm.innerHTML = km.toFixed(2); dom.dispFare.innerHTML = "Rs." + fare.toFixed(2); if(currentMode==='manual') dom.manualKmInput.value = km.toFixed(2); let ni = dom.nightIndicator; if(ni) ni.style.display = (nightActive && !dom.manualFareInput.value) ? 'inline-block' : 'none'; }
-    function calcFare() { let manualFare=parseInt(dom.manualFareInput.value)||0, disc=parseInt(dom.discountInput.value)||0, wait=parseInt(dom.waitSelect.value), waitCharge=wait*SETTINGS.waitRate, km=totalMeters/1000, total=manualFare>0 ? manualFare+waitCharge-disc : SETTINGS.base + (Math.max(0,km-1)*SETTINGS.rate) + waitCharge - disc; if(nightActive && manualFare===0) total = total + (total*SETTINGS.nightPercent/100); return Math.max(0, Math.round(total)); }
-    function startGPS() { if(!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(pos => { let acc=pos.coords.accuracy; lastLat=pos.coords.latitude; lastLon=pos.coords.longitude; if(acc<200) { gpsReady=true; dom.gpsStatus.innerHTML = `✅ GPS Ready (${acc.toFixed(0)}m)`; dom.gpsStatus.className = 'gps-status gps-ready'; dom.startBtn.disabled=false; if(currentMode==='auto') { currentLocationLat=lastLat; currentLocationLon=lastLon; reverseGeocode(lastLat,lastLon); } } else { setTimeout(startGPS,3000); } }, err => { dom.gpsStatus.innerHTML = '❌ GPS permission needed'; dom.startBtn.disabled=true; setTimeout(startGPS,5000); }, {enableHighAccuracy:true, timeout:15000}); }
+    function updateDisplay() { let km=totalMeters/1000; let fare=calcFare(); if(Math.abs(km-lastKmValue)>0.01) { animateCounter('disp-km'); lastKmValue=km; } if(fare!==lastFareValue) { animateCounter('disp-fare'); lastFareValue=fare; } document.getElementById('disp-km').innerHTML = km.toFixed(2); document.getElementById('disp-fare').innerHTML = "Rs." + fare.toFixed(2); if(currentMode==='manual') document.getElementById('manual-km-input').value = km.toFixed(2); let ni = document.getElementById('night-indicator'); if(ni) ni.style.display = (nightActive && !document.getElementById('manual-fare').value) ? 'inline-block' : 'none'; }
+    function calcFare() { let manualFare=parseInt(document.getElementById('manual-fare').value)||0, disc=parseInt(document.getElementById('discount-input').value)||0, wait=parseInt(document.getElementById('wait-select').value), waitCharge=wait*SETTINGS.waitRate, km=totalMeters/1000, total=manualFare>0 ? manualFare+waitCharge-disc : SETTINGS.base + (Math.max(0,km-1)*SETTINGS.rate) + waitCharge - disc; if(nightActive && manualFare===0) total = total + (total*SETTINGS.nightPercent/100); return Math.max(0, Math.round(total)); }
+    function startGPS() { if(!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(pos => { let acc=pos.coords.accuracy; lastLat=pos.coords.latitude; lastLon=pos.coords.longitude; if(acc<200) { gpsReady=true; document.getElementById('gps-status').innerHTML = `✅ GPS Ready (${acc.toFixed(0)}m)`; document.getElementById('gps-status').className = 'gps-status gps-ready'; document.getElementById('startBtn').disabled=false; if(currentMode==='auto') { currentLocationLat=lastLat; currentLocationLon=lastLon; reverseGeocode(lastLat,lastLon); } } else { setTimeout(startGPS,3000); } }, err => { document.getElementById('gps-status').innerHTML = '❌ GPS permission needed'; document.getElementById('startBtn').disabled=true; setTimeout(startGPS,5000); }, {enableHighAccuracy:true, timeout:15000}); }
     function trackRide() { if(watchId) navigator.geolocation.clearWatch(watchId); watchId = navigator.geolocation.watchPosition(pos => { if(!sTime) return; let lat=pos.coords.latitude, lon=pos.coords.longitude, acc=pos.coords.accuracy; if(acc<200 && currentMode==='auto') reverseGeocode(lat,lon); if(lastLat!==null && lastLon!==null && acc<200) { let d=calculateDistanceMeters(lastLat,lastLon,lat,lon); if(d>3 && d<200) { totalMeters += d; updateDisplay(); saveRideState(); } } lastLat=lat; lastLon=lon; }, null, {enableHighAccuracy:true, timeout:5000}); }
-    async function reverseGeocode(lat,lon) { try { let res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=en&countrycodes=lk`); let data = await res.json(); currentLocationAddress = data.display_name || `${lat.toFixed(4)},${lon.toFixed(4)}`; dom.currentLocationAddressDiv.innerHTML = currentLocationAddress.substring(0,80); } catch(e){} }
+    async function reverseGeocode(lat,lon) { try { let res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=en&countrycodes=lk`); let data = await res.json(); currentLocationAddress = data.display_name || `${lat.toFixed(4)},${lon.toFixed(4)}`; document.getElementById('current-location-address').innerHTML = currentLocationAddress.substring(0,80); } catch(e){} }
     function refreshCurrentLocation() { if(navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => reverseGeocode(pos.coords.latitude, pos.coords.longitude)); }
-    function setMode(mode) { currentMode=mode; ['auto','gps','manual','delivery'].forEach(m=>document.getElementById(`mode-${m}`).classList.remove('active')); document.getElementById(`mode-${mode}`).classList.add('active'); if(mode==='auto') { dom.autoLocationCard.style.display='block'; document.getElementById('location-fields').style.display='none'; document.getElementById('delivery-fields').style.display='none'; document.getElementById('manual-controls').style.display='none'; if(!sTime) startGPS(); refreshCurrentLocation(); } else if(mode==='gps') { dom.autoLocationCard.style.display='none'; document.getElementById('location-fields').style.display='block'; document.getElementById('delivery-fields').style.display='none'; document.getElementById('manual-controls').style.display='none'; if(!sTime) startGPS(); setupAutocomplete('start-loc','start-loc-suggestions'); setupAutocomplete('end-loc','end-loc-suggestions'); } else if(mode==='manual') { dom.autoLocationCard.style.display='none'; document.getElementById('location-fields').style.display='block'; document.getElementById('delivery-fields').style.display='none'; document.getElementById('manual-controls').style.display='block'; gpsReady=true; if(watchId) { navigator.geolocation.clearWatch(watchId); watchId=null; } dom.startBtn.disabled=false; setupAutocomplete('start-loc','start-loc-suggestions'); setupAutocomplete('end-loc','end-loc-suggestions'); } else if(mode==='delivery') { dom.autoLocationCard.style.display='none'; document.getElementById('location-fields').style.display='block'; document.getElementById('delivery-fields').style.display='block'; document.getElementById('manual-controls').style.display='none'; if(!sTime) startGPS(); setupAutocomplete('start-loc','start-loc-suggestions'); setupAutocomplete('end-loc','end-loc-suggestions'); } updateDisplay(); }
+    function setMode(mode) { currentMode=mode; ['auto','gps','manual','delivery'].forEach(m=>document.getElementById(`mode-${m}`).classList.remove('active')); document.getElementById(`mode-${mode}`).classList.add('active'); if(mode==='auto') { document.getElementById('auto-location-card').style.display='block'; document.getElementById('location-fields').style.display='none'; document.getElementById('delivery-fields').style.display='none'; document.getElementById('manual-controls').style.display='none'; if(!sTime) startGPS(); refreshCurrentLocation(); } else if(mode==='gps') { document.getElementById('auto-location-card').style.display='none'; document.getElementById('location-fields').style.display='block'; document.getElementById('delivery-fields').style.display='none'; document.getElementById('manual-controls').style.display='none'; if(!sTime) startGPS(); setupAutocomplete('start-loc','start-loc-suggestions'); setupAutocomplete('end-loc','end-loc-suggestions'); } else if(mode==='manual') { document.getElementById('auto-location-card').style.display='none'; document.getElementById('location-fields').style.display='block'; document.getElementById('delivery-fields').style.display='none'; document.getElementById('manual-controls').style.display='block'; gpsReady=true; if(watchId) { navigator.geolocation.clearWatch(watchId); watchId=null; } document.getElementById('startBtn').disabled=false; setupAutocomplete('start-loc','start-loc-suggestions'); setupAutocomplete('end-loc','end-loc-suggestions'); } else if(mode==='delivery') { document.getElementById('auto-location-card').style.display='none'; document.getElementById('location-fields').style.display='block'; document.getElementById('delivery-fields').style.display='block'; document.getElementById('manual-controls').style.display='none'; if(!sTime) startGPS(); setupAutocomplete('start-loc','start-loc-suggestions'); setupAutocomplete('end-loc','end-loc-suggestions'); } updateDisplay(); }
     async function searchSriLankaLocations(q) { if(!q||q.length<2) return []; try { let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q+" Sri Lanka")}&limit=8&countrycodes=lk`); return await res.json(); } catch(e){ return []; } }
     let searchTimeout;
     function setupAutocomplete(inputId,suggestionsId) { let input=document.getElementById(inputId); let div=document.getElementById(suggestionsId); if(!input||!div) return; input.addEventListener('input', async function() { let q=this.value.trim(); if(q.length<2) { div.style.display='none'; return; } clearTimeout(searchTimeout); searchTimeout = setTimeout(async () => { let results = await searchSriLankaLocations(q); div.innerHTML=''; if(results.length===0) div.innerHTML='<div class="autocomplete-item">No results</div>'; else results.forEach(p => { let item=document.createElement('div'); item.className='autocomplete-item'; item.textContent=p.display_name.substring(0,80); item.onclick=() => { input.value=p.display_name; if(inputId==='end-loc') currentDestinationAddress=p.display_name; div.style.display='none'; }; div.appendChild(item); }); div.style.display='block'; },300); }); document.addEventListener('click',e=>{ if(e.target!==input) div.style.display='none'; }); }
     function openMapPicker(field) { mapPickerField=field; document.getElementById('map-title').innerText=field==='start'?'Pickup':'Drop'; document.getElementById('map-modal').style.display='flex'; setTimeout(() => { if(mapObj) mapObj.remove(); mapObj = L.map('map').setView([7.8731,80.7718],8); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>', subdomains: 'abcd', maxZoom: 19, minZoom: 1 }).addTo(mapObj); mapMarker = L.marker([7.8731,80.7718],{draggable:true}).addTo(mapObj); mapMarker.on('dragend',() => reverseMapGeocode(mapMarker.getLatLng().lat,mapMarker.getLatLng().lng)); mapObj.on('click',e => { mapMarker.setLatLng(e.latlng); reverseMapGeocode(e.latlng.lat,e.latlng.lng); }); if(navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => { mapObj.setView([pos.coords.latitude,pos.coords.longitude],14); mapMarker.setLatLng([pos.coords.latitude,pos.coords.longitude]); reverseMapGeocode(pos.coords.latitude,pos.coords.longitude); }); let search=document.getElementById('map-search'); let results=document.getElementById('search-results'); search.oninput = async function() { let q=this.value.trim(); if(q.length<2) { results.style.display='none'; return; } let data = await searchSriLankaLocations(q); results.innerHTML=''; if(data.length===0) results.innerHTML='<div class="search-item">No results</div>'; else data.forEach(place => { let div=document.createElement('div'); div.className='search-item'; div.textContent=place.display_name.substring(0,60); div.onclick=() => { mapObj.setView([place.lat,place.lon],14); mapMarker.setLatLng([place.lat,place.lon]); reverseMapGeocode(place.lat,place.lon); results.style.display='none'; search.value=place.display_name; }; results.appendChild(div); }); results.style.display='block'; }; },100); }
     async function reverseMapGeocode(lat,lon) { try { let res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=en&countrycodes=lk`); let data = await res.json(); document.getElementById('selected-address').value = data.display_name; } catch(e){} }
     function getCurrentMapLocation() { if(navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => { mapObj.setView([pos.coords.latitude,pos.coords.longitude],14); mapMarker.setLatLng([pos.coords.latitude,pos.coords.longitude]); reverseMapGeocode(pos.coords.latitude,pos.coords.longitude); }); }
-    function useMapLocation() { let addr=document.getElementById('selected-address').value; if(addr && mapPickerField==='start') dom.startLoc.value=addr; else if(addr && mapPickerField==='end') { dom.endLoc.value=addr; currentDestinationAddress=addr; } closeMapModal(); }
+    function useMapLocation() { let addr=document.getElementById('selected-address').value; if(addr && mapPickerField==='start') document.getElementById('start-loc').value=addr; else if(addr && mapPickerField==='end') { document.getElementById('end-loc').value=addr; currentDestinationAddress=addr; } closeMapModal(); }
     function closeMapModal() { document.getElementById('map-modal').style.display='none'; if(mapObj) mapObj.remove(); }
-    function manualAddDistance(km) { if(!sTime) { alert("Start ride"); return; } if(currentMode!=='manual') { alert("Manual mode required"); return; } totalMeters = Math.max(0, totalMeters + (km*1000)); dom.manualKmInput.value = (totalMeters/1000).toFixed(2); updateDisplay(); saveRideState(); }
-    function setManualDistance() { if(!sTime) { alert("Start ride"); return; } if(currentMode!=='manual') { alert("Manual mode required"); return; } let val=parseFloat(dom.manualKmInput.value); if(!isNaN(val) && val>=0) { totalMeters = val*1000; updateDisplay(); saveRideState(); } }
+    function manualAddDistance(km) { if(!sTime) { alert("Start ride"); return; } if(currentMode!=='manual') { alert("Manual mode required"); return; } totalMeters = Math.max(0, totalMeters + (km*1000)); document.getElementById('manual-km-input').value = (totalMeters/1000).toFixed(2); updateDisplay(); saveRideState(); }
+    function setManualDistance() { if(!sTime) { alert("Start ride"); return; } if(currentMode!=='manual') { alert("Manual mode required"); return; } let val=parseFloat(document.getElementById('manual-km-input').value); if(!isNaN(val) && val>=0) { totalMeters = val*1000; updateDisplay(); saveRideState(); } }
     function openPhoneNavigation() { if(!currentDestinationAddress) { alert("Enter destination"); return; } let encoded=encodeURIComponent(currentDestinationAddress); let isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent); window.open(isIOS ? `http://maps.apple.com/?daddr=${encoded}` : `https://www.google.com/maps/dir/?api=1&destination=${encoded}`, '_blank'); }
     
-    // ========== START RIDE FUNCTION - FIXED ==========
+    // ========== START RIDE FUNCTION ==========
     async function startRide() {
-        console.log("startRide called, currentMode:", currentMode);
         if(sTime) { alert("Ride already active!"); return; }
         
-        // Auto mode validation
         if(currentMode === 'auto') { 
             if(!currentLocationAddress || currentLocationAddress === "Waiting for GPS...") { 
                 alert("Please wait for GPS to get current location!"); 
@@ -435,11 +399,8 @@
             } 
             startLocationAddress = currentLocationAddress;
         } 
-        // GPS mode validation
         else if(currentMode === 'gps') { 
-            let startLoc = dom.startLoc.value.trim();
-            let endLoc = dom.endLoc.value.trim();
-            if(!startLoc || !endLoc) { 
+            if(!document.getElementById('start-loc').value.trim() || !document.getElementById('end-loc').value.trim()) { 
                 alert("Enter pickup and drop locations!"); 
                 return; 
             } 
@@ -447,41 +408,34 @@
                 alert("GPS not ready! Please wait for GPS signal."); 
                 return; 
             } 
-            startLocationAddress = startLoc;
-            currentDestinationAddress = endLoc;
+            startLocationAddress = document.getElementById('start-loc').value;
+            currentDestinationAddress = document.getElementById('end-loc').value;
         } 
-        // Manual mode validation
         else if(currentMode === 'manual') { 
-            let startLoc = dom.startLoc.value.trim();
-            let endLoc = dom.endLoc.value.trim();
-            if(!startLoc || !endLoc) { 
+            if(!document.getElementById('start-loc').value.trim() || !document.getElementById('end-loc').value.trim()) { 
                 alert("Enter pickup and drop locations!"); 
                 return; 
             } 
-            startLocationAddress = startLoc;
-            currentDestinationAddress = endLoc;
+            startLocationAddress = document.getElementById('start-loc').value;
+            currentDestinationAddress = document.getElementById('end-loc').value;
         } 
-        // Delivery mode validation
         else if(currentMode === 'delivery') { 
-            let startLoc = dom.startLoc.value.trim();
-            let endLoc = dom.endLoc.value.trim();
-            if(!startLoc || !endLoc) { 
+            if(!document.getElementById('start-loc').value.trim() || !document.getElementById('end-loc').value.trim()) { 
                 alert("Enter pickup and drop locations!"); 
                 return; 
             } 
-            startLocationAddress = startLoc;
-            currentDestinationAddress = endLoc;
-            deliveryPickupName = dom.pickupName.value || "";
-            deliveryPickupPhone = dom.pickupPhone.value || "";
-            deliveryDeliveryName = dom.deliveryName.value || "";
-            deliveryDeliveryPhone = dom.deliveryPhone.value || "";
+            startLocationAddress = document.getElementById('start-loc').value;
+            currentDestinationAddress = document.getElementById('end-loc').value;
+            deliveryPickupName = document.getElementById('pickup-name').value || "";
+            deliveryPickupPhone = document.getElementById('pickup-phone').value || "";
+            deliveryDeliveryName = document.getElementById('delivery-name').value || "";
+            deliveryDeliveryPhone = document.getElementById('delivery-phone').value || "";
         }
         
         sTime = new Date();
         await requestWakeLock();
         document.body.classList.add('ride-active');
         
-        // Start tracking based on mode
         if(currentMode === 'auto') {
             totalMeters = 0;
             if(currentLocationLat && currentLocationLon) { 
@@ -494,36 +448,40 @@
             totalMeters = 0;
             lastLat = null; 
             lastLon = null;
-            if(navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(pos) {
-                    lastLat = pos.coords.latitude;
-                    lastLon = pos.coords.longitude;
-                });
-            }
+            setTimeout(() => {
+                if(navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(pos) {
+                        lastLat = pos.coords.latitude;
+                        lastLon = pos.coords.longitude;
+                    });
+                }
+            }, 100);
             trackRide();
-            dom.navContainer.style.display = 'block';
+            document.getElementById('nav-container').style.display = 'block';
         } 
         else if(currentMode === 'manual') {
-            totalMeters = (parseFloat(dom.manualKmInput.value) || 0) * 1000;
-            dom.navContainer.style.display = 'block';
+            totalMeters = (parseFloat(document.getElementById('manual-km-input').value) || 0) * 1000;
+            document.getElementById('nav-container').style.display = 'block';
         } 
         else if(currentMode === 'delivery') {
             totalMeters = 0;
             lastLat = null; 
             lastLon = null;
-            if(navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(pos) {
-                    lastLat = pos.coords.latitude;
-                    lastLon = pos.coords.longitude;
-                });
-            }
+            setTimeout(() => {
+                if(navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(pos) {
+                        lastLat = pos.coords.latitude;
+                        lastLon = pos.coords.longitude;
+                    });
+                }
+            }, 100);
             trackRide();
-            dom.navContainer.style.display = 'block';
+            document.getElementById('nav-container').style.display = 'block';
         }
         
-        dom.startBtn.innerHTML = "⏵ ACTIVE";
-        dom.startBtn.classList.add('btn-active-anim');
-        dom.startBtn.disabled = true;
+        document.getElementById('startBtn').innerHTML = "⏵ ACTIVE";
+        document.getElementById('startBtn').classList.add('btn-active-anim');
+        document.getElementById('startBtn').disabled = true;
         updateDisplay();
         
         document.querySelectorAll('.mode-btn').forEach(btn => {
@@ -532,7 +490,6 @@
         });
         
         saveRideState();
-        addSystemLog('INFO', 'Ride started', `Mode: ${currentMode}`);
         alert("Ride started successfully!");
     }
     
@@ -541,23 +498,22 @@
         releaseWakeLock(); 
         document.body.classList.remove('ride-active'); 
         if(watchId) { navigator.geolocation.clearWatch(watchId); watchId=null; } 
-        dom.startBtn.innerHTML="START RIDE"; 
-        dom.startBtn.classList.remove('btn-active-anim'); 
-        dom.startBtn.disabled=false; 
-        if(currentMode==='auto' && currentDestinationAddress) dom.navContainer.style.display='block'; 
-        else if(currentMode!=='auto') dom.navContainer.style.display='none'; 
+        document.getElementById('startBtn').innerHTML="START RIDE"; 
+        document.getElementById('startBtn').classList.remove('btn-active-anim'); 
+        document.getElementById('startBtn').disabled=false; 
+        if(currentMode==='auto' && currentDestinationAddress) document.getElementById('nav-container').style.display='block'; 
+        else if(currentMode!=='auto') document.getElementById('nav-container').style.display='none'; 
         document.querySelectorAll('.mode-btn').forEach(btn => { btn.style.pointerEvents='auto'; btn.style.opacity='1'; }); 
         let from="", to=""; 
         if(currentMode==='auto') { from=startLocationAddress; to=currentLocationAddress; } 
-        else { from=dom.startLoc.value; to=dom.endLoc.value; } 
+        else { from=document.getElementById('start-loc').value; to=document.getElementById('end-loc').value; } 
         let fare=calcFare(); 
         currentRID=generateReceiptID(); 
         let km=totalMeters/1000; 
-        pendingRideData = { id:currentRID, fare, km, from, to, mobile:dom.mobileInput.value||"N/A", wait:parseInt(dom.waitSelect.value), disc:parseInt(dom.discountInput.value)||0, manualFare:parseInt(dom.manualFareInput.value)||0, nightUsed:nightActive, mode:currentMode==='auto'?"Auto":(currentMode==='gps'?"GPS":(currentMode==='manual'?"Manual":"Delivery")), time:Date.now() }; 
+        pendingRideData = { id:currentRID, fare, km, from, to, mobile:document.getElementById('mobile').value||"N/A", wait:parseInt(document.getElementById('wait-select').value), disc:parseInt(document.getElementById('discount-input').value)||0, manualFare:parseInt(document.getElementById('manual-fare').value)||0, nightUsed:nightActive, mode:currentMode==='auto'?"Auto":(currentMode==='gps'?"GPS":(currentMode==='manual'?"Manual":"Delivery")), time:Date.now() }; 
         if(currentMode==='delivery') { pendingRideData.pickupName=deliveryPickupName; pendingRideData.pickupPhone=deliveryPickupPhone; pendingRideData.deliveryName=deliveryDeliveryName; pendingRideData.deliveryPhone=deliveryDeliveryPhone; } 
         localStorage.removeItem('amt_ride_state'); 
         openPaymentPopup(); 
-        addSystemLog('INFO', 'Ride ended', `Fare: Rs.${fare}, Distance: ${km}km`);
     }
     
     function generateReceiptID() { let n=new Date(), y=n.getFullYear(), m=n.getMonth(); let fy=(m>=3)?y:y-1; let c=parseInt(localStorage.getItem(`cnt_${fy}`)||"0")+1; localStorage.setItem(`cnt_${fy}`,c); return `${fy.toString().slice(-2)}${n.toLocaleString('en',{month:'short'}).toUpperCase()}-${c.toString().padStart(8,'0')}`; }
@@ -567,7 +523,7 @@
         if(!pendingRideData) { alert("No ride data available. Please end a ride first."); return; }
         selectedMethod = "cash"; 
         document.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('selected')); 
-        if(document.querySelector('.payment-method-btn:first-child')) document.querySelector('.payment-method-btn:first-child').classList.add('selected');
+        document.querySelector('.payment-method-btn[data-method="cash"]')?.classList.add('selected');
         document.getElementById('payment-detail-fields').style.display = 'block'; 
         document.getElementById('cash-fields').style.display = 'block'; 
         document.getElementById('card-fields').style.display = 'none'; 
@@ -577,10 +533,10 @@
         document.getElementById('payment-popup').style.display = 'flex'; 
     }
     
-    function selectPaymentMethod(method, btnElement) { 
+    function selectPaymentMethod(method) { 
         selectedMethod = method; 
         document.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('selected')); 
-        btnElement.classList.add('selected'); 
+        document.querySelector(`.payment-method-btn[data-method="${method}"]`)?.classList.add('selected'); 
         document.getElementById('cash-fields').style.display = 'none'; 
         document.getElementById('card-fields').style.display = 'none'; 
         document.getElementById('mobile-fields').style.display = 'none'; 
@@ -605,28 +561,22 @@
     
     function closePaymentPopup() { document.getElementById('payment-popup').style.display = 'none'; }
     
-    // ========== CONFIRM PAYMENT & SHOW RECEIPT - FIXED ==========
+    // ========== CONFIRM PAYMENT & SHOW RECEIPT ==========
     function confirmPaymentAndShowReceipt() { 
         if(!pendingRideData) { 
             alert("No ride data found. Please end a ride first."); 
             return; 
         } 
-        
         pendingRideData.payment = getPaymentInfo(); 
-        
         let list = JSON.parse(localStorage.getItem('rides') || '[]'); 
         list.push(pendingRideData); 
         localStorage.setItem('rides', JSON.stringify(list)); 
-        
         showReceipt(pendingRideData, false); 
-        
         closePaymentPopup(); 
-        
         sTime = null; 
         currentDestinationAddress = ""; 
         if(currentMode !== 'manual') setTimeout(() => startGPS(), 1000); 
-        dom.navContainer.style.display = 'none'; 
-        
+        document.getElementById('nav-container').style.display = 'none'; 
         addSystemLog('INFO', 'Payment confirmed', `Receipt: ${pendingRideData.id}`); 
     }
     
@@ -659,22 +609,21 @@
     async function downloadReceiptPDF() { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); let {jsPDF}=window.jspdf; let pdf = new jsPDF({unit:'mm', format:'a6'}); pdf.addImage(canvas.toDataURL(),'PNG',2.5,5,100,(canvas.height*100)/canvas.width); pdf.save(`${currentRID}.pdf`); }
     async function printViaBluetooth() { alert("PDF ready"); downloadReceiptPDF(); }
     
-    function toggleNightCharge() { nightActive=!nightActive; let btn=dom.nightBtn; if(nightActive) { btn.innerHTML='🌙 NIGHT ON'; btn.classList.add('night-active'); } else { btn.innerHTML='🌙 NIGHT OFF'; btn.classList.remove('night-active'); } updateDisplay(); if(sTime) saveRideState(); }
+    function toggleNightCharge() { nightActive=!nightActive; let btn=document.getElementById('nightBtn'); if(nightActive) { btn.innerHTML='🌙 NIGHT ON'; btn.classList.add('night-active'); } else { btn.innerHTML='🌙 NIGHT OFF'; btn.classList.remove('night-active'); } updateDisplay(); if(sTime) saveRideState(); }
     
-    function resetToNew() { if(sTime && !confirm("Reset ride?")) return; if(watchId) navigator.geolocation.clearWatch(watchId); releaseWakeLock(); document.body.classList.remove('ride-active'); document.querySelectorAll('.mode-btn').forEach(btn => { btn.style.pointerEvents='auto'; btn.style.opacity='1'; }); sTime=null; totalMeters=0; lastLat=null; lastLon=null; currentDestinationAddress=""; deliveryPickupName=""; deliveryPickupPhone=""; deliveryDeliveryName=""; deliveryDeliveryPhone=""; dom.startBtn.innerHTML="START RIDE"; dom.startBtn.classList.remove('btn-active-anim'); dom.startBtn.disabled=false; dom.startLoc.value=''; dom.endLoc.value=''; dom.mobileInput.value=''; dom.manualFareInput.value=''; dom.discountInput.value=''; dom.waitSelect.value='0'; dom.manualKmInput.value='0'; dom.navContainer.style.display='none'; if(dom.pickupName) dom.pickupName.value=''; if(dom.pickupPhone) dom.pickupPhone.value=''; if(dom.deliveryName) dom.deliveryName.value=''; if(dom.deliveryPhone) dom.deliveryPhone.value=''; updateDisplay(); localStorage.removeItem('amt_ride_state'); if(currentMode==='auto') refreshCurrentLocation(); if(currentMode!=='manual') startGPS(); else { gpsReady=true; dom.startBtn.disabled=false; } }
+    function resetToNew() { if(sTime && !confirm("Reset ride?")) return; if(watchId) navigator.geolocation.clearWatch(watchId); releaseWakeLock(); document.body.classList.remove('ride-active'); document.querySelectorAll('.mode-btn').forEach(btn => { btn.style.pointerEvents='auto'; btn.style.opacity='1'; }); sTime=null; totalMeters=0; lastLat=null; lastLon=null; currentDestinationAddress=""; deliveryPickupName=""; deliveryPickupPhone=""; deliveryDeliveryName=""; deliveryDeliveryPhone=""; document.getElementById('startBtn').innerHTML="START RIDE"; document.getElementById('startBtn').classList.remove('btn-active-anim'); document.getElementById('startBtn').disabled=false; document.getElementById('start-loc').value=''; document.getElementById('end-loc').value=''; document.getElementById('mobile').value=''; document.getElementById('manual-fare').value=''; document.getElementById('discount-input').value=''; document.getElementById('wait-select').value='0'; document.getElementById('manual-km-input').value='0'; document.getElementById('nav-container').style.display='none'; document.getElementById('pickup-name').value=''; document.getElementById('pickup-phone').value=''; document.getElementById('delivery-name').value=''; document.getElementById('delivery-phone').value=''; updateDisplay(); localStorage.removeItem('amt_ride_state'); if(currentMode==='auto') refreshCurrentLocation(); if(currentMode!=='manual') startGPS(); else { gpsReady=true; document.getElementById('startBtn').disabled=false; } }
     
     // HISTORY with Date Filter
     function filterHistory(type) {
-        currentHistoryFilter = type;
-        document.querySelectorAll('.date-filter-btn').forEach(btn => btn.classList.remove('active'));
-        if(event && event.target) event.target.classList.add('active');
-        document.getElementById('custom-date-range').style.display = type === 'custom' ? 'block' : 'none';
         let now = new Date(), start = '', end = '';
         if(type === 'today') { start = end = now.toISOString().split('T')[0]; }
         else if(type === 'week') { let weekAgo = new Date(now); weekAgo.setDate(now.getDate() - 7); start = weekAgo.toISOString().split('T')[0]; end = now.toISOString().split('T')[0]; }
         else if(type === 'month') { start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]; end = now.toISOString().split('T')[0]; }
         else { return; }
-        updateHistoryList(start, end);
+        document.getElementById('custom-date-range').style.display = type === 'custom' ? 'block' : 'none';
+        if(type !== 'custom') updateHistoryList(start, end);
+        document.querySelectorAll('.date-filter-btn').forEach(btn => btn.classList.remove('active'));
+        if(event && event.target) event.target.classList.add('active');
     }
     function applyCustomHistoryFilter() { let start = document.getElementById('history-start-date').value; let end = document.getElementById('history-end-date').value; if(start && end) updateHistoryList(start, end); }
     function updateHistoryList(startDate, endDate) {
@@ -718,7 +667,7 @@
     document.getElementById('fuel-liters')?.addEventListener('input', function() { let l=parseFloat(this.value)||0; let p=parseFloat(document.getElementById('fuel-price')?.value||0); let t=document.getElementById('fuel-total'); if(t) t.value=(l*p).toFixed(2); });
     document.getElementById('fuel-price')?.addEventListener('input', function() { let l=parseFloat(document.getElementById('fuel-liters')?.value||0); let p=parseFloat(this.value)||0; let t=document.getElementById('fuel-total'); if(t) t.value=(l*p).toFixed(2); });
     
-    window.onload = function() { loadSettings(); dom.manualKmInput.value='0'; initVoiceRecognition(); };
+    window.onload = function() { loadSettings(); document.getElementById('manual-km-input').value='0'; initVoiceRecognition(); };
 </script>
 </body>
 </html>
