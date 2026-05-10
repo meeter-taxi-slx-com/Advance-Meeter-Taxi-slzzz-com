@@ -228,7 +228,24 @@
 
 <div id="income-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToReportsMenu()">←</div><div class="close-circle" onclick="closeM('income-modal')">✕</div><h3>📈 Earnings</h3><canvas id="earningsChart" style="max-height:250px;"></canvas><div class="grid-2" style="margin:15px 0;"><div>Today:<br><b id="stat-today">Rs.0.00</b></div><div>Total:<br><b id="stat-total">Rs.0.00</b></div></div><button class="btn-reprint" onclick="downloadCSV()">📥 CSV</button></div></div>
 
-<div id="history-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToReportsMenu()">←</div><div class="close-circle" onclick="closeM('history-modal')">✕</div><h3 style="text-align:center;">📜 RIDE HISTORY</h3><div class="date-filter"><button class="date-filter-btn active" onclick="filterHistory('today')">Today</button><button class="date-filter-btn" onclick="filterHistory('week')">This Week</button><button class="date-filter-btn" onclick="filterHistory('month')">This Month</button><button class="date-filter-btn" onclick="filterHistory('custom')">Custom</button></div><div id="custom-date-range" style="display:none; margin-bottom:15px;"><div class="grid-2"><input type="date" id="history-start-date"><input type="date" id="history-end-date"></div><button class="map-picker-btn" onclick="applyCustomHistoryFilter()">Apply</button></div><div id="history-list"></div></div></div>
+<div id="history-modal" class="modal">
+    <div class="modal-content">
+        <div class="back-btn" onclick="goBackToReportsMenu()">←</div>
+        <div class="close-circle" onclick="closeM('history-modal')">✕</div>
+        <h3 style="text-align:center;">📜 RIDE HISTORY</h3>
+        <div class="date-filter">
+            <button class="date-filter-btn active" onclick="filterHistory('today')">Today</button>
+            <button class="date-filter-btn" onclick="filterHistory('week')">This Week</button>
+            <button class="date-filter-btn" onclick="filterHistory('month')">This Month</button>
+            <button class="date-filter-btn" onclick="filterHistory('custom')">Custom</button>
+        </div>
+        <div id="custom-date-range" style="display:none; margin-bottom:15px;">
+            <div class="grid-2"><input type="date" id="history-start-date"><input type="date" id="history-end-date"></div>
+            <button class="map-picker-btn" onclick="applyCustomHistoryFilter()">Apply</button>
+        </div>
+        <div id="history-list"></div>
+    </div>
+</div>
 
 <div id="profit-report-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToReportsMenu()">←</div><div class="close-circle" onclick="closeM('profit-report-modal')">✕</div><h3 style="text-align:center;">💰 PROFIT & EXPENSES</h3><div class="report-tabs"><button class="report-tab active" onclick="showProfitReportTab('daily')">Daily</button><button class="report-tab" onclick="showProfitReportTab('monthly')">Monthly</button><button class="report-tab" onclick="showProfitReportTab('yearly')">Yearly</button><button class="report-tab" onclick="showProfitReportTab('range')">Range</button></div><div id="profit-date-range-panel" style="display:none;"><div class="grid-2"><input type="date" id="profit-start-date"><input type="date" id="profit-end-date"></div><button class="map-picker-btn" onclick="updateProfitReport()">Apply</button></div><div id="profit-report-container"></div><div style="margin-top:15px;"><canvas id="profitChart" style="max-height:200px; width:100%;"></canvas></div><button class="btn-reprint" style="margin-top:15px; width:100%;" onclick="exportProfitCSV()">📥 Export CSV</button></div></div>
 
@@ -353,7 +370,7 @@
     async function printTravelReceipt() { let rides = JSON.parse(localStorage.getItem('rides') || '[]'); let totalDist = rides.reduce((s,r)=>s+r.km,0); let totalFare = rides.reduce((s,r)=>s+r.fare,0); let html = `<div class="receipt-print"><div class="r-header">TRAVEL SUMMARY</div><div class="r-row"><span>Total Rides:</span><b>${rides.length}</b></div><div class="r-row"><span>Total Distance:</span><b>${totalDist.toFixed(2)} km</b></div><div class="r-row"><span>Total Earnings:</span><b>Rs.${totalFare.toFixed(2)}</b></div><div class="r-divider">-------------------</div>${rides.slice().reverse().slice(0,50).map(r=>`<div class="r-row-full"><span class="r-label">From:</span><span class="r-address">${r.from.substring(0,50)}</span><span class="r-label">To:</span><span class="r-address">${r.to.substring(0,50)}</span><span>${r.km.toFixed(2)} km | Rs.${r.fare.toFixed(2)}</span></div>`).join('')}<div class="r-divider">Thank you! 🚕</div></div>`; let win = window.open('', '_blank'); win.document.write(html); win.document.close(); win.print(); }
     
     // ========== GLOBAL VARIABLES ==========
-    let sTime = null, watchId = null, totalMeters = 0, lastLat = null, lastOn = null, currentRID = "", nightActive = false, gpsReady = false, currentMode = "auto", pendingRideData = null, selectedMethod = "cash", currentLocationAddress = "", currentLocationLat = null, currentLocationLon = null, startLocationAddress = "", currentDestinationAddress = "", mapPickerField = null, mapObj = null, mapMarker = null, deliveryPickupName="", deliveryPickupPhone="", deliveryDeliveryName="", deliveryDeliveryPhone="";
+    let sTime = null, watchId = null, totalMeters = 0, lastLat = null, lastLon = null, currentRID = "", nightActive = false, gpsReady = false, currentMode = "auto", pendingRideData = null, selectedMethod = "cash", currentLocationAddress = "", currentLocationLat = null, currentLocationLon = null, startLocationAddress = "", currentDestinationAddress = "", mapPickerField = null, mapObj = null, mapMarker = null, deliveryPickupName="", deliveryPickupPhone="", deliveryDeliveryName="", deliveryDeliveryPhone="";
     let SETTINGS = { base:100, rate:80, waitRate:5, nightPercent:10, appName:"ADVANCE MEETER TAXI", receiptName:"OFFICIAL RECEIPT", password:"1234", logo:null };
     let currentReportType = "daily";
     
@@ -518,7 +535,7 @@
     
     function generateReceiptID() { let n=new Date(), y=n.getFullYear(), m=n.getMonth(); let fy=(m>=3)?y:y-1; let c=parseInt(localStorage.getItem(`cnt_${fy}`)||"0")+1; localStorage.setItem(`cnt_${fy}`,c); return `${fy.toString().slice(-2)}${n.toLocaleString('en',{month:'short'}).toUpperCase()}-${c.toString().padStart(8,'0')}`; }
     
-    // ========== PAYMENT FUNCTIONS ==========
+    // ========== PAYMENT FUNCTIONS (UPDATED) ==========
     function openPaymentPopup() { 
         if(!pendingRideData) { alert("No ride data available. Please end a ride first."); return; }
         selectedMethod = "cash"; 
@@ -552,17 +569,31 @@
     function getPaymentInfo() { 
         switch(selectedMethod) { 
             case 'cash': return { method: 'Cash', detail: '' }; 
-            case 'card': let cd = ""; if(document.getElementById('card-number')?.value) cd += `****${document.getElementById('card-number').value}`; if(document.getElementById('card-name')?.value) cd += ` - ${document.getElementById('card-name').value}`; return { method: 'Card', detail: cd || 'Card payment' }; 
-            case 'mobile': let md = ""; if(document.getElementById('mobile-provider')?.value) md += document.getElementById('mobile-provider').value; if(document.getElementById('mobile-number')?.value) md += ` ${document.getElementById('mobile-number').value}`; return { method: 'Mobile', detail: md || 'Mobile payment' }; 
-            case 'bank': let bd = ""; if(document.getElementById('bank-name')?.value) bd += document.getElementById('bank-name').value; if(document.getElementById('bank-ref')?.value) bd += ` - Ref: ${document.getElementById('bank-ref').value}`; return { method: 'Bank Transfer', detail: bd || 'Bank transfer' }; 
-            default: return { method: document.getElementById('other-method')?.value || 'Other', detail: document.getElementById('other-ref')?.value || '' }; 
+            case 'card': 
+                let cd = ""; 
+                if(document.getElementById('card-number')?.value) cd += `****${document.getElementById('card-number').value}`; 
+                if(document.getElementById('card-name')?.value) cd += ` - ${document.getElementById('card-name').value}`; 
+                return { method: 'Card', detail: cd || 'Card payment' }; 
+            case 'mobile': 
+                let md = ""; 
+                if(document.getElementById('mobile-provider')?.value) md += document.getElementById('mobile-provider').value; 
+                if(document.getElementById('mobile-number')?.value) md += ` ${document.getElementById('mobile-number').value}`; 
+                return { method: 'Mobile', detail: md || 'Mobile payment' }; 
+            case 'bank': 
+                let bd = ""; 
+                if(document.getElementById('bank-name')?.value) bd += document.getElementById('bank-name').value; 
+                if(document.getElementById('bank-ref')?.value) bd += ` - Ref: ${document.getElementById('bank-ref').value}`; 
+                return { method: 'Bank Transfer', detail: bd || 'Bank transfer' }; 
+            default: 
+                return { method: document.getElementById('other-method')?.value || 'Other', detail: document.getElementById('other-ref')?.value || '' }; 
         } 
     }
     
     function closePaymentPopup() { document.getElementById('payment-popup').style.display = 'none'; }
     
-    // ========== CONFIRM PAYMENT & SHOW RECEIPT ==========
+    // ========== CONFIRM PAYMENT & SHOW RECEIPT (FIXED) ==========
     function confirmPaymentAndShowReceipt() { 
+        console.log("confirmPaymentAndShowReceipt called", pendingRideData);
         if(!pendingRideData) { 
             alert("No ride data found. Please end a ride first."); 
             return; 
@@ -613,27 +644,67 @@
     
     function resetToNew() { if(sTime && !confirm("Reset ride?")) return; if(watchId) navigator.geolocation.clearWatch(watchId); releaseWakeLock(); document.body.classList.remove('ride-active'); document.querySelectorAll('.mode-btn').forEach(btn => { btn.style.pointerEvents='auto'; btn.style.opacity='1'; }); sTime=null; totalMeters=0; lastLat=null; lastLon=null; currentDestinationAddress=""; deliveryPickupName=""; deliveryPickupPhone=""; deliveryDeliveryName=""; deliveryDeliveryPhone=""; document.getElementById('startBtn').innerHTML="START RIDE"; document.getElementById('startBtn').classList.remove('btn-active-anim'); document.getElementById('startBtn').disabled=false; document.getElementById('start-loc').value=''; document.getElementById('end-loc').value=''; document.getElementById('mobile').value=''; document.getElementById('manual-fare').value=''; document.getElementById('discount-input').value=''; document.getElementById('wait-select').value='0'; document.getElementById('manual-km-input').value='0'; document.getElementById('nav-container').style.display='none'; document.getElementById('pickup-name').value=''; document.getElementById('pickup-phone').value=''; document.getElementById('delivery-name').value=''; document.getElementById('delivery-phone').value=''; updateDisplay(); localStorage.removeItem('amt_ride_state'); if(currentMode==='auto') refreshCurrentLocation(); if(currentMode!=='manual') startGPS(); else { gpsReady=true; document.getElementById('startBtn').disabled=false; } }
     
-    // HISTORY with Date Filter
+    // ========== HISTORY WITH DATE FILTER (FIXED) ==========
     function filterHistory(type) {
         let now = new Date(), start = '', end = '';
-        if(type === 'today') { start = end = now.toISOString().split('T')[0]; }
-        else if(type === 'week') { let weekAgo = new Date(now); weekAgo.setDate(now.getDate() - 7); start = weekAgo.toISOString().split('T')[0]; end = now.toISOString().split('T')[0]; }
-        else if(type === 'month') { start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]; end = now.toISOString().split('T')[0]; }
-        else { return; }
-        document.getElementById('custom-date-range').style.display = type === 'custom' ? 'block' : 'none';
-        if(type !== 'custom') updateHistoryList(start, end);
+        if(type === 'today') { 
+            start = end = now.toISOString().split('T')[0]; 
+        } else if(type === 'week') { 
+            let weekAgo = new Date(now); 
+            weekAgo.setDate(now.getDate() - 7); 
+            start = weekAgo.toISOString().split('T')[0]; 
+            end = now.toISOString().split('T')[0]; 
+        } else if(type === 'month') { 
+            start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]; 
+            end = now.toISOString().split('T')[0]; 
+        } else if(type === 'custom') {
+            document.getElementById('custom-date-range').style.display = 'block';
+            return;
+        }
+        
+        document.getElementById('custom-date-range').style.display = 'none';
+        if(start && end) updateHistoryList(start, end);
+        
         document.querySelectorAll('.date-filter-btn').forEach(btn => btn.classList.remove('active'));
         if(event && event.target) event.target.classList.add('active');
     }
-    function applyCustomHistoryFilter() { let start = document.getElementById('history-start-date').value; let end = document.getElementById('history-end-date').value; if(start && end) updateHistoryList(start, end); }
+    
+    function applyCustomHistoryFilter() { 
+        let start = document.getElementById('history-start-date').value; 
+        let end = document.getElementById('history-end-date').value; 
+        if(start && end) updateHistoryList(start, end); 
+    }
+    
     function updateHistoryList(startDate, endDate) {
         let allRides = JSON.parse(localStorage.getItem('rides') || '[]');
-        let rides = allRides.filter(r => { let d = new Date(r.time).toISOString().split('T')[0]; return d >= startDate && d <= endDate; });
+        let rides = allRides;
+        
+        if(startDate && endDate) {
+            rides = allRides.filter(r => { 
+                let d = new Date(r.time).toISOString().split('T')[0]; 
+                return d >= startDate && d <= endDate; 
+            });
+        }
+        
         let c = document.getElementById('history-list');
-        if(!rides.length) { c.innerHTML = "<p style='text-align:center;padding:20px;'>No rides in this period</p>"; return; }
-        c.innerHTML = rides.slice().reverse().map((r,i) => `<div class="history-item"><div style="display:flex; justify-content:space-between;"><b>${r.id}</b><button class="btn-reprint" onclick="reprintRide(${allRides.findIndex(ride => ride.id === r.id)})">📄 VIEW</button></div><small>${new Date(r.time).toLocaleString()}</small><br><small>${r.from.substring(0,30)} → ${r.to.substring(0,30)}</small><div><strong>Rs.${r.fare.toFixed(2)}</strong> | ${r.km.toFixed(1)}km | ${r.payment?.method||'Cash'}</div></div>`).join('');
+        if(!rides.length) { 
+            c.innerHTML = "<p style='text-align:center;padding:20px;'>No rides in this period</p>"; 
+            return; 
+        }
+        
+        c.innerHTML = rides.slice().reverse().map((r, idx) => {
+            let originalIndex = allRides.findIndex(ride => ride.id === r.id);
+            return `<div class="history-item"><div style="display:flex; justify-content:space-between;"><b>${r.id}</b><button class="btn-reprint" onclick="reprintRide(${originalIndex})">📄 VIEW</button></div><small>${new Date(r.time).toLocaleString()}</small><br><small>${r.from.substring(0,50)} → ${r.to.substring(0,50)}</small><div><strong>Rs.${r.fare.toFixed(2)}</strong> | ${r.km.toFixed(1)}km | ${r.payment?.method || 'Cash'}</div></div>`;
+        }).join('');
     }
-    function reprintRide(index) { let rides = JSON.parse(localStorage.getItem('rides')||'[]'); if(rides[index]) { showReceipt(rides[index], true); closeM('history-modal'); } }
+    
+    function reprintRide(index) { 
+        let rides = JSON.parse(localStorage.getItem('rides')||'[]'); 
+        if(rides[index]) { 
+            showReceipt(rides[index], true); 
+            closeM('history-modal'); 
+        } 
+    }
     
     // EARNINGS
     function updateEarningsChart() { let rides = JSON.parse(localStorage.getItem('rides')||'[]'); let d=[0,0,0,0,0,0,0]; rides.forEach(r=>d[new Date(r.time).getDay()]+=r.fare); if(window.mChart) window.mChart.destroy(); window.mChart=new Chart(document.getElementById('earningsChart'),{ type:'bar', data:{ labels:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], datasets:[{ data:d, backgroundColor:'#667eea' }] } }); let today=rides.filter(r=>new Date(r.time).toDateString()===new Date().toDateString()).reduce((a,b)=>a+b.fare,0); let total=rides.reduce((a,b)=>a+b.fare,0); document.getElementById('stat-today').innerHTML="Rs."+today.toFixed(2); document.getElementById('stat-total').innerHTML="Rs."+total.toFixed(2); }
@@ -662,7 +733,23 @@
     function openTravelReport() { showTravelReportTab('daily'); document.getElementById('travel-report-modal').style.display='flex'; }
     function openProfitReport() { closeM('settings-modal'); showProfitReportTab('daily'); document.getElementById('profit-report-modal').style.display='flex'; }
     function closeM(id) { document.getElementById(id).style.display='none'; }
-    function openPanel(id) { closeM('settings-modal'); document.getElementById(id).style.display='flex'; if(id==='income-modal') updateEarningsChart(); if(id==='history-modal') filterHistory('today'); if(id==='report-modal') showReportTab('daily'); }
+    
+    // UPDATED - openPanel with history default today
+    function openPanel(id) { 
+        closeM('settings-modal'); 
+        document.getElementById(id).style.display = 'flex'; 
+        if(id === 'income-modal') updateEarningsChart(); 
+        if(id === 'history-modal') {
+            let today = new Date().toISOString().split('T')[0];
+            updateHistoryList(today, today);
+            document.querySelectorAll('.date-filter-btn').forEach(btn => btn.classList.remove('active'));
+            if(document.querySelector('.date-filter-btn:first-child')) {
+                document.querySelector('.date-filter-btn:first-child').classList.add('active');
+            }
+            document.getElementById('custom-date-range').style.display = 'none';
+        }
+        if(id === 'report-modal') updateReportDisplay(); 
+    }
     
     document.getElementById('fuel-liters')?.addEventListener('input', function() { let l=parseFloat(this.value)||0; let p=parseFloat(document.getElementById('fuel-price')?.value||0); let t=document.getElementById('fuel-total'); if(t) t.value=(l*p).toFixed(2); });
     document.getElementById('fuel-price')?.addEventListener('input', function() { let l=parseFloat(document.getElementById('fuel-liters')?.value||0); let p=parseFloat(this.value)||0; let t=document.getElementById('fuel-total'); if(t) t.value=(l*p).toFixed(2); });
