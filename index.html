@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Advance Meeter Taxi">
     <meta name="theme-color" content="#1a4a9e">
-    <title>ADVANCE MEETER TAXI</title>
+    <title>ADVANCE MEETER TAXI - Premium</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -30,9 +30,9 @@
             --gray: #64748b;
             --gray-bg: #f1f5f9;
             --white: #ffffff;
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --shadow-xl: 0 25px 50px -12px rgba(0,0,0,0.25);
             --radius: 20px;
             --radius-lg: 28px;
             --radius-xl: 40px;
@@ -403,7 +403,7 @@
     function closeMapModal() { document.getElementById('map-modal').style.display='none'; if(mapObj) mapObj.remove(); }
     function manualAddDistance(km) { if(!sTime) { alert("Start ride"); return; } if(currentMode!=='manual') { alert("Manual mode required"); return; } totalMeters = Math.max(0, totalMeters + (km*1000)); document.getElementById('manual-km-input').value = (totalMeters/1000).toFixed(2); updateDisplay(); saveRideState(); }
     function setManualDistance() { if(!sTime) { alert("Start ride"); return; } if(currentMode!=='manual') { alert("Manual mode required"); return; } let val=parseFloat(document.getElementById('manual-km-input').value); if(!isNaN(val) && val>=0) { totalMeters = val*1000; updateDisplay(); saveRideState(); } }
-    function openPhoneNavigation() { if(!currentDestinationAddress) { alert("Enter destination"); return; } let encoded=encodeURIComponent(currentDestinationAddress); let isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent); window.open(isIOS ? `http://maps.apple.com/?daddr=${encoded}` : `https://www.google.com/maps/dir/?api=1&destination=${encoded}`, '_blank'); }
+    function openPhoneNavigation() { if(!currentDestinationAddress) { alert("Enter destination"); return; } let encoded=encodeURIComponent(currentDestinationAddress); let isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent); window.open(isIOS ? `http://maps.apple.com/?daddr=${encoded}` : `https://www.google.com/maps/dir/?api=1&destination=${encoded}&travelmode=driving`, '_blank'); }
     
     // ========== START RIDE FUNCTION ==========
     async function startRide() {
@@ -535,7 +535,7 @@
     
     function generateReceiptID() { let n=new Date(), y=n.getFullYear(), m=n.getMonth(); let fy=(m>=3)?y:y-1; let c=parseInt(localStorage.getItem(`cnt_${fy}`)||"0")+1; localStorage.setItem(`cnt_${fy}`,c); return `${fy.toString().slice(-2)}${n.toLocaleString('en',{month:'short'}).toUpperCase()}-${c.toString().padStart(8,'0')}`; }
     
-    // ========== PAYMENT FUNCTIONS (FULLY WORKING) ==========
+    // ========== PAYMENT FUNCTIONS (UPDATED - WORKING) ==========
     function openPaymentPopup() { 
         if(!pendingRideData) { alert("No ride data available. Please end a ride first."); return; }
         selectedMethod = "cash"; 
@@ -552,6 +552,7 @@
     }
     
     function selectPaymentMethod(method) { 
+        console.log("selectPaymentMethod called with:", method);
         selectedMethod = method; 
         document.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('selected')); 
         const selectedBtn = document.querySelector(`.payment-method-btn[data-method="${method}"]`);
@@ -569,59 +570,64 @@
     }
     
     function getPaymentInfo() { 
+        console.log("getPaymentInfo called. selectedMethod:", selectedMethod);
         switch(selectedMethod) { 
             case 'cash': return { method: 'Cash', detail: '' }; 
             case 'card': 
                 let cd = ""; 
-                const cardNum = document.getElementById('card-number')?.value;
-                const cardName = document.getElementById('card-name')?.value;
-                if(cardNum) cd += `****${cardNum}`; 
-                if(cardName) cd += ` - ${cardName}`; 
+                if(document.getElementById('card-number')?.value) cd += `****${document.getElementById('card-number').value}`; 
+                if(document.getElementById('card-name')?.value) cd += ` - ${document.getElementById('card-name').value}`; 
                 return { method: 'Card', detail: cd || 'Card payment' }; 
             case 'mobile': 
                 let md = ""; 
-                const provider = document.getElementById('mobile-provider')?.value;
-                const mobileNum = document.getElementById('mobile-number')?.value;
-                if(provider) md += provider; 
-                if(mobileNum) md += ` ${mobileNum}`; 
+                if(document.getElementById('mobile-provider')?.value) md += document.getElementById('mobile-provider').value; 
+                if(document.getElementById('mobile-number')?.value) md += ` ${document.getElementById('mobile-number').value}`; 
                 return { method: 'Mobile', detail: md || 'Mobile payment' }; 
             case 'bank': 
                 let bd = ""; 
-                const bankName = document.getElementById('bank-name')?.value;
-                const bankRef = document.getElementById('bank-ref')?.value;
-                if(bankName) bd += bankName; 
-                if(bankRef) bd += ` - Ref: ${bankRef}`; 
+                if(document.getElementById('bank-name')?.value) bd += document.getElementById('bank-name').value; 
+                if(document.getElementById('bank-ref')?.value) bd += ` - Ref: ${document.getElementById('bank-ref').value}`; 
                 return { method: 'Bank Transfer', detail: bd || 'Bank transfer' }; 
             default: 
-                const otherMethod = document.getElementById('other-method')?.value || 'Other';
-                const otherRef = document.getElementById('other-ref')?.value || '';
-                return { method: otherMethod, detail: otherRef }; 
+                return { method: document.getElementById('other-method')?.value || 'Other', detail: document.getElementById('other-ref')?.value || '' }; 
         } 
     }
     
-    function closePaymentPopup() { 
-        document.getElementById('payment-popup').style.display = 'none'; 
-    }
+    function closePaymentPopup() { document.getElementById('payment-popup').style.display = 'none'; }
     
     function confirmPaymentAndShowReceipt() { 
+        console.log("confirmPaymentAndShowReceipt called");
+        console.log("pendingRideData:", pendingRideData);
+        console.log("selectedMethod:", selectedMethod);
+        
         if(!pendingRideData) { 
             alert("No ride data found. Please end a ride first."); 
             return; 
         }
-        pendingRideData.payment = getPaymentInfo(); 
+        
+        let paymentInfo = getPaymentInfo(); 
+        console.log("paymentInfo:", paymentInfo);
+        
+        pendingRideData.payment = paymentInfo; 
+        
         let list = JSON.parse(localStorage.getItem('rides') || '[]'); 
         list.push(pendingRideData); 
         localStorage.setItem('rides', JSON.stringify(list)); 
+        
         showReceipt(pendingRideData, false); 
         closePaymentPopup(); 
+        
         sTime = null; 
         currentDestinationAddress = ""; 
         if(currentMode !== 'manual') setTimeout(() => startGPS(), 1000); 
         document.getElementById('nav-container').style.display = 'none'; 
+        
         addSystemLog('INFO', 'Payment confirmed', `Receipt: ${pendingRideData.id}`); 
     }
     
     function showReceipt(ride, isDuplicate) { 
+        console.log("showReceipt called for ride:", ride.id);
+        
         let sub = (ride.manualFare > 0) ? ride.manualFare : (SETTINGS.base + (Math.max(0, ride.km - 1) * SETTINGS.rate)); 
         let waitC = ride.wait * SETTINGS.waitRate; 
         let dupHtml = isDuplicate ? '<div style="background:#e74c3c; color:white; text-align:center; padding:3px; border-radius:8px;">📋 COPY</div>' : ''; 
@@ -635,14 +641,18 @@
         if(ride.nightUsed && ride.manualFare === 0) rows += `<div class="r-row"><span>Night(${SETTINGS.nightPercent}%):</span><b>+${Math.round(ride.fare - (sub + waitC - ride.disc))}</b></div>`; 
         if(ride.disc > 0) rows += `<div class="r-row"><span>Discount:</span><b>-Rs.${ride.disc}</b></div>`; 
         rows += `<div class="r-row"><span>Mode:</span><b>${ride.mode}</b></div><div class="r-row"><span>Payment:</span><b>${ride.payment.method}</b></div>`; 
+        
         document.getElementById('receipt-body').innerHTML = rows; 
         document.getElementById('receipt-total').innerHTML = ride.fare.toFixed(2); 
         document.getElementById('receipt-header').innerText = SETTINGS.receiptName; 
         document.getElementById('receipt-words').innerHTML = numberToWords(ride.fare); 
+        
         let qr = document.getElementById('receipt-qr'); 
         qr.innerHTML = ""; 
         new QRCode(qr, { text: `${ride.id}|Rs.${ride.fare.toFixed(2)}|${ride.payment.method}`, width: 85, height: 85 }); 
+        
         document.getElementById('receiptModal').style.display = "flex"; 
+        console.log("Receipt modal should be visible now");
     }
     
     async function shareWA() { try { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); canvas.toBlob(blob => { if(navigator.share) navigator.share({ files:[new File([blob],'receipt.png')] }); else { let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='receipt.png'; a.click(); } }); } catch(e){ downloadReceiptPDF(); } }
@@ -654,20 +664,13 @@
     
     function resetToNew() { if(sTime && !confirm("Reset ride?")) return; if(watchId) navigator.geolocation.clearWatch(watchId); releaseWakeLock(); document.body.classList.remove('ride-active'); document.querySelectorAll('.mode-btn').forEach(btn => { btn.style.pointerEvents='auto'; btn.style.opacity='1'; }); sTime=null; totalMeters=0; lastLat=null; lastLon=null; currentDestinationAddress=""; deliveryPickupName=""; deliveryPickupPhone=""; deliveryDeliveryName=""; deliveryDeliveryPhone=""; document.getElementById('startBtn').innerHTML="START RIDE"; document.getElementById('startBtn').classList.remove('btn-active-anim'); document.getElementById('startBtn').disabled=false; document.getElementById('start-loc').value=''; document.getElementById('end-loc').value=''; document.getElementById('mobile').value=''; document.getElementById('manual-fare').value=''; document.getElementById('discount-input').value=''; document.getElementById('wait-select').value='0'; document.getElementById('manual-km-input').value='0'; document.getElementById('nav-container').style.display='none'; document.getElementById('pickup-name').value=''; document.getElementById('pickup-phone').value=''; document.getElementById('delivery-name').value=''; document.getElementById('delivery-phone').value=''; updateDisplay(); localStorage.removeItem('amt_ride_state'); if(currentMode==='auto') refreshCurrentLocation(); if(currentMode!=='manual') startGPS(); else { gpsReady=true; document.getElementById('startBtn').disabled=false; } }
     
-    // ========== HISTORY WITH DATE FILTER ==========
+    // ========== HISTORY WITH DATE FILTER (UPDATED - WORKING) ==========
     function filterHistory(type) {
         let now = new Date(), start = '', end = '';
-        if(type === 'today') { 
-            start = end = now.toISOString().split('T')[0]; 
-        } else if(type === 'week') { 
-            let weekAgo = new Date(now); 
-            weekAgo.setDate(now.getDate() - 7); 
-            start = weekAgo.toISOString().split('T')[0]; 
-            end = now.toISOString().split('T')[0]; 
-        } else if(type === 'month') { 
-            start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]; 
-            end = now.toISOString().split('T')[0]; 
-        } else if(type === 'custom') {
+        if(type === 'today') { start = end = now.toISOString().split('T')[0]; }
+        else if(type === 'week') { let weekAgo = new Date(now); weekAgo.setDate(now.getDate() - 7); start = weekAgo.toISOString().split('T')[0]; end = now.toISOString().split('T')[0]; }
+        else if(type === 'month') { start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]; end = now.toISOString().split('T')[0]; }
+        else if(type === 'custom') {
             document.getElementById('custom-date-range').style.display = 'block';
             return;
         }
@@ -709,11 +712,15 @@
     }
     
     function reprintRide(index) { 
+        console.log("reprintRide called with index:", index);
         let rides = JSON.parse(localStorage.getItem('rides')||'[]'); 
         if(rides[index]) { 
+            console.log("Found ride:", rides[index].id);
             showReceipt(rides[index], true); 
             closeM('history-modal'); 
-        } 
+        } else {
+            console.log("Ride not found at index:", index);
+        }
     }
     
     // EARNINGS
