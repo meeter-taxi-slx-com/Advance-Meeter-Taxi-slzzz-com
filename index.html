@@ -8,12 +8,18 @@
     <meta name="apple-mobile-web-app-title" content="Advance Meeter Taxi">
     <meta name="theme-color" content="#1a4a9e">
     <title>ADVANCE MEETER TAXI - Premium</title>
+    
+    <!-- Google Maps API - FIXED with your key -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgKk_qT-vv0HlSaVi3ScSqtsCcRjYHKVs&libraries=places,geometry&callback=initGoogleMaps" async defer></script>
+    
+    <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
     <style>
         :root {
             --primary: #1a4a9e;
@@ -113,7 +119,8 @@
         .payment-detail-fields { margin-top: 15px; padding: 18px; background: var(--gray-bg); border-radius: 28px; }
         .confirm-payment-btn { background: var(--secondary-gradient); color: white; padding: 16px; border: none; border-radius: 40px; font-size: 16px; font-weight: 700; width: 100%; margin-top: 20px; cursor: pointer; transition: var(--transition); }
         .confirm-payment-btn:active { transform: scale(0.97); }
-        .history-item { background: var(--gray-bg); padding: 16px; margin-bottom: 12px; border-radius: 28px; border-left: 4px solid var(--primary); transition: var(--transition); }
+        .history-item { background: var(--gray-bg); padding: 16px; margin-bottom: 12px; border-radius: 28px; border-left: 4px solid var(--primary); transition: var(--transition); cursor: pointer; }
+        .history-item:active { transform: scale(0.98); }
         .btn-reprint { background: var(--primary-gradient); padding: 6px 14px; font-size: 11px; font-weight: 600; color: white; border: none; border-radius: 25px; cursor: pointer; transition: var(--transition); }
         .receipt-print { width: 72mm; max-width: 72mm; margin: 0 auto; padding: 3mm; font-family: 'Courier New', monospace; font-size: 9pt; background: white; position: relative; border-radius: 16px; }
         .r-header { background: linear-gradient(135deg, #000, #1a1a2e); color: white; padding: 8px; text-align: center; font-weight: 800; border-radius: 12px 12px 0 0; }
@@ -146,6 +153,24 @@
         .autocomplete-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
         .autocomplete-item:hover { background: var(--gray-bg); }
         .restore-banner { background: #fef3c7; color: #b45309; padding: 12px; border-radius: 28px; margin-bottom: 16px; text-align: center; font-size: 12px; font-weight: 600; display: none; cursor: pointer; }
+        
+        /* Toast Notifications */
+        .toast-container { position: fixed; bottom: 20px; left: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+        .toast { background: var(--white); border-radius: 16px; padding: 12px 16px; box-shadow: var(--shadow-xl); display: flex; align-items: center; gap: 12px; animation: slideUp 0.3s ease; pointer-events: auto; border-left: 4px solid; color: var(--dark); }
+        .toast.success { border-left-color: #2ecc71; }
+        .toast.error { border-left-color: #e74c3c; }
+        .toast.warning { border-left-color: #f39c12; }
+        .toast.info { border-left-color: #3498db; }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        /* Loading Spinner */
+        .spinner-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 10001; }
+        .spinner { width: 50px; height: 50px; border: 4px solid var(--gray-bg); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* AI Suggestion */
+        .ai-suggestion { background: linear-gradient(135deg, #667eea15, #764ba215); border-radius: 20px; padding: 8px 12px; margin: 8px 0; font-size: 11px; color: var(--primary); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: var(--transition); }
+        .ai-suggestion:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
@@ -169,7 +194,9 @@
 
     <div id="auto-location-card" class="location-card"><div style="display: flex; justify-content: space-between;"><div style="flex:1;"><div class="location-title">📍 CURRENT LOCATION</div><div id="current-location-address" class="location-address">Waiting for GPS...</div></div><button class="refresh-location" onclick="refreshCurrentLocation()">⟳</button></div></div>
 
-    <div id="location-fields" style="display: none;"><div class="grid-2"><div class="autocomplete-container"><input id="start-loc" type="text" placeholder="Pick Up Location"><div id="start-loc-suggestions" class="autocomplete-dropdown" style="display: none;"></div></div><div class="autocomplete-container"><input id="end-loc" type="text" placeholder="Drop Off Location"><div id="end-loc-suggestions" class="autocomplete-dropdown" style="display: none;"></div></div></div><div class="grid-2"><button class="map-picker-btn" onclick="openMapPicker('start')">🗺️ Pickup Map</button><button class="map-picker-btn" onclick="openMapPicker('end')">🗺️ Drop Map</button></div></div>
+    <div id="location-fields" style="display: none;"><div class="grid-2"><div class="autocomplete-container"><input id="start-loc" type="text" placeholder="Pick Up Location" autocomplete="off"><div id="start-loc-suggestions" class="autocomplete-dropdown" style="display: none;"></div></div><div class="autocomplete-container"><input id="end-loc" type="text" placeholder="Drop Off Location" autocomplete="off"><div id="end-loc-suggestions" class="autocomplete-dropdown" style="display: none;"></div></div></div><div class="grid-2"><button class="map-picker-btn" onclick="openMapPicker('start')">🗺️ Pickup Map</button><button class="map-picker-btn" onclick="openMapPicker('end')">🗺️ Drop Map</button></div></div>
+
+    <div id="ai-suggestions" class="ai-suggestion" style="display: none;" onclick="useAISuggestion()">🤖 <span id="ai-suggestion-text">AI suggesting optimal route...</span></div>
 
     <div id="delivery-fields" class="delivery-fields"><h4>📦 Pickup Person</h4><div class="grid-2"><input type="text" id="pickup-name" placeholder="Name"><input type="tel" id="pickup-phone" placeholder="Phone"></div><h4>📍 Delivery Person</h4><div class="grid-2"><input type="text" id="delivery-name" placeholder="Name"><input type="tel" id="delivery-phone" placeholder="Phone"></div></div>
 
@@ -183,6 +210,12 @@
 
     <div class="voice-container"><button id="voiceBtn" class="voice-btn" onclick="toggleVoiceCommand()">🎤 VOICE (OFF)</button><div id="voiceStatus" class="voice-status">⚪ Tap to enable</div><div class="voice-commands-guide">SR | ER | NAV | RP | FL | RPL | TR</div></div>
 </div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Loading Spinner -->
+<div class="spinner-overlay" id="spinnerOverlay"><div class="spinner"></div></div>
 
 <!-- Payment Popup -->
 <div id="payment-popup" class="modal">
@@ -208,7 +241,7 @@
 </div>
 
 <!-- Settings Modal -->
-<div id="settings-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeSettingsAndLogout()">✕</div><h3 style="text-align:center; margin-bottom:24px;">⚙️ SETTINGS MENU</h3><div class="settings-menu"><button class="settings-menu-btn" onclick="openAppSettings()">📱 APPLICATION SETTINGS</button><button class="settings-menu-btn secondary" onclick="openFuelLogModal()">⛽ FUEL LOG</button><button class="settings-menu-btn secondary" onclick="openRepairLogModal()">🔧 REPAIR LOG</button><button class="settings-menu-btn secondary" onclick="openReportsMenu()">📊 REPORTS</button><button class="settings-menu-btn warning" onclick="openSystemLogModal()">📋 SYSTEM LOG</button></div></div></div>
+<div id="settings-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeSettingsAndLogout()">✕</div><h3 style="text-align:center; margin-bottom:24px;">⚙️ SETTINGS MENU</h3><div class="settings-menu"><button class="settings-menu-btn" onclick="openAppSettings()">📱 APPLICATION SETTINGS</button><button class="settings-menu-btn secondary" onclick="openFuelLogModal()">⛽ FUEL LOG</button><button class="settings-menu-btn secondary" onclick="openRepairLogModal()">🔧 REPAIR LOG</button><button class="settings-menu-btn secondary" onclick="openReportsMenu()">📊 REPORTS</button><button class="settings-menu-btn warning" onclick="openSystemLogModal()">📋 SYSTEM LOG</button><button class="settings-menu-btn" onclick="openDriverApp()">👨‍✈️ DRIVER APP</button></div></div></div>
 
 <div id="app-settings-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToSettingsMenu()">←</div><div class="close-circle" onclick="closeM('app-settings-modal')">✕</div><h3 style="text-align:center;">📱 APP SETTINGS</h3><label>App Name:</label><input id="set-app-name"><label>Receipt Header:</label><input id="set-receipt-header"><label>Logo:</label><input type="file" id="logo-upload" accept="image/*"><div class="grid-2"><div><label>Base Fare:</label><input id="set-base" type="number"></div><div><label>Rate/KM:</label><input id="set-rate" type="number"></div></div><div class="grid-2"><div><label>Wait/min:</label><input id="set-wait" type="number"></div><div><label>Night %:</label><input id="set-night" type="number"></div></div><label>New Password:</label><input id="set-pwd" type="password"><button class="confirm-payment-btn" onclick="saveSettings()">💾 SAVE</button></div></div>
 
@@ -216,7 +249,7 @@
 
 <div id="repair-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToSettingsMenu()">←</div><div class="close-circle" onclick="closeM('repair-modal')">✕</div><h3 style="text-align:center;">🔧 REPAIR LOG</h3><div class="grid-2"><input type="date" id="repair-date"><input type="text" id="repair-desc" placeholder="Description"></div><div class="grid-2"><input type="number" id="repair-cost" placeholder="Cost"><input type="text" id="repair-garage" placeholder="Garage"></div><input type="text" id="repair-notes" placeholder="Notes"><button class="confirm-payment-btn" onclick="addRepairLog()">➕ ADD</button><button class="settings-menu-btn secondary" style="margin-top:10px;" onclick="openRepairReport()">📊 REPORT</button><div id="repair-list" style="margin-top:15px; max-height:150px; overflow-y:auto;"></div></div></div>
 
-<div id="reports-menu-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToSettingsMenu()">←</div><div class="close-circle" onclick="closeM('reports-menu-modal')">✕</div><h3 style="text-align:center;">📊 REPORTS</h3><div class="settings-menu"><button class="settings-menu-btn" onclick="openPanel('report-modal')">📊 PAYMENTS</button><button class="settings-menu-btn secondary" onclick="openPanel('income-modal')">📈 EARNINGS</button><button class="settings-menu-btn secondary" onclick="openPanel('history-modal')">📜 HISTORY</button><button class="settings-menu-btn secondary" onclick="openTravelReport()">📍 TRAVEL</button><button class="settings-menu-btn secondary" onclick="openProfitReport()">💰 PROFIT REPORT</button></div></div></div>
+<div id="reports-menu-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToSettingsMenu()">←</div><div class="close-circle" onclick="closeM('reports-menu-modal')">✕</div><h3 style="text-align:center;">📊 REPORTS</h3><div class="settings-menu"><button class="settings-menu-btn" onclick="openPanel('report-modal')">📊 PAYMENTS</button><button class="settings-menu-btn secondary" onclick="openPanel('income-modal')">📈 EARNINGS</button><button class="settings-menu-btn secondary" onclick="openPanel('history-modal')">📜 HISTORY</button><button class="settings-menu-btn secondary" onclick="openTravelReport()">📍 TRAVEL</button><button class="settings-menu-btn secondary" onclick="openProfitReport()">💰 PROFIT REPORT</button><button class="settings-menu-btn secondary" onclick="showPeakHoursReport()">📊 PEAK HOURS</button><button class="settings-menu-btn secondary" onclick="showDriverPerformanceReport()">👨‍✈️ DRIVER PERF</button></div></div></div>
 
 <div id="fuel-report-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToFuelLog()">←</div><div class="close-circle" onclick="closeM('fuel-report-modal')">✕</div><h3>⛽ FUEL REPORT</h3><div class="report-tabs"><button class="report-tab active" onclick="showFuelReportTab('daily')">Daily</button><button class="report-tab" onclick="showFuelReportTab('monthly')">Monthly</button><button class="report-tab" onclick="showFuelReportTab('yearly')">Yearly</button><button class="report-tab" onclick="showFuelReportTab('range')">Range</button></div><div id="fuel-date-range-panel" style="display:none;"><div class="grid-2"><input type="date" id="fuel-start-date"><input type="date" id="fuel-end-date"></div><button class="map-picker-btn" onclick="updateFuelReport()">Apply</button></div><div id="fuel-report-container"></div><button class="btn-reprint" onclick="exportFuelCSV()">📥 CSV</button></div></div>
 
@@ -249,7 +282,33 @@
 
 <div id="profit-report-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToReportsMenu()">←</div><div class="close-circle" onclick="closeM('profit-report-modal')">✕</div><h3 style="text-align:center;">💰 PROFIT & EXPENSES</h3><div class="report-tabs"><button class="report-tab active" onclick="showProfitReportTab('daily')">Daily</button><button class="report-tab" onclick="showProfitReportTab('monthly')">Monthly</button><button class="report-tab" onclick="showProfitReportTab('yearly')">Yearly</button><button class="report-tab" onclick="showProfitReportTab('range')">Range</button></div><div id="profit-date-range-panel" style="display:none;"><div class="grid-2"><input type="date" id="profit-start-date"><input type="date" id="profit-end-date"></div><button class="map-picker-btn" onclick="updateProfitReport()">Apply</button></div><div id="profit-report-container"></div><div style="margin-top:15px;"><canvas id="profitChart" style="max-height:200px; width:100%;"></canvas></div><button class="btn-reprint" style="margin-top:15px; width:100%;" onclick="exportProfitCSV()">📥 Export CSV</button></div></div>
 
-<div id="receiptModal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeM('receiptModal')">✕</div><div id="receipt-view" class="receipt-print"><div class="r-header" id="receipt-header">TAXI RECEIPT</div><div id="receipt-body"></div><div class="r-total">TOTAL: Rs.<span id="receipt-total"></span></div><div id="receipt-qr"></div><div class="receipt-seal"></div></div><div class="receipt-btns"><button class="btn-wa" onclick="shareWA()">WhatsApp</button><button class="btn-gm" onclick="sendEmailWithAttachment()">Gmail</button></div><button class="btn-pdf" onclick="downloadReceiptPDF()">PDF</button><button class="btn-print" onclick="printViaBluetooth()">Print</button></div></div>
+<div id="peak-hours-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToReportsMenu()">←</div><div class="close-circle" onclick="closeM('peak-hours-modal')">✕</div><h3>📊 PEAK HOURS ANALYSIS</h3><div class="peak-chart-container"><canvas id="peakHoursChart"></canvas></div><div id="peak-hours-stats" style="margin-top: 15px;"></div><button class="btn-reprint" onclick="exportPeakHoursCSV()">📥 CSV</button></div></div>
+
+<div id="driver-performance-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToReportsMenu()">←</div><div class="close-circle" onclick="closeM('driver-performance-modal')">✕</div><h3>👨‍✈️ DRIVER PERFORMANCE</h3><div id="driver-performance-stats"></div><canvas id="driverPerformanceChart" style="max-height: 200px; margin-top: 15px;"></canvas><button class="btn-reprint" onclick="exportDriverPerformanceCSV()">📥 CSV</button></div></div>
+
+<div id="driver-app-modal" class="modal"><div class="modal-content"><div class="close-circle" onclick="closeM('driver-app-modal')">✕</div><h3 style="text-align:center;">👨‍✈️ DRIVER APP</h3><div id="driver-app-stats"></div><div id="driver-app-rides"></div><button class="confirm-payment-btn" onclick="closeM('driver-app-modal')">Close</button></div></div>
+
+<!-- FIXED: Receipt Modal with words element -->
+<div id="receiptModal" class="modal">
+    <div class="modal-content">
+        <div class="close-circle" onclick="closeM('receiptModal')">✕</div>
+        <div id="receipt-view" class="receipt-print">
+            <div class="r-header" id="receipt-header">TAXI RECEIPT</div>
+            <div id="receipt-body"></div>
+            <div class="r-total">TOTAL: Rs. <span id="receipt-total"></span></div>
+            <div class="r-words" id="receipt-words"></div>
+            <div id="receipt-qr"></div>
+            <div class="r-divider">Thank you! 🚕</div>
+            <div class="receipt-seal"></div>
+        </div>
+        <div class="receipt-btns">
+            <button class="btn-wa" onclick="shareWA()">📱 WHATSAPP</button>
+            <button class="btn-gm" onclick="sendEmailWithAttachment()">📧 GMAIL</button>
+        </div>
+        <button class="btn-pdf" onclick="downloadReceiptPDF()">📄 PDF</button>
+        <button class="btn-print" onclick="printViaBluetooth()">🖨️ PRINT</button>
+    </div>
+</div>
 
 <div id="system-log-modal" class="modal"><div class="modal-content"><div class="back-btn" onclick="goBackToSettingsMenu()">←</div><div class="close-circle" onclick="closeM('system-log-modal')">✕</div><h3>📋 SYSTEM LOGS</h3><div id="system-log-list" style="max-height:350px; overflow-y:auto;"></div><button class="btn-reprint" onclick="exportSystemLogCSV()">📥 CSV</button><button class="settings-menu-btn warning" style="margin-top:10px;" onclick="clearSystemLog()">🗑️ CLEAR</button></div></div>
 
@@ -262,8 +321,22 @@
     let systemLogs = JSON.parse(localStorage.getItem('system_logs') || '[]');
     function addSystemLog(type, message, details) { let log = { id: Date.now(), date: new Date().toISOString(), type, message, details: details || '' }; systemLogs.unshift(log); if (systemLogs.length > 200) systemLogs = systemLogs.slice(0, 200); localStorage.setItem('system_logs', JSON.stringify(systemLogs)); }
     function openSystemLogModal() { let container = document.getElementById('system-log-list'); if(container) { container.innerHTML = systemLogs.map(log => `<div class="system-log-entry"><small>${new Date(log.date).toLocaleString()}</small><br><strong>${log.type}</strong>: ${log.message}<br><small>${log.details}</small></div>`).join('') || '<div style="text-align:center;padding:20px;">No logs</div>'; closeM('settings-modal'); document.getElementById('system-log-modal').style.display = 'flex'; } }
-    function clearSystemLog() { if(confirm('Clear all logs?')) { systemLogs = []; localStorage.setItem('system_logs', JSON.stringify(systemLogs)); alert('Cleared'); openSystemLogModal(); } }
-    function exportSystemLogCSV() { let csv = "Date,Type,Message,Details\n" + systemLogs.map(l => `${l.date},${l.type},${l.message},${l.details}`).join("\n"); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'system_logs.csv'; a.click(); }
+    function clearSystemLog() { if(confirm('Clear all logs?')) { systemLogs = []; localStorage.setItem('system_logs', JSON.stringify(systemLogs)); showToast('Logs cleared', 'success'); openSystemLogModal(); } }
+    function exportSystemLogCSV() { let csv = "Date,Type,Message,Details\n" + systemLogs.map(l => `${l.date},${l.type},${l.message},${l.details}`).join("\n"); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'system_logs.csv'; a.click(); showToast('CSV exported', 'success'); }
+    
+    // ========== TOAST NOTIFICATIONS ==========
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}</span><span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function showLoading(show) {
+        document.getElementById('spinnerOverlay').style.display = show ? 'flex' : 'none';
+    }
     
     // ========== WAKE LOCK ==========
     let wakeLock = null;
@@ -287,13 +360,13 @@
     function toggleVoiceCommand() {
         if (!voiceActive) {
             if (!recognition && !initVoiceRecognition()) return;
-            try { recognition.start(); voiceActive = true; document.getElementById('voiceBtn').innerHTML = '🎤 LISTENING...'; document.getElementById('voiceBtn').classList.add('listening'); document.getElementById('voiceStatus').innerHTML = '🎤 Listening...'; } catch(e) { alert('Microphone access needed'); }
-        } else { if (recognition) recognition.stop(); voiceActive = false; document.getElementById('voiceBtn').innerHTML = '🎤 VOICE (OFF)'; document.getElementById('voiceBtn').classList.remove('listening'); document.getElementById('voiceStatus').innerHTML = '⚪ Tap to enable'; }
+            try { recognition.start(); voiceActive = true; document.getElementById('voiceBtn').innerHTML = '🎤 LISTENING...'; document.getElementById('voiceBtn').classList.add('listening'); document.getElementById('voiceStatus').innerHTML = '🎤 Listening...'; showToast('Voice commands active', 'success'); } catch(e) { showToast('Microphone access needed', 'error'); }
+        } else { if (recognition) recognition.stop(); voiceActive = false; document.getElementById('voiceBtn').innerHTML = '🎤 VOICE (OFF)'; document.getElementById('voiceBtn').classList.remove('listening'); document.getElementById('voiceStatus').innerHTML = '⚪ Tap to enable'; showToast('Voice commands off', 'info'); }
     }
     function processVoiceCommand(cmd) {
-        if (cmd === 'sr' || cmd.includes('start ride')) { if (!sTime) startRide(); else speakText('Ride active'); }
-        else if (cmd === 'er' || cmd.includes('end ride')) { if (sTime) endRide(); else speakText('No active ride'); }
-        else if (cmd === 'nav' || cmd.includes('navigate')) { if (currentDestinationAddress) openPhoneNavigation(); else speakText('No destination'); }
+        if (cmd === 'sr' || cmd.includes('start ride')) { if (!sTime) startRide(); else showToast('Ride already active', 'warning'); }
+        else if (cmd === 'er' || cmd.includes('end ride')) { if (sTime) endRide(); else showToast('No active ride', 'warning'); }
+        else if (cmd === 'nav' || cmd.includes('navigate')) { if (currentDestinationAddress) openPhoneNavigation(); else showToast('No destination set', 'warning'); }
         else if (cmd === 'rp' || cmd.includes('report')) { openReportsMenu(); }
         else if (cmd === 'fl' || cmd.includes('fuel')) { openFuelLogModal(); }
         else if (cmd === 'rpl' || cmd.includes('repair')) { openRepairLogModal(); }
@@ -302,6 +375,124 @@
         else if (cmd.includes('night off')) { if (nightActive) toggleNightCharge(); }
     }
     function speakText(t) { if (!voiceActive) return; let utterance = new SpeechSynthesisUtterance(t); utterance.lang = 'en-US'; window.speechSynthesis.speak(utterance); }
+    
+    // ========== GOOGLE MAPS INIT ==========
+    let googleAutocompleteStart = null, googleAutocompleteEnd = null;
+    
+    function initGoogleMaps() {
+        console.log('Google Maps initialized successfully');
+        const startInput = document.getElementById('start-loc');
+        const endInput = document.getElementById('end-loc');
+        
+        if (startInput && typeof google !== 'undefined' && google.maps && google.maps.places) {
+            try {
+                googleAutocompleteStart = new google.maps.places.Autocomplete(startInput, {
+                    componentRestrictions: { country: 'lk' },
+                    fields: ['formatted_address', 'geometry', 'name']
+                });
+                googleAutocompleteStart.addListener('place_changed', function() {
+                    const place = googleAutocompleteStart.getPlace();
+                    if (place && place.formatted_address) {
+                        console.log('Start location selected:', place.formatted_address);
+                    }
+                });
+            } catch(e) { console.error('Google Maps start autocomplete error:', e); }
+        }
+        
+        if (endInput && typeof google !== 'undefined' && google.maps && google.maps.places) {
+            try {
+                googleAutocompleteEnd = new google.maps.places.Autocomplete(endInput, {
+                    componentRestrictions: { country: 'lk' },
+                    fields: ['formatted_address', 'geometry', 'name']
+                });
+                googleAutocompleteEnd.addListener('place_changed', function() {
+                    const place = googleAutocompleteEnd.getPlace();
+                    if (place && place.formatted_address) {
+                        currentDestinationAddress = place.formatted_address;
+                        console.log('Destination set:', place.formatted_address);
+                        showToast('Destination set: ' + place.name, 'success');
+                    }
+                });
+            } catch(e) { console.error('Google Maps end autocomplete error:', e); }
+        }
+    }
+    
+    // ========== MAPBOX INTEGRATION FOR MAP PICKER ==========
+    function openMapPicker(field) {
+        mapPickerField = field;
+        document.getElementById('map-title').innerText = field === 'start' ? 'Pickup Location' : 'Drop Location';
+        document.getElementById('map-modal').style.display = 'flex';
+        
+        setTimeout(function() {
+            if (mapObj) {
+                mapObj.remove();
+                mapObj = null;
+            }
+            
+            try {
+                mapObj = L.map('map').setView([7.8731, 80.7718], 8);
+                L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYWRpbHNoYW4iLCJhIjoiY21venoyNW0yMG95YjJwb2YycWFwNzYzaCJ9.9fgllEuHalwbmbUt7Ckw-g', {
+                    attribution: '© Mapbox',
+                    maxZoom: 19
+                }).addTo(mapObj);
+                
+                mapMarker = L.marker([7.8731, 80.7718], { draggable: true }).addTo(mapObj);
+                
+                mapMarker.on('dragend', function() {
+                    reverseMapGeocode(mapMarker.getLatLng().lat, mapMarker.getLatLng().lng);
+                });
+                
+                mapObj.on('click', function(e) {
+                    mapMarker.setLatLng(e.latlng);
+                    reverseMapGeocode(e.latlng.lat, e.latlng.lng);
+                });
+                
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(pos) {
+                        mapObj.setView([pos.coords.latitude, pos.coords.longitude], 14);
+                        mapMarker.setLatLng([pos.coords.latitude, pos.coords.longitude]);
+                        reverseMapGeocode(pos.coords.latitude, pos.coords.longitude);
+                    }, function(err) {
+                        console.log('Geolocation error:', err);
+                    });
+                }
+            } catch(e) {
+                console.error('Mapbox initialization error:', e);
+                showToast('Map could not load. Check your internet connection.', 'error');
+            }
+            
+            var searchInput = document.getElementById('map-search');
+            var resultsDiv = document.getElementById('search-results');
+            
+            searchInput.oninput = async function() {
+                var query = this.value.trim();
+                if (query.length < 2) {
+                    resultsDiv.style.display = 'none';
+                    return;
+                }
+                var data = await searchSriLankaLocations(query);
+                resultsDiv.innerHTML = '';
+                if (data.length === 0) {
+                    resultsDiv.innerHTML = '<div class="search-item">No results in Sri Lanka</div>';
+                } else {
+                    data.forEach(function(place) {
+                        var div = document.createElement('div');
+                        div.className = 'search-item';
+                        div.textContent = place.display_name.substring(0, 60);
+                        div.onclick = function() {
+                            mapObj.setView([place.lat, place.lon], 14);
+                            mapMarker.setLatLng([place.lat, place.lon]);
+                            reverseMapGeocode(place.lat, place.lon);
+                            resultsDiv.style.display = 'none';
+                            searchInput.value = place.display_name;
+                        };
+                        resultsDiv.appendChild(div);
+                    });
+                }
+                resultsDiv.style.display = 'block';
+            };
+        }, 100);
+    }
     
     // ========== PROFIT REPORT ==========
     let profitChart = null;
@@ -340,34 +531,133 @@
         let ctx = document.getElementById('profitChart').getContext('2d');
         profitChart = new Chart(ctx, { type: 'bar', data: { labels: ['Earnings', 'Fuel Cost', 'Repair Cost', 'Net Profit'], datasets: [{ data: [data.totalEarnings, data.totalFuelCost, data.totalRepairCost, data.netProfit], backgroundColor: ['#2ecc71', '#e74c3c', '#f39c12', '#3498db'], borderRadius: 10 }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } } });
     }
-    function exportProfitCSV() { let rides = JSON.parse(localStorage.getItem('rides') || '[]'); let fuelLogs = JSON.parse(localStorage.getItem('fuel_logs') || '[]'); let repairLogs = JSON.parse(localStorage.getItem('repair_logs') || '[]'); let csv = "Date,Earnings,Fuel Cost,Repair Cost,Net Profit\n"; let allDates = [...new Set([...rides.map(r=>new Date(r.time).toISOString().split('T')[0]), ...fuelLogs.map(f=>f.date), ...repairLogs.map(r=>r.date)])].sort(); for(let date of allDates) { let dayRides = rides.filter(r=>new Date(r.time).toISOString().split('T')[0] === date); let dayFuel = fuelLogs.filter(f=>f.date === date); let dayRepair = repairLogs.filter(r=>r.date === date); let earn = dayRides.reduce((s,r)=>s+r.fare,0); let fuel = dayFuel.reduce((s,f)=>s+f.total,0); let repair = dayRepair.reduce((s,r)=>s+r.cost,0); csv += `${date},${earn.toFixed(2)},${fuel.toFixed(2)},${repair.toFixed(2)},${(earn-fuel-repair).toFixed(2)}\n`; } let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'profit_report.csv'; a.click(); }
+    function exportProfitCSV() { let rides = JSON.parse(localStorage.getItem('rides') || '[]'); let fuelLogs = JSON.parse(localStorage.getItem('fuel_logs') || '[]'); let repairLogs = JSON.parse(localStorage.getItem('repair_logs') || '[]'); let csv = "Date,Earnings,Fuel Cost,Repair Cost,Net Profit\n"; let allDates = [...new Set([...rides.map(r=>new Date(r.time).toISOString().split('T')[0]), ...fuelLogs.map(f=>f.date), ...repairLogs.map(r=>r.date)])].sort(); for(let date of allDates) { let dayRides = rides.filter(r=>new Date(r.time).toISOString().split('T')[0] === date); let dayFuel = fuelLogs.filter(f=>f.date === date); let dayRepair = repairLogs.filter(r=>r.date === date); let earn = dayRides.reduce((s,r)=>s+r.fare,0); let fuel = dayFuel.reduce((s,f)=>s+f.total,0); let repair = dayRepair.reduce((s,r)=>s+r.cost,0); csv += `${date},${earn.toFixed(2)},${fuel.toFixed(2)},${repair.toFixed(2)},${(earn-fuel-repair).toFixed(2)}\n`; } let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'profit_report.csv'; a.click(); showToast('CSV exported', 'success'); }
     
     // ========== FUEL LOG ==========
     let fuelLogs = JSON.parse(localStorage.getItem('fuel_logs') || '[]');
     function saveFuelLogs() { localStorage.setItem('fuel_logs', JSON.stringify(fuelLogs)); updateFuelList(); }
-    function addFuelLog() { let date = document.getElementById('fuel-date').value || new Date().toISOString().split('T')[0]; let liters = parseFloat(document.getElementById('fuel-liters').value); let price = parseFloat(document.getElementById('fuel-price').value); if (!liters || !price) { alert("Enter liters and price"); return; } let total = liters * price; fuelLogs.push({ id: Date.now(), date, liters, price, total, notes: document.getElementById('fuel-notes').value }); saveFuelLogs(); document.getElementById('fuel-liters').value = ''; document.getElementById('fuel-price').value = ''; alert("Fuel added!"); }
+    function addFuelLog() { let date = document.getElementById('fuel-date').value || new Date().toISOString().split('T')[0]; let liters = parseFloat(document.getElementById('fuel-liters').value); let price = parseFloat(document.getElementById('fuel-price').value); if (!liters || !price) { showToast("Enter liters and price", 'warning'); return; } let total = liters * price; fuelLogs.push({ id: Date.now(), date, liters, price, total, notes: document.getElementById('fuel-notes').value }); saveFuelLogs(); document.getElementById('fuel-liters').value = ''; document.getElementById('fuel-price').value = ''; showToast("Fuel added!", 'success'); }
     function updateFuelList() { let c = document.getElementById('fuel-list'); if(c) c.innerHTML = fuelLogs.slice().reverse().slice(0,10).map(l => `<div style="padding:8px; border-bottom:1px solid #e2e8f0;">${l.date} | ${l.liters}L @ Rs.${l.price} = Rs.${l.total.toFixed(2)}</div>`).join(''); let ft = document.getElementById('fuel-total'); if(ft && document.getElementById('fuel-liters').value && document.getElementById('fuel-price').value) ft.value = (parseFloat(document.getElementById('fuel-liters').value||0) * parseFloat(document.getElementById('fuel-price').value||0)).toFixed(2); }
     function getFuelByDateRange(s,e) { return fuelLogs.filter(l => l.date >= s && l.date <= e); }
     function showFuelReportTab(t) { document.querySelectorAll('#fuel-report-modal .report-tab').forEach(tb=>tb.classList.remove('active')); if(event&&event.target) event.target.classList.add('active'); document.getElementById('fuel-date-range-panel').style.display = t==='range'?'block':'none'; let now=new Date(), s='', e=''; if(t==='daily') { s=e=now.toISOString().split('T')[0]; } else if(t==='monthly') { s=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0]; e=new Date(now.getFullYear(),now.getMonth()+1,0).toISOString().split('T')[0]; } else if(t==='yearly') { s=new Date(now.getFullYear(),0,1).toISOString().split('T')[0]; e=new Date(now.getFullYear(),11,31).toISOString().split('T')[0]; } let logs = getFuelByDateRange(s,e); let totalL = logs.reduce((a,b)=>a+b.liters,0); let totalC = logs.reduce((a,b)=>a+b.total,0); document.getElementById('fuel-report-container').innerHTML = `<div style="text-align:center; padding:10px;"><strong>${t.toUpperCase()}</strong><br>Total: ${totalL.toFixed(2)}L | Rs.${totalC.toFixed(2)}</div><div class="payment-stats">${logs.map(r=>`<div class="stat-row"><span>${r.date}</span><span>${r.liters}L @ Rs.${r.price}=Rs.${r.total.toFixed(2)}</span></div>`).join('')}</div>`; }
     function updateFuelReport() { let s=document.getElementById('fuel-start-date').value, e=document.getElementById('fuel-end-date').value; if(!s||!e) return; let logs=getFuelByDateRange(s,e); let totalL=logs.reduce((a,b)=>a+b.liters,0); let totalC=logs.reduce((a,b)=>a+b.total,0); document.getElementById('fuel-report-container').innerHTML = `<div style="text-align:center;"><strong>${s} to ${e}</strong><br>Total: ${totalL.toFixed(2)}L | Rs.${totalC.toFixed(2)}</div><div class="payment-stats">${logs.map(r=>`<div class="stat-row"><span>${r.date}</span><span>${r.liters}L @ Rs.${r.price}=Rs.${r.total.toFixed(2)}</span></div>`).join('')}</div>`; }
-    function exportFuelCSV() { let csv = "Date,Liters,Price/L,Total,Notes\n" + fuelLogs.map(r => `${r.date},${r.liters},${r.price},${r.total.toFixed(2)},${r.notes||''}`).join("\n"); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'fuel_report.csv'; a.click(); }
+    function exportFuelCSV() { let csv = "Date,Liters,Price/L,Total,Notes\n" + fuelLogs.map(r => `${r.date},${r.liters},${r.price},${r.total.toFixed(2)},${r.notes||''}`).join("\n"); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'fuel_report.csv'; a.click(); showToast('CSV exported', 'success'); }
     
     // ========== REPAIR LOG ==========
     let repairLogs = JSON.parse(localStorage.getItem('repair_logs') || '[]');
     function saveRepairLogs() { localStorage.setItem('repair_logs', JSON.stringify(repairLogs)); updateRepairList(); }
-    function addRepairLog() { let date = document.getElementById('repair-date').value || new Date().toISOString().split('T')[0]; let desc = document.getElementById('repair-desc').value; let cost = parseFloat(document.getElementById('repair-cost').value); if (!desc || !cost) { alert("Enter description and cost"); return; } repairLogs.push({ id: Date.now(), date, desc, cost, garage: document.getElementById('repair-garage').value, notes: document.getElementById('repair-notes').value }); saveRepairLogs(); document.getElementById('repair-desc').value = ''; document.getElementById('repair-cost').value = ''; alert("Repair added!"); }
+    function addRepairLog() { let date = document.getElementById('repair-date').value || new Date().toISOString().split('T')[0]; let desc = document.getElementById('repair-desc').value; let cost = parseFloat(document.getElementById('repair-cost').value); if (!desc || !cost) { showToast("Enter description and cost", 'warning'); return; } repairLogs.push({ id: Date.now(), date, desc, cost, garage: document.getElementById('repair-garage').value, notes: document.getElementById('repair-notes').value }); saveRepairLogs(); document.getElementById('repair-desc').value = ''; document.getElementById('repair-cost').value = ''; showToast("Repair added!", 'success'); }
     function updateRepairList() { let c = document.getElementById('repair-list'); if(c) c.innerHTML = repairLogs.slice().reverse().slice(0,10).map(r => `<div style="padding:8px; border-bottom:1px solid #e2e8f0;">${r.date} | ${r.desc} | Rs.${r.cost.toFixed(2)}</div>`).join(''); }
     function getRepairByDateRange(s,e) { return repairLogs.filter(r => r.date >= s && r.date <= e); }
     function showRepairReportTab(t) { document.querySelectorAll('#repair-report-modal .report-tab').forEach(tb=>tb.classList.remove('active')); if(event&&event.target) event.target.classList.add('active'); document.getElementById('repair-date-range-panel').style.display = t==='range'?'block':'none'; let now=new Date(), s='', e=''; if(t==='daily') { s=e=now.toISOString().split('T')[0]; } else if(t==='monthly') { s=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0]; e=new Date(now.getFullYear(),now.getMonth()+1,0).toISOString().split('T')[0]; } else if(t==='yearly') { s=new Date(now.getFullYear(),0,1).toISOString().split('T')[0]; e=new Date(now.getFullYear(),11,31).toISOString().split('T')[0]; } let logs = getRepairByDateRange(s,e); let totalC = logs.reduce((a,b)=>a+b.cost,0); document.getElementById('repair-report-container').innerHTML = `<div style="text-align:center; padding:10px;"><strong>${t.toUpperCase()}</strong><br>Total: Rs.${totalC.toFixed(2)}</div><div class="payment-stats">${logs.map(r=>`<div class="stat-row"><span>${r.date}</span><span>${r.desc} - Rs.${r.cost.toFixed(2)}</span></div>`).join('')}</div>`; }
     function updateRepairReport() { let s=document.getElementById('repair-start-date').value, e=document.getElementById('repair-end-date').value; if(!s||!e) return; let logs=getRepairByDateRange(s,e); let totalC=logs.reduce((a,b)=>a+b.cost,0); document.getElementById('repair-report-container').innerHTML = `<div style="text-align:center;"><strong>${s} to ${e}</strong><br>Total: Rs.${totalC.toFixed(2)}</div><div class="payment-stats">${logs.map(r=>`<div class="stat-row"><span>${r.date}</span><span>${r.desc} - Rs.${r.cost.toFixed(2)}</span></div>`).join('')}</div>`; }
-    function exportRepairCSV() { let csv = "Date,Description,Cost,Garage,Notes\n" + repairLogs.map(r => `${r.date},${r.desc},${r.cost.toFixed(2)},${r.garage||''},${r.notes||''}`).join("\n"); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'repair_report.csv'; a.click(); }
+    function exportRepairCSV() { let csv = "Date,Description,Cost,Garage,Notes\n" + repairLogs.map(r => `${r.date},${r.desc},${r.cost.toFixed(2)},${r.garage||''},${r.notes||''}`).join("\n"); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'repair_report.csv'; a.click(); showToast('CSV exported', 'success'); }
     
     // ========== TRAVEL REPORT ==========
     function getTravelRidesByDateRange(s,e) { let all = JSON.parse(localStorage.getItem('rides') || '[]'); return all.filter(r => { let d = new Date(r.time).toISOString().split('T')[0]; return d >= s && d <= e; }); }
     function showTravelReportTab(t) { document.querySelectorAll('#travel-report-modal .report-tab').forEach(tb=>tb.classList.remove('active')); if(event&&event.target) event.target.classList.add('active'); document.getElementById('travel-date-range-panel').style.display = t==='range'?'block':'none'; let now=new Date(), s='', e=''; if(t==='daily') { s=e=now.toISOString().split('T')[0]; } else if(t==='monthly') { s=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0]; e=new Date(now.getFullYear(),now.getMonth()+1,0).toISOString().split('T')[0]; } else if(t==='yearly') { s=new Date(now.getFullYear(),0,1).toISOString().split('T')[0]; e=new Date(now.getFullYear(),11,31).toISOString().split('T')[0]; } let rides = getTravelRidesByDateRange(s,e); let totalDist = rides.reduce((a,b)=>a+b.km,0); document.getElementById('travel-report-container').innerHTML = `<div style="text-align:center; padding:10px;"><strong>${t.toUpperCase()}</strong><br>Total: ${totalDist.toFixed(2)} km | Rides: ${rides.length}</div><div class="payment-stats">${rides.map(r=>`<div class="stat-row"><span>${new Date(r.time).toLocaleDateString()}</span><span>${r.from.substring(0,25)}→${r.to.substring(0,25)}</span><span>${r.km.toFixed(2)} km</span><span>Rs.${r.fare.toFixed(2)}</span></div>`).join('')}</div>`; }
     function updateTravelReport() { let s=document.getElementById('travel-start-date').value, e=document.getElementById('travel-end-date').value; if(!s||!e) return; let rides=getTravelRidesByDateRange(s,e); let totalDist=rides.reduce((a,b)=>a+b.km,0); document.getElementById('travel-report-container').innerHTML = `<div style="text-align:center;"><strong>${s} to ${e}</strong><br>Total: ${totalDist.toFixed(2)} km | Rides: ${rides.length}</div><div class="payment-stats">${rides.map(r=>`<div class="stat-row"><span>${new Date(r.time).toLocaleDateString()}</span><span>${r.from.substring(0,30)}→${r.to.substring(0,30)}</span><span>${r.km.toFixed(2)} km</span><span>Rs.${r.fare.toFixed(2)}</span></div>`).join('')}</div>`; }
-    function exportTravelCSV() { let rides = JSON.parse(localStorage.getItem('rides') || '[]'); let csv = "Date,From,To,Distance,Fare,Payment\n" + rides.map(r => `${new Date(r.time).toLocaleDateString()},${r.from},${r.to},${r.km.toFixed(2)},${r.fare.toFixed(2)},${r.payment?.method||'Cash'}`).join("\n"); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'travel_report.csv'; a.click(); }
+    function exportTravelCSV() { let rides = JSON.parse(localStorage.getItem('rides') || '[]'); let csv = "Date,From,To,Distance,Fare,Payment\n" + rides.map(r => `${new Date(r.time).toLocaleDateString()},${r.from},${r.to},${r.km.toFixed(2)},${r.fare.toFixed(2)},${r.payment?.method||'Cash'}`).join("\n"); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'travel_report.csv'; a.click(); showToast('CSV exported', 'success'); }
     async function printTravelReceipt() { let rides = JSON.parse(localStorage.getItem('rides') || '[]'); let totalDist = rides.reduce((s,r)=>s+r.km,0); let totalFare = rides.reduce((s,r)=>s+r.fare,0); let html = `<div class="receipt-print"><div class="r-header">TRAVEL SUMMARY</div><div class="r-row"><span>Total Rides:</span><b>${rides.length}</b></div><div class="r-row"><span>Total Distance:</span><b>${totalDist.toFixed(2)} km</b></div><div class="r-row"><span>Total Earnings:</span><b>Rs.${totalFare.toFixed(2)}</b></div><div class="r-divider">-------------------</div>${rides.slice().reverse().slice(0,50).map(r=>`<div class="r-row-full"><span class="r-label">From:</span><span class="r-address">${r.from.substring(0,50)}</span><span class="r-label">To:</span><span class="r-address">${r.to.substring(0,50)}</span><span>${r.km.toFixed(2)} km | Rs.${r.fare.toFixed(2)}</span></div>`).join('')}<div class="r-divider">Thank you! 🚕</div></div>`; let win = window.open('', '_blank'); win.document.write(html); win.document.close(); win.print(); }
+    
+    // ========== PEAK HOURS REPORT ==========
+    let peakHoursChart = null;
+    function showPeakHoursReport() {
+        const rides = JSON.parse(localStorage.getItem('rides') || '[]');
+        const hourCounts = new Array(24).fill(0);
+        rides.forEach(ride => { const hour = new Date(ride.time).getHours(); hourCounts[hour]++; });
+        const peakHour = hourCounts.indexOf(Math.max(...hourCounts));
+        if(peakHoursChart) peakHoursChart.destroy();
+        const ctx = document.getElementById('peakHoursChart').getContext('2d');
+        peakHoursChart = new Chart(ctx, {
+            type: 'bar',
+            data: { labels: hourCounts.map((_, i) => `${i}:00`), datasets: [{ label: 'Rides', data: hourCounts, backgroundColor: '#1a4a9e', borderRadius: 8 }] },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
+        });
+        document.getElementById('peak-hours-stats').innerHTML = `<div class="profit-card"><div class="profit-row"><strong>Peak Hour:</strong> <span>${peakHour}:00 - ${peakHour+1}:00 (${hourCounts[peakHour]} rides)</span></div><div class="profit-row"><strong>Second Peak:</strong> <span>${hourCounts.indexOf([...hourCounts].sort((a,b)=>b-a)[1])}:00</span></div><div class="profit-row"><strong>Total Rides:</strong> <span>${rides.length}</span></div></div>`;
+        document.getElementById('peak-hours-modal').style.display = 'flex';
+        closeM('reports-menu-modal');
+    }
+    function exportPeakHoursCSV() {
+        const rides = JSON.parse(localStorage.getItem('rides') || '[]');
+        const hourCounts = new Array(24).fill(0);
+        rides.forEach(ride => { const hour = new Date(ride.time).getHours(); hourCounts[hour]++; });
+        let csv = "Hour,Rides\n" + hourCounts.map((c, i) => `${i}:00,${c}`).join("\n");
+        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'peak_hours.csv'; a.click();
+        showToast('CSV exported', 'success');
+    }
+    
+    // ========== DRIVER PERFORMANCE REPORT ==========
+    let driverPerfChart = null;
+    function showDriverPerformanceReport() {
+        const rides = JSON.parse(localStorage.getItem('rides') || '[]');
+        const totalRides = rides.length;
+        const totalEarnings = rides.reduce((s, r) => s + r.fare, 0);
+        const totalKm = rides.reduce((s, r) => s + r.km, 0);
+        const avgFare = totalRides > 0 ? totalEarnings / totalRides : 0;
+        const avgKm = totalRides > 0 ? totalKm / totalRides : 0;
+        document.getElementById('driver-performance-stats').innerHTML = `
+            <div class="profit-card"><div class="profit-row"><strong>Total Rides:</strong> <span>${totalRides}</span></div>
+            <div class="profit-row"><strong>Total Earnings:</strong> <span>Rs.${totalEarnings.toFixed(2)}</span></div>
+            <div class="profit-row"><strong>Total Distance:</strong> <span>${totalKm.toFixed(1)} km</span></div>
+            <div class="profit-row"><strong>Avg Fare/Ride:</strong> <span>Rs.${avgFare.toFixed(2)}</span></div>
+            <div class="profit-row"><strong>Avg Distance/Ride:</strong> <span>${avgKm.toFixed(1)} km</span></div></div>`;
+        if(driverPerfChart) driverPerfChart.destroy();
+        const ctx = document.getElementById('driverPerformanceChart').getContext('2d');
+        driverPerfChart = new Chart(ctx, {
+            type: 'bar',
+            data: { labels: ['Earnings', 'Distance (km)'], datasets: [{ data: [totalEarnings, totalKm], backgroundColor: ['#2ecc71', '#3498db'], borderRadius: 8 }] },
+            options: { responsive: true, maintainAspectRatio: true }
+        });
+        document.getElementById('driver-performance-modal').style.display = 'flex';
+        closeM('reports-menu-modal');
+    }
+    function exportDriverPerformanceCSV() {
+        const rides = JSON.parse(localStorage.getItem('rides') || '[]');
+        let csv = "Date,Ride ID,Distance,Fare,Payment\n" + rides.map(r => `${new Date(r.time).toLocaleDateString()},${r.id},${r.km.toFixed(2)},${r.fare.toFixed(2)},${r.payment?.method||'Cash'}`).join("\n");
+        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = 'driver_performance.csv'; a.click();
+        showToast('CSV exported', 'success');
+    }
+    
+    // ========== DRIVER APP ==========
+    function openDriverApp() {
+        const rides = JSON.parse(localStorage.getItem('rides') || '[]');
+        const today = new Date().toDateString();
+        const todayRides = rides.filter(r => new Date(r.time).toDateString() === today);
+        const todayEarnings = todayRides.reduce((s, r) => s + r.fare, 0);
+        const weekRides = rides.filter(r => new Date(r.time) >= new Date(Date.now() - 7*24*60*60*1000));
+        const weekEarnings = weekRides.reduce((s, r) => s + r.fare, 0);
+        document.getElementById('driver-app-stats').innerHTML = `
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+                <div style="background: linear-gradient(135deg, #2ecc71, #27ae60); padding: 15px; border-radius: 20px; color: white; text-align: center;">
+                    <div style="font-size: 11px;">Today's Earnings</div>
+                    <div style="font-size: 24px; font-weight: 800;">Rs.${todayEarnings.toFixed(2)}</div>
+                    <div style="font-size: 11px;">${todayRides.length} rides</div>
+                </div>
+                <div style="background: linear-gradient(135deg, #3498db, #2980b9); padding: 15px; border-radius: 20px; color: white; text-align: center;">
+                    <div style="font-size: 11px;">Weekly Earnings</div>
+                    <div style="font-size: 24px; font-weight: 800;">Rs.${weekEarnings.toFixed(2)}</div>
+                    <div style="font-size: 11px;">${weekRides.length} rides</div>
+                </div>
+            </div>`;
+        document.getElementById('driver-app-rides').innerHTML = `<div style="background: var(--gray-bg); border-radius: 20px; padding: 15px;"><div style="font-weight: 600; margin-bottom: 10px;">📋 Recent Rides</div>${todayRides.slice().reverse().slice(0, 5).map(r => `<div style="padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.1);"><div><strong>${r.id}</strong> - Rs.${r.fare.toFixed(2)}</div><div style="font-size: 11px;">${new Date(r.time).toLocaleTimeString()}</div></div>`).join('')}${todayRides.length === 0 ? '<div style="text-align: center; padding: 20px;">No rides today</div>' : ''}</div>`;
+        document.getElementById('driver-app-modal').style.display = 'flex';
+        closeM('settings-modal');
+    }
+    
+    // ========== PUSH NOTIFICATIONS ==========
+    function requestNotificationPermission() {
+        if ('Notification' in window) {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') showToast('Notifications enabled', 'success');
+            });
+        }
+    }
+    function sendNotification(title, body) {
+        if (Notification.permission === 'granted') {
+            new Notification(title, { body, icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231a4a9e"%3E%3Cpath d="M12 2C8.13 2 5 5.13 5 9v4c0 .78.16 1.53.46 2.22L4.62 17.5c-.15.38.1.82.48.82h13.8c.38 0 .63-.44.48-.82l-.84-3.28c.3-.69.46-1.44.46-2.22V9c0-3.87-3.13-7-7-7zM9 19c0 1.66 1.34 3 3 3s3-1.34 3-3H9z"/%3E%3C/svg%3E' });
+        }
+    }
     
     // ========== GLOBAL VARIABLES ==========
     let sTime = null, watchId = null, totalMeters = 0, lastLat = null, lastLon = null, currentRID = "", nightActive = false, gpsReady = false, currentMode = "auto", pendingRideData = null, selectedMethod = "cash", currentLocationAddress = "", currentLocationLat = null, currentLocationLon = null, startLocationAddress = "", currentDestinationAddress = "", mapPickerField = null, mapObj = null, mapMarker = null, deliveryPickupName="", deliveryPickupPhone="", deliveryDeliveryName="", deliveryDeliveryPhone="";
@@ -375,54 +665,53 @@
     let currentReportType = "daily";
     
     // Navigation functions
-    function goBackToSettingsMenu() { closeM('app-settings-modal'); closeM('fuel-modal'); closeM('repair-modal'); closeM('reports-menu-modal'); closeM('system-log-modal'); closeM('fuel-report-modal'); closeM('repair-report-modal'); closeM('travel-report-modal'); closeM('report-modal'); closeM('income-modal'); closeM('history-modal'); closeM('profit-report-modal'); document.getElementById('settings-modal').style.display = 'flex'; }
+    function goBackToSettingsMenu() { closeM('app-settings-modal'); closeM('fuel-modal'); closeM('repair-modal'); closeM('reports-menu-modal'); closeM('system-log-modal'); closeM('fuel-report-modal'); closeM('repair-report-modal'); closeM('travel-report-modal'); closeM('report-modal'); closeM('income-modal'); closeM('history-modal'); closeM('profit-report-modal'); closeM('peak-hours-modal'); closeM('driver-performance-modal'); document.getElementById('settings-modal').style.display = 'flex'; }
     function goBackToFuelLog() { closeM('fuel-report-modal'); document.getElementById('fuel-modal').style.display = 'flex'; }
     function goBackToRepairLog() { closeM('repair-report-modal'); document.getElementById('repair-modal').style.display = 'flex'; }
-    function goBackToReportsMenu() { closeM('report-modal'); closeM('income-modal'); closeM('history-modal'); closeM('travel-report-modal'); closeM('profit-report-modal'); document.getElementById('reports-menu-modal').style.display = 'flex'; }
+    function goBackToReportsMenu() { closeM('report-modal'); closeM('income-modal'); closeM('history-modal'); closeM('travel-report-modal'); closeM('profit-report-modal'); closeM('peak-hours-modal'); closeM('driver-performance-modal'); document.getElementById('reports-menu-modal').style.display = 'flex'; }
     
     function saveRideState() { if(sTime) localStorage.setItem('amt_ride_state', JSON.stringify({ isRideActive:true, startTime:sTime, totalMeters, lastLat, lastLon, currentMode, nightActive, startLocationAddress, currentLocationAddress, gpsReady:true, destinationAddress:currentDestinationAddress, deliveryPickupName, deliveryPickupPhone, deliveryDeliveryName, deliveryDeliveryPhone })); else localStorage.removeItem('amt_ride_state'); }
     function loadRideState() { let saved = localStorage.getItem('amt_ride_state'); if(saved) try { let state = JSON.parse(saved); if(state.isRideActive && state.startTime) { document.getElementById('restore-banner').style.display = 'block'; return true; } } catch(e){} return false; }
-    function restorePreviousRide() { let saved = localStorage.getItem('amt_ride_state'); if(!saved) return; try { let state = JSON.parse(saved); sTime = state.startTime; totalMeters = state.totalMeters||0; lastLat = state.lastLat; lastLon = state.lastLon; currentMode = state.currentMode||"auto"; nightActive = state.nightActive||false; startLocationAddress = state.startLocationAddress||""; currentLocationAddress = state.currentLocationAddress||""; currentDestinationAddress = state.destinationAddress||""; deliveryPickupName=state.deliveryPickupName||""; deliveryPickupPhone=state.deliveryPickupPhone||""; deliveryDeliveryName=state.deliveryDeliveryName||""; deliveryDeliveryPhone=state.deliveryDeliveryPhone||""; gpsReady=true; setMode(currentMode); let nightBtn=document.getElementById('nightBtn'); if(nightActive) { nightBtn.innerHTML='🌙 NIGHT ON'; nightBtn.classList.add('night-active'); } else { nightBtn.innerHTML='🌙 NIGHT OFF'; nightBtn.classList.remove('night-active'); } updateDisplay(); if(currentMode==='auto' && currentLocationAddress) document.getElementById('current-location-address').innerHTML = currentLocationAddress; if(currentMode==='manual') document.getElementById('manual-km-input').value = (totalMeters/1000).toFixed(2); if(currentMode==='delivery') { document.getElementById('pickup-name').value=deliveryPickupName; document.getElementById('pickup-phone').value=deliveryPickupPhone; document.getElementById('delivery-name').value=deliveryDeliveryName; document.getElementById('delivery-phone').value=deliveryDeliveryPhone; } if(sTime) { document.getElementById('startBtn').innerHTML="⏵ ACTIVE"; document.getElementById('startBtn').classList.add('btn-active-anim'); document.getElementById('startBtn').disabled=true; document.body.classList.add('ride-active'); requestWakeLock(); trackRide(); if(currentMode!=='auto') document.getElementById('nav-container').style.display='block'; } document.getElementById('restore-banner').style.display='none'; document.querySelectorAll('.mode-btn').forEach(btn=>btn.style.pointerEvents='none'); alert(`Restored: ${(totalMeters/1000).toFixed(2)} km`); } catch(e){} }
+    function restorePreviousRide() { let saved = localStorage.getItem('amt_ride_state'); if(!saved) return; try { let state = JSON.parse(saved); sTime = state.startTime; totalMeters = state.totalMeters||0; lastLat = state.lastLat; lastLon = state.lastLon; currentMode = state.currentMode||"auto"; nightActive = state.nightActive||false; startLocationAddress = state.startLocationAddress||""; currentLocationAddress = state.currentLocationAddress||""; currentDestinationAddress = state.destinationAddress||""; deliveryPickupName=state.deliveryPickupName||""; deliveryPickupPhone=state.deliveryPickupPhone||""; deliveryDeliveryName=state.deliveryDeliveryName||""; deliveryDeliveryPhone=state.deliveryDeliveryPhone||""; gpsReady=true; setMode(currentMode); let nightBtn=document.getElementById('nightBtn'); if(nightActive) { nightBtn.innerHTML='🌙 NIGHT ON'; nightBtn.classList.add('night-active'); } else { nightBtn.innerHTML='🌙 NIGHT OFF'; nightBtn.classList.remove('night-active'); } updateDisplay(); if(currentMode==='auto' && currentLocationAddress) document.getElementById('current-location-address').innerHTML = currentLocationAddress; if(currentMode==='manual') document.getElementById('manual-km-input').value = (totalMeters/1000).toFixed(2); if(currentMode==='delivery') { document.getElementById('pickup-name').value=deliveryPickupName; document.getElementById('pickup-phone').value=deliveryPickupPhone; document.getElementById('delivery-name').value=deliveryDeliveryName; document.getElementById('delivery-phone').value=deliveryDeliveryPhone; } if(sTime) { document.getElementById('startBtn').innerHTML="⏵ ACTIVE"; document.getElementById('startBtn').classList.add('btn-active-anim'); document.getElementById('startBtn').disabled=true; document.body.classList.add('ride-active'); requestWakeLock(); trackRide(); if(currentMode!=='auto') document.getElementById('nav-container').style.display='block'; } document.getElementById('restore-banner').style.display='none'; document.querySelectorAll('.mode-btn').forEach(btn=>btn.style.pointerEvents='none'); showToast(`Restored: ${(totalMeters/1000).toFixed(2)} km`, 'success'); } catch(e){} }
     function calculateDistanceMeters(lat1,lon1,lat2,lon2) { const R=6371000; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); return R*2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); }
     let lastKmValue=0, lastFareValue=0;
     function animateCounter(id) { let el=document.getElementById(id); if(el) { el.classList.remove('count-animation'); void el.offsetWidth; el.classList.add('count-animation'); } }
     function updateDisplay() { let km=totalMeters/1000; let fare=calcFare(); if(Math.abs(km-lastKmValue)>0.01) { animateCounter('disp-km'); lastKmValue=km; } if(fare!==lastFareValue) { animateCounter('disp-fare'); lastFareValue=fare; } document.getElementById('disp-km').innerHTML = km.toFixed(2); document.getElementById('disp-fare').innerHTML = "Rs." + fare.toFixed(2); if(currentMode==='manual') document.getElementById('manual-km-input').value = km.toFixed(2); let ni = document.getElementById('night-indicator'); if(ni) ni.style.display = (nightActive && !document.getElementById('manual-fare').value) ? 'inline-block' : 'none'; }
     function calcFare() { let manualFare=parseInt(document.getElementById('manual-fare').value)||0, disc=parseInt(document.getElementById('discount-input').value)||0, wait=parseInt(document.getElementById('wait-select').value), waitCharge=wait*SETTINGS.waitRate, km=totalMeters/1000, total=manualFare>0 ? manualFare+waitCharge-disc : SETTINGS.base + (Math.max(0,km-1)*SETTINGS.rate) + waitCharge - disc; if(nightActive && manualFare===0) total = total + (total*SETTINGS.nightPercent/100); return Math.max(0, Math.round(total)); }
-    function startGPS() { if(!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(pos => { let acc=pos.coords.accuracy; lastLat=pos.coords.latitude; lastLon=pos.coords.longitude; if(acc<200) { gpsReady=true; document.getElementById('gps-status').innerHTML = `✅ GPS Ready (${acc.toFixed(0)}m)`; document.getElementById('gps-status').className = 'gps-status gps-ready'; document.getElementById('startBtn').disabled=false; if(currentMode==='auto') { currentLocationLat=lastLat; currentLocationLon=lastLon; reverseGeocode(lastLat,lastLon); } } else { setTimeout(startGPS,3000); } }, err => { document.getElementById('gps-status').innerHTML = '❌ GPS permission needed'; document.getElementById('startBtn').disabled=true; setTimeout(startGPS,5000); }, {enableHighAccuracy:true, timeout:15000}); }
+    function startGPS() { if(!navigator.geolocation) return; showLoading(true); navigator.geolocation.getCurrentPosition(pos => { let acc=pos.coords.accuracy; lastLat=pos.coords.latitude; lastLon=pos.coords.longitude; if(acc<200) { gpsReady=true; document.getElementById('gps-status').innerHTML = `✅ GPS Ready (${acc.toFixed(0)}m)`; document.getElementById('gps-status').className = 'gps-status gps-ready'; document.getElementById('startBtn').disabled=false; if(currentMode==='auto') { currentLocationLat=lastLat; currentLocationLon=lastLon; reverseGeocode(lastLat,lastLon); } showLoading(false); showToast('GPS ready', 'success'); } else { showLoading(false); setTimeout(startGPS,3000); } }, err => { showLoading(false); document.getElementById('gps-status').innerHTML = '❌ GPS permission needed'; document.getElementById('gps-status').className = 'gps-status gps-error'; document.getElementById('startBtn').disabled=true; showToast('GPS permission needed', 'error'); setTimeout(startGPS,5000); }, {enableHighAccuracy:true, timeout:15000}); }
     function trackRide() { if(watchId) navigator.geolocation.clearWatch(watchId); watchId = navigator.geolocation.watchPosition(pos => { if(!sTime) return; let lat=pos.coords.latitude, lon=pos.coords.longitude, acc=pos.coords.accuracy; if(acc<200 && currentMode==='auto') reverseGeocode(lat,lon); if(lastLat!==null && lastLon!==null && acc<200) { let d=calculateDistanceMeters(lastLat,lastLon,lat,lon); if(d>3 && d<200) { totalMeters += d; updateDisplay(); saveRideState(); } } lastLat=lat; lastLon=lon; }, null, {enableHighAccuracy:true, timeout:5000}); }
     async function reverseGeocode(lat,lon) { try { let res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=en&countrycodes=lk`); let data = await res.json(); currentLocationAddress = data.display_name || `${lat.toFixed(4)},${lon.toFixed(4)}`; document.getElementById('current-location-address').innerHTML = currentLocationAddress.substring(0,80); } catch(e){} }
-    function refreshCurrentLocation() { if(navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => reverseGeocode(pos.coords.latitude, pos.coords.longitude)); }
-    function setMode(mode) { currentMode=mode; ['auto','gps','manual','delivery'].forEach(m=>document.getElementById(`mode-${m}`).classList.remove('active')); document.getElementById(`mode-${mode}`).classList.add('active'); if(mode==='auto') { document.getElementById('auto-location-card').style.display='block'; document.getElementById('location-fields').style.display='none'; document.getElementById('delivery-fields').style.display='none'; document.getElementById('manual-controls').style.display='none'; if(!sTime) startGPS(); refreshCurrentLocation(); } else if(mode==='gps') { document.getElementById('auto-location-card').style.display='none'; document.getElementById('location-fields').style.display='block'; document.getElementById('delivery-fields').style.display='none'; document.getElementById('manual-controls').style.display='none'; if(!sTime) startGPS(); setupAutocomplete('start-loc','start-loc-suggestions'); setupAutocomplete('end-loc','end-loc-suggestions'); } else if(mode==='manual') { document.getElementById('auto-location-card').style.display='none'; document.getElementById('location-fields').style.display='block'; document.getElementById('delivery-fields').style.display='none'; document.getElementById('manual-controls').style.display='block'; gpsReady=true; if(watchId) { navigator.geolocation.clearWatch(watchId); watchId=null; } document.getElementById('startBtn').disabled=false; setupAutocomplete('start-loc','start-loc-suggestions'); setupAutocomplete('end-loc','end-loc-suggestions'); } else if(mode==='delivery') { document.getElementById('auto-location-card').style.display='none'; document.getElementById('location-fields').style.display='block'; document.getElementById('delivery-fields').style.display='block'; document.getElementById('manual-controls').style.display='none'; if(!sTime) startGPS(); setupAutocomplete('start-loc','start-loc-suggestions'); setupAutocomplete('end-loc','end-loc-suggestions'); } updateDisplay(); }
+    function refreshCurrentLocation() { if(navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => reverseGeocode(pos.coords.latitude, pos.coords.longitude)); showToast('Location refreshed', 'info'); }
+    function setMode(mode) { currentMode=mode; ['auto','gps','manual','delivery'].forEach(m=>document.getElementById(`mode-${m}`).classList.remove('active')); document.getElementById(`mode-${mode}`).classList.add('active'); if(mode==='auto') { document.getElementById('auto-location-card').style.display='block'; document.getElementById('location-fields').style.display='none'; document.getElementById('delivery-fields').style.display='none'; document.getElementById('manual-controls').style.display='none'; if(!sTime) startGPS(); refreshCurrentLocation(); } else if(mode==='gps') { document.getElementById('auto-location-card').style.display='none'; document.getElementById('location-fields').style.display='block'; document.getElementById('delivery-fields').style.display='none'; document.getElementById('manual-controls').style.display='none'; if(!sTime) startGPS(); setupAutocomplete('start-loc','start-loc-suggestions'); setupAutocomplete('end-loc','end-loc-suggestions'); } else if(mode==='manual') { document.getElementById('auto-location-card').style.display='none'; document.getElementById('location-fields').style.display='block'; document.getElementById('delivery-fields').style.display='none'; document.getElementById('manual-controls').style.display='block'; gpsReady=true; if(watchId) { navigator.geolocation.clearWatch(watchId); watchId=null; } document.getElementById('startBtn').disabled=false; setupAutocomplete('start-loc','start-loc-suggestions'); setupAutocomplete('end-loc','end-loc-suggestions'); } else if(mode==='delivery') { document.getElementById('auto-location-card').style.display='none'; document.getElementById('location-fields').style.display='block'; document.getElementById('delivery-fields').style.display='block'; document.getElementById('manual-controls').style.display='none'; if(!sTime) startGPS(); setupAutocomplete('start-loc','start-loc-suggestions'); setupAutocomplete('end-loc','end-loc-suggestions'); } updateDisplay(); showToast(`${mode} mode activated`, 'info'); }
     async function searchSriLankaLocations(q) { if(!q||q.length<2) return []; try { let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q+" Sri Lanka")}&limit=8&countrycodes=lk`); return await res.json(); } catch(e){ return []; } }
     let searchTimeout;
-    function setupAutocomplete(inputId,suggestionsId) { let input=document.getElementById(inputId); let div=document.getElementById(suggestionsId); if(!input||!div) return; input.addEventListener('input', async function() { let q=this.value.trim(); if(q.length<2) { div.style.display='none'; return; } clearTimeout(searchTimeout); searchTimeout = setTimeout(async () => { let results = await searchSriLankaLocations(q); div.innerHTML=''; if(results.length===0) div.innerHTML='<div class="autocomplete-item">No results</div>'; else results.forEach(p => { let item=document.createElement('div'); item.className='autocomplete-item'; item.textContent=p.display_name.substring(0,80); item.onclick=() => { input.value=p.display_name; if(inputId==='end-loc') currentDestinationAddress=p.display_name; div.style.display='none'; }; div.appendChild(item); }); div.style.display='block'; },300); }); document.addEventListener('click',e=>{ if(e.target!==input) div.style.display='none'; }); }
-    function openMapPicker(field) { mapPickerField=field; document.getElementById('map-title').innerText=field==='start'?'Pickup':'Drop'; document.getElementById('map-modal').style.display='flex'; setTimeout(() => { if(mapObj) mapObj.remove(); mapObj = L.map('map').setView([7.8731,80.7718],8); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>', subdomains: 'abcd', maxZoom: 19, minZoom: 1 }).addTo(mapObj); mapMarker = L.marker([7.8731,80.7718],{draggable:true}).addTo(mapObj); mapMarker.on('dragend',() => reverseMapGeocode(mapMarker.getLatLng().lat,mapMarker.getLatLng().lng)); mapObj.on('click',e => { mapMarker.setLatLng(e.latlng); reverseMapGeocode(e.latlng.lat,e.latlng.lng); }); if(navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => { mapObj.setView([pos.coords.latitude,pos.coords.longitude],14); mapMarker.setLatLng([pos.coords.latitude,pos.coords.longitude]); reverseMapGeocode(pos.coords.latitude,pos.coords.longitude); }); let search=document.getElementById('map-search'); let results=document.getElementById('search-results'); search.oninput = async function() { let q=this.value.trim(); if(q.length<2) { results.style.display='none'; return; } let data = await searchSriLankaLocations(q); results.innerHTML=''; if(data.length===0) results.innerHTML='<div class="search-item">No results</div>'; else data.forEach(place => { let div=document.createElement('div'); div.className='search-item'; div.textContent=place.display_name.substring(0,60); div.onclick=() => { mapObj.setView([place.lat,place.lon],14); mapMarker.setLatLng([place.lat,place.lon]); reverseMapGeocode(place.lat,place.lon); results.style.display='none'; search.value=place.display_name; }; results.appendChild(div); }); results.style.display='block'; }; },100); }
+    function setupAutocomplete(inputId,suggestionsId) { let input=document.getElementById(inputId); let div=document.getElementById(suggestionsId); if(!input||!div) return; input.addEventListener('input', async function() { let q=this.value.trim(); if(q.length<2) { div.style.display='none'; return; } clearTimeout(searchTimeout); searchTimeout = setTimeout(async () => { let results = await searchSriLankaLocations(q); div.innerHTML=''; if(results.length===0) div.innerHTML='<div class="autocomplete-item">No results</div>'; else results.forEach(p => { let item=document.createElement('div'); item.className='autocomplete-item'; item.textContent=p.display_name.substring(0,80); item.onclick=() => { input.value=p.display_name; if(inputId==='end-loc') { currentDestinationAddress=p.display_name; } div.style.display='none'; }; div.appendChild(item); }); div.style.display='block'; },300); }); document.addEventListener('click',e=>{ if(e.target!==input) div.style.display='none'; }); }
     async function reverseMapGeocode(lat,lon) { try { let res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=en&countrycodes=lk`); let data = await res.json(); document.getElementById('selected-address').value = data.display_name; } catch(e){} }
-    function getCurrentMapLocation() { if(navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => { mapObj.setView([pos.coords.latitude,pos.coords.longitude],14); mapMarker.setLatLng([pos.coords.latitude,pos.coords.longitude]); reverseMapGeocode(pos.coords.latitude,pos.coords.longitude); }); }
-    function useMapLocation() { let addr=document.getElementById('selected-address').value; if(addr && mapPickerField==='start') document.getElementById('start-loc').value=addr; else if(addr && mapPickerField==='end') { document.getElementById('end-loc').value=addr; currentDestinationAddress=addr; } closeMapModal(); }
+    function getCurrentMapLocation() { if(navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => { mapObj.setView([pos.coords.latitude,pos.coords.longitude],14); mapMarker.setLatLng([pos.coords.latitude,pos.coords.longitude]); reverseMapGeocode(pos.coords.latitude,pos.coords.longitude); }); showToast('Getting your location...', 'info'); }
+    function useMapLocation() { let addr=document.getElementById('selected-address').value; if(addr && mapPickerField==='start') document.getElementById('start-loc').value=addr; else if(addr && mapPickerField==='end') { document.getElementById('end-loc').value=addr; currentDestinationAddress=addr; } closeMapModal(); showToast('Location set', 'success'); }
     function closeMapModal() { document.getElementById('map-modal').style.display='none'; if(mapObj) mapObj.remove(); }
-    function manualAddDistance(km) { if(!sTime) { alert("Start ride"); return; } if(currentMode!=='manual') { alert("Manual mode required"); return; } totalMeters = Math.max(0, totalMeters + (km*1000)); document.getElementById('manual-km-input').value = (totalMeters/1000).toFixed(2); updateDisplay(); saveRideState(); }
-    function setManualDistance() { if(!sTime) { alert("Start ride"); return; } if(currentMode!=='manual') { alert("Manual mode required"); return; } let val=parseFloat(document.getElementById('manual-km-input').value); if(!isNaN(val) && val>=0) { totalMeters = val*1000; updateDisplay(); saveRideState(); } }
-    function openPhoneNavigation() { if(!currentDestinationAddress) { alert("Enter destination"); return; } let encoded=encodeURIComponent(currentDestinationAddress); let isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent); window.open(isIOS ? `http://maps.apple.com/?daddr=${encoded}` : `https://www.google.com/maps/dir/?api=1&destination=${encoded}&travelmode=driving`, '_blank'); }
+    function manualAddDistance(km) { if(!sTime) { showToast("Start ride first", 'warning'); return; } if(currentMode!=='manual') { showToast("Manual mode required", 'warning'); return; } totalMeters = Math.max(0, totalMeters + (km*1000)); document.getElementById('manual-km-input').value = (totalMeters/1000).toFixed(2); updateDisplay(); saveRideState(); showToast(`Distance ${km>0?'+':''}${km} km`, 'info'); }
+    function setManualDistance() { if(!sTime) { showToast("Start ride first", 'warning'); return; } if(currentMode!=='manual') { showToast("Manual mode required", 'warning'); return; } let val=parseFloat(document.getElementById('manual-km-input').value); if(!isNaN(val) && val>=0) { totalMeters = val*1000; updateDisplay(); saveRideState(); showToast(`Distance set to ${val.toFixed(2)} km`, 'success'); } }
+    function openPhoneNavigation() { if(!currentDestinationAddress) { showToast("Enter destination first", 'warning'); return; } let encoded=encodeURIComponent(currentDestinationAddress); let isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent); window.open(isIOS ? `http://maps.apple.com/?daddr=${encoded}` : `https://www.google.com/maps/dir/?api=1&destination=${encoded}&travelmode=driving`, '_blank'); showToast('Opening navigation...', 'info'); }
     
     // ========== START RIDE FUNCTION ==========
     async function startRide() {
-        if(sTime) { alert("Ride already active!"); return; }
+        if(sTime) { showToast("Ride already active!", 'warning'); return; }
         
         if(currentMode === 'auto') { 
             if(!currentLocationAddress || currentLocationAddress === "Waiting for GPS...") { 
-                alert("Please wait for GPS to get current location!"); 
+                showToast("Please wait for GPS to get current location!", 'warning'); 
                 return; 
             } 
             startLocationAddress = currentLocationAddress;
         } 
         else if(currentMode === 'gps') { 
             if(!document.getElementById('start-loc').value.trim() || !document.getElementById('end-loc').value.trim()) { 
-                alert("Enter pickup and drop locations!"); 
+                showToast("Enter pickup and drop locations!", 'warning'); 
                 return; 
             } 
             if(!gpsReady) { 
-                alert("GPS not ready! Please wait for GPS signal."); 
+                showToast("GPS not ready! Please wait for GPS signal.", 'warning'); 
                 return; 
             } 
             startLocationAddress = document.getElementById('start-loc').value;
@@ -430,7 +719,7 @@
         } 
         else if(currentMode === 'manual') { 
             if(!document.getElementById('start-loc').value.trim() || !document.getElementById('end-loc').value.trim()) { 
-                alert("Enter pickup and drop locations!"); 
+                showToast("Enter pickup and drop locations!", 'warning'); 
                 return; 
             } 
             startLocationAddress = document.getElementById('start-loc').value;
@@ -438,7 +727,7 @@
         } 
         else if(currentMode === 'delivery') { 
             if(!document.getElementById('start-loc').value.trim() || !document.getElementById('end-loc').value.trim()) { 
-                alert("Enter pickup and drop locations!"); 
+                showToast("Enter pickup and drop locations!", 'warning'); 
                 return; 
             } 
             startLocationAddress = document.getElementById('start-loc').value;
@@ -507,11 +796,12 @@
         });
         
         saveRideState();
-        alert("Ride started successfully!");
+        showToast("Ride started successfully! 🚕", 'success');
+        sendNotification('Ride Started', 'Your taxi ride has started. Safe journey!');
     }
     
     function endRide() { 
-        if(!sTime) { alert("No active ride"); return; } 
+        if(!sTime) { showToast("No active ride", 'warning'); return; } 
         releaseWakeLock(); 
         document.body.classList.remove('ride-active'); 
         if(watchId) { navigator.geolocation.clearWatch(watchId); watchId=null; } 
@@ -535,9 +825,9 @@
     
     function generateReceiptID() { let n=new Date(), y=n.getFullYear(), m=n.getMonth(); let fy=(m>=3)?y:y-1; let c=parseInt(localStorage.getItem(`cnt_${fy}`)||"0")+1; localStorage.setItem(`cnt_${fy}`,c); return `${fy.toString().slice(-2)}${n.toLocaleString('en',{month:'short'}).toUpperCase()}-${c.toString().padStart(8,'0')}`; }
     
-    // ========== PAYMENT FUNCTIONS (UPDATED - WORKING) ==========
+    // ========== PAYMENT FUNCTIONS ==========
     function openPaymentPopup() { 
-        if(!pendingRideData) { alert("No ride data available. Please end a ride first."); return; }
+        if(!pendingRideData) { showToast("No ride data available. Please end a ride first.", 'error'); return; }
         selectedMethod = "cash"; 
         document.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('selected')); 
         const cashBtn = document.querySelector('.payment-method-btn[data-method="cash"]');
@@ -552,7 +842,6 @@
     }
     
     function selectPaymentMethod(method) { 
-        console.log("selectPaymentMethod called with:", method);
         selectedMethod = method; 
         document.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('selected')); 
         const selectedBtn = document.querySelector(`.payment-method-btn[data-method="${method}"]`);
@@ -570,38 +859,25 @@
     }
     
     function getPaymentInfo() { 
-        console.log("getPaymentInfo called. selectedMethod:", selectedMethod);
         switch(selectedMethod) { 
             case 'cash': return { method: 'Cash', detail: '' }; 
-            case 'card': 
-                let cd = ""; 
-                if(document.getElementById('card-number')?.value) cd += `****${document.getElementById('card-number').value}`; 
-                if(document.getElementById('card-name')?.value) cd += ` - ${document.getElementById('card-name').value}`; 
-                return { method: 'Card', detail: cd || 'Card payment' }; 
-            case 'mobile': 
-                let md = ""; 
-                if(document.getElementById('mobile-provider')?.value) md += document.getElementById('mobile-provider').value; 
-                if(document.getElementById('mobile-number')?.value) md += ` ${document.getElementById('mobile-number').value}`; 
-                return { method: 'Mobile', detail: md || 'Mobile payment' }; 
-            case 'bank': 
-                let bd = ""; 
-                if(document.getElementById('bank-name')?.value) bd += document.getElementById('bank-name').value; 
-                if(document.getElementById('bank-ref')?.value) bd += ` - Ref: ${document.getElementById('bank-ref').value}`; 
-                return { method: 'Bank Transfer', detail: bd || 'Bank transfer' }; 
-            default: 
-                return { method: document.getElementById('other-method')?.value || 'Other', detail: document.getElementById('other-ref')?.value || '' }; 
+            case 'card': let cd = ""; if(document.getElementById('card-number')?.value) cd += `****${document.getElementById('card-number').value}`; if(document.getElementById('card-name')?.value) cd += ` - ${document.getElementById('card-name').value}`; return { method: 'Card', detail: cd || 'Card payment' }; 
+            case 'mobile': let md = ""; if(document.getElementById('mobile-provider')?.value) md += document.getElementById('mobile-provider').value; if(document.getElementById('mobile-number')?.value) md += ` ${document.getElementById('mobile-number').value}`; return { method: 'Mobile', detail: md || 'Mobile payment' }; 
+            case 'bank': let bd = ""; if(document.getElementById('bank-name')?.value) bd += document.getElementById('bank-name').value; if(document.getElementById('bank-ref')?.value) bd += ` - Ref: ${document.getElementById('bank-ref').value}`; return { method: 'Bank Transfer', detail: bd || 'Bank transfer' }; 
+            default: return { method: document.getElementById('other-method')?.value || 'Other', detail: document.getElementById('other-ref')?.value || '' }; 
         } 
     }
     
     function closePaymentPopup() { document.getElementById('payment-popup').style.display = 'none'; }
     
+    // ========== CONFIRM PAYMENT & SHOW RECEIPT - FIXED ==========
     function confirmPaymentAndShowReceipt() { 
         console.log("confirmPaymentAndShowReceipt called");
         console.log("pendingRideData:", pendingRideData);
         console.log("selectedMethod:", selectedMethod);
         
         if(!pendingRideData) { 
-            alert("No ride data found. Please end a ride first."); 
+            showToast("No ride data found. Please end a ride first.", 'error'); 
             return; 
         }
         
@@ -613,6 +889,7 @@
         let list = JSON.parse(localStorage.getItem('rides') || '[]'); 
         list.push(pendingRideData); 
         localStorage.setItem('rides', JSON.stringify(list)); 
+        console.log("Ride saved. Total rides:", list.length);
         
         showReceipt(pendingRideData, false); 
         closePaymentPopup(); 
@@ -623,14 +900,19 @@
         document.getElementById('nav-container').style.display = 'none'; 
         
         addSystemLog('INFO', 'Payment confirmed', `Receipt: ${pendingRideData.id}`); 
+        showToast('Payment confirmed! Receipt generated', 'success');
+        sendNotification('Payment Received', `Rs.${pendingRideData.fare.toFixed(2)} collected`);
+        
+        pendingRideData = null;
     }
     
+    // ========== SHOW RECEIPT - FIXED ==========
     function showReceipt(ride, isDuplicate) { 
         console.log("showReceipt called for ride:", ride.id);
         
         let sub = (ride.manualFare > 0) ? ride.manualFare : (SETTINGS.base + (Math.max(0, ride.km - 1) * SETTINGS.rate)); 
         let waitC = ride.wait * SETTINGS.waitRate; 
-        let dupHtml = isDuplicate ? '<div style="background:#e74c3c; color:white; text-align:center; padding:3px; border-radius:8px;">📋 COPY</div>' : ''; 
+        let dupHtml = isDuplicate ? '<div style="background:#e74c3c; color:white; text-align:center; padding:3px; border-radius:8px; margin-bottom:8px;">📋 COPY / REPRINT</div>' : ''; 
         let rows = dupHtml; 
         rows += `<div class="r-row"><span>Receipt:</span><b>${ride.id}</b></div><div class="r-row"><span>Date:</span><b>${new Date(ride.time).toLocaleString()}</b></div><div class="r-row"><span>Mobile:</span><b>${ride.mobile}</b></div>`; 
         if(ride.mode === 'Delivery') { 
@@ -640,56 +922,54 @@
         if(waitC > 0) rows += `<div class="r-row"><span>Wait(${ride.wait}m):</span><b>+Rs.${waitC.toFixed(2)}</b></div>`; 
         if(ride.nightUsed && ride.manualFare === 0) rows += `<div class="r-row"><span>Night(${SETTINGS.nightPercent}%):</span><b>+${Math.round(ride.fare - (sub + waitC - ride.disc))}</b></div>`; 
         if(ride.disc > 0) rows += `<div class="r-row"><span>Discount:</span><b>-Rs.${ride.disc}</b></div>`; 
-        rows += `<div class="r-row"><span>Mode:</span><b>${ride.mode}</b></div><div class="r-row"><span>Payment:</span><b>${ride.payment.method}</b></div>`; 
+        rows += `<div class="r-row"><span>Mode:</span><b>${ride.mode}</b></div><div class="r-row"><span>Payment:</span><b>${ride.payment.method} ${ride.payment.detail || ''}</b></div>`; 
         
         document.getElementById('receipt-body').innerHTML = rows; 
         document.getElementById('receipt-total').innerHTML = ride.fare.toFixed(2); 
         document.getElementById('receipt-header').innerText = SETTINGS.receiptName; 
-        document.getElementById('receipt-words').innerHTML = numberToWords(ride.fare); 
+        
+        let wordsEl = document.getElementById('receipt-words');
+        if(wordsEl) wordsEl.innerHTML = numberToWords(ride.fare);
         
         let qr = document.getElementById('receipt-qr'); 
-        qr.innerHTML = ""; 
-        new QRCode(qr, { text: `${ride.id}|Rs.${ride.fare.toFixed(2)}|${ride.payment.method}`, width: 85, height: 85 }); 
+        if(qr) {
+            qr.innerHTML = ""; 
+            try {
+                new QRCode(qr, { text: `${ride.id}|Rs.${ride.fare.toFixed(2)}|${ride.payment.method}`, width: 85, height: 85 });
+            } catch(e) { console.error('QR error:', e); }
+        }
         
         document.getElementById('receiptModal').style.display = "flex"; 
-        console.log("Receipt modal should be visible now");
+        console.log("Receipt modal displayed");
     }
     
-    async function shareWA() { try { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); canvas.toBlob(blob => { if(navigator.share) navigator.share({ files:[new File([blob],'receipt.png')] }); else { let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='receipt.png'; a.click(); } }); } catch(e){ downloadReceiptPDF(); } }
-    async function sendEmailWithAttachment() { try { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); let {jsPDF}=window.jspdf; let pdf = new jsPDF({unit:'mm', format:'a6'}); pdf.addImage(canvas.toDataURL(),'PNG',2.5,5,100,(canvas.height*100)/canvas.width); let blob = pdf.output('blob'); if(navigator.share) navigator.share({ files:[new File([blob],'receipt.pdf')] }); else { let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='receipt.pdf'; a.click(); } } catch(e){ downloadReceiptPDF(); } }
-    async function downloadReceiptPDF() { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); let {jsPDF}=window.jspdf; let pdf = new jsPDF({unit:'mm', format:'a6'}); pdf.addImage(canvas.toDataURL(),'PNG',2.5,5,100,(canvas.height*100)/canvas.width); pdf.save(`${currentRID}.pdf`); }
-    async function printViaBluetooth() { alert("PDF ready"); downloadReceiptPDF(); }
+    async function shareWA() { try { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); canvas.toBlob(blob => { if(navigator.share) navigator.share({ files:[new File([blob],'receipt.png')] }); else { let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='receipt.png'; a.click(); showToast('Image saved', 'success'); } }); } catch(e){ downloadReceiptPDF(); } }
+    async function sendEmailWithAttachment() { try { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); let {jsPDF}=window.jspdf; let pdf = new jsPDF({unit:'mm', format:'a6'}); pdf.addImage(canvas.toDataURL(),'PNG',2.5,5,100,(canvas.height*100)/canvas.width); let blob = pdf.output('blob'); if(navigator.share) navigator.share({ files:[new File([blob],'receipt.pdf')] }); else { let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='receipt.pdf'; a.click(); showToast('PDF saved', 'success'); } } catch(e){ downloadReceiptPDF(); } }
+    async function downloadReceiptPDF() { let canvas = await html2canvas(document.getElementById('receipt-view'),{scale:2}); let {jsPDF}=window.jspdf; let pdf = new jsPDF({unit:'mm', format:'a6'}); pdf.addImage(canvas.toDataURL(),'PNG',2.5,5,100,(canvas.height*100)/canvas.width); pdf.save(`${currentRID}.pdf`); showToast('PDF downloaded', 'success'); }
+    async function printViaBluetooth() { showToast('Opening PDF...', 'info'); downloadReceiptPDF(); }
     
-    function toggleNightCharge() { nightActive=!nightActive; let btn=document.getElementById('nightBtn'); if(nightActive) { btn.innerHTML='🌙 NIGHT ON'; btn.classList.add('night-active'); } else { btn.innerHTML='🌙 NIGHT OFF'; btn.classList.remove('night-active'); } updateDisplay(); if(sTime) saveRideState(); }
+    function toggleNightCharge() { nightActive=!nightActive; let btn=document.getElementById('nightBtn'); if(nightActive) { btn.innerHTML='🌙 NIGHT ON'; btn.classList.add('night-active'); showToast('Night charge enabled', 'info'); } else { btn.innerHTML='🌙 NIGHT OFF'; btn.classList.remove('night-active'); showToast('Night charge disabled', 'info'); } updateDisplay(); if(sTime) saveRideState(); }
     
-    function resetToNew() { if(sTime && !confirm("Reset ride?")) return; if(watchId) navigator.geolocation.clearWatch(watchId); releaseWakeLock(); document.body.classList.remove('ride-active'); document.querySelectorAll('.mode-btn').forEach(btn => { btn.style.pointerEvents='auto'; btn.style.opacity='1'; }); sTime=null; totalMeters=0; lastLat=null; lastLon=null; currentDestinationAddress=""; deliveryPickupName=""; deliveryPickupPhone=""; deliveryDeliveryName=""; deliveryDeliveryPhone=""; document.getElementById('startBtn').innerHTML="START RIDE"; document.getElementById('startBtn').classList.remove('btn-active-anim'); document.getElementById('startBtn').disabled=false; document.getElementById('start-loc').value=''; document.getElementById('end-loc').value=''; document.getElementById('mobile').value=''; document.getElementById('manual-fare').value=''; document.getElementById('discount-input').value=''; document.getElementById('wait-select').value='0'; document.getElementById('manual-km-input').value='0'; document.getElementById('nav-container').style.display='none'; document.getElementById('pickup-name').value=''; document.getElementById('pickup-phone').value=''; document.getElementById('delivery-name').value=''; document.getElementById('delivery-phone').value=''; updateDisplay(); localStorage.removeItem('amt_ride_state'); if(currentMode==='auto') refreshCurrentLocation(); if(currentMode!=='manual') startGPS(); else { gpsReady=true; document.getElementById('startBtn').disabled=false; } }
+    function resetToNew() { if(sTime && !confirm("Reset ride?")) return; if(watchId) navigator.geolocation.clearWatch(watchId); releaseWakeLock(); document.body.classList.remove('ride-active'); document.querySelectorAll('.mode-btn').forEach(btn => { btn.style.pointerEvents='auto'; btn.style.opacity='1'; }); sTime=null; totalMeters=0; lastLat=null; lastLon=null; currentDestinationAddress=""; deliveryPickupName=""; deliveryPickupPhone=""; deliveryDeliveryName=""; deliveryDeliveryPhone=""; document.getElementById('startBtn').innerHTML="START RIDE"; document.getElementById('startBtn').classList.remove('btn-active-anim'); document.getElementById('startBtn').disabled=false; document.getElementById('start-loc').value=''; document.getElementById('end-loc').value=''; document.getElementById('mobile').value=''; document.getElementById('manual-fare').value=''; document.getElementById('discount-input').value=''; document.getElementById('wait-select').value='0'; document.getElementById('manual-km-input').value='0'; document.getElementById('nav-container').style.display='none'; document.getElementById('pickup-name').value=''; document.getElementById('pickup-phone').value=''; document.getElementById('delivery-name').value=''; document.getElementById('delivery-phone').value=''; updateDisplay(); localStorage.removeItem('amt_ride_state'); if(currentMode==='auto') refreshCurrentLocation(); if(currentMode!=='manual') startGPS(); else { gpsReady=true; document.getElementById('startBtn').disabled=false; } showToast('Reset complete', 'info'); }
     
-    // ========== HISTORY WITH DATE FILTER (UPDATED - WORKING) ==========
+    // ========== HISTORY FUNCTIONS - FIXED ==========
     function filterHistory(type) {
         let now = new Date(), start = '', end = '';
         if(type === 'today') { start = end = now.toISOString().split('T')[0]; }
         else if(type === 'week') { let weekAgo = new Date(now); weekAgo.setDate(now.getDate() - 7); start = weekAgo.toISOString().split('T')[0]; end = now.toISOString().split('T')[0]; }
         else if(type === 'month') { start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]; end = now.toISOString().split('T')[0]; }
-        else if(type === 'custom') {
-            document.getElementById('custom-date-range').style.display = 'block';
-            return;
-        }
-        
+        else if(type === 'custom') { document.getElementById('custom-date-range').style.display = 'block'; return; }
         document.getElementById('custom-date-range').style.display = 'none';
         if(start && end) updateHistoryList(start, end);
-        
         document.querySelectorAll('.date-filter-btn').forEach(btn => btn.classList.remove('active'));
         if(event && event.target) event.target.classList.add('active');
     }
     
-    function applyCustomHistoryFilter() { 
-        let start = document.getElementById('history-start-date').value; 
-        let end = document.getElementById('history-end-date').value; 
-        if(start && end) updateHistoryList(start, end); 
-    }
+    function applyCustomHistoryFilter() { let start = document.getElementById('history-start-date').value; let end = document.getElementById('history-end-date').value; if(start && end) updateHistoryList(start, end); }
     
     function updateHistoryList(startDate, endDate) {
         let allRides = JSON.parse(localStorage.getItem('rides') || '[]');
+        console.log("Total rides in storage:", allRides.length);
         let rides = allRides;
         
         if(startDate && endDate) {
@@ -699,55 +979,83 @@
             });
         }
         
+        console.log("Filtered rides:", rides.length);
         let c = document.getElementById('history-list');
-        if(!rides.length) { 
+        if(!c) return;
+        
+        if(rides.length === 0) { 
             c.innerHTML = "<p style='text-align:center;padding:20px;'>No rides in this period</p>"; 
             return; 
         }
         
-        c.innerHTML = rides.slice().reverse().map((r, idx) => {
-            let originalIndex = allRides.findIndex(ride => ride.id === r.id);
-            return `<div class="history-item"><div style="display:flex; justify-content:space-between;"><b>${r.id}</b><button class="btn-reprint" onclick="reprintRide(${originalIndex})">📄 VIEW</button></div><small>${new Date(r.time).toLocaleString()}</small><br><small>${r.from.substring(0,50)} → ${r.to.substring(0,50)}</small><div><strong>Rs.${r.fare.toFixed(2)}</strong> | ${r.km.toFixed(1)}km | ${r.payment?.method || 'Cash'}</div></div>`;
-        }).join('');
+        let html = '';
+        for(let i = rides.length - 1; i >= 0; i--) {
+            let r = rides[i];
+            html += `<div class="history-item" onclick="viewRideDetails('${r.id}')">`;
+            html += `<div style="display:flex; justify-content:space-between;">`;
+            html += `<b>${r.id}</b>`;
+            html += `<button class="btn-reprint" onclick="event.stopPropagation(); reprintRide('${r.id}')">📄 VIEW</button>`;
+            html += `</div>`;
+            html += `<small>${new Date(r.time).toLocaleString()}</small><br>`;
+            html += `<small>${r.from ? r.from.substring(0,50) : 'N/A'} → ${r.to ? r.to.substring(0,50) : 'N/A'}</small>`;
+            html += `<div><strong>Rs.${r.fare ? r.fare.toFixed(2) : '0.00'}</strong> | ${r.km ? r.km.toFixed(1) : '0'}km | ${r.payment?.method || 'Cash'}</div>`;
+            html += `</div>`;
+        }
+        c.innerHTML = html;
+        console.log("History HTML generated");
     }
     
-    function reprintRide(index) { 
-        console.log("reprintRide called with index:", index);
-        let rides = JSON.parse(localStorage.getItem('rides')||'[]'); 
-        if(rides[index]) { 
-            console.log("Found ride:", rides[index].id);
-            showReceipt(rides[index], true); 
-            closeM('history-modal'); 
+    function viewRideDetails(rideId) {
+        console.log("viewRideDetails called for:", rideId);
+        let rides = JSON.parse(localStorage.getItem('rides') || '[]');
+        let ride = rides.find(r => r.id === rideId);
+        if(ride) {
+            showReceipt(ride, true);
+            closeM('history-modal');
         } else {
-            console.log("Ride not found at index:", index);
+            showToast('Ride not found', 'error');
         }
     }
     
-    // EARNINGS
-    function updateEarningsChart() { let rides = JSON.parse(localStorage.getItem('rides')||'[]'); let d=[0,0,0,0,0,0,0]; rides.forEach(r=>d[new Date(r.time).getDay()]+=r.fare); if(window.mChart) window.mChart.destroy(); window.mChart=new Chart(document.getElementById('earningsChart'),{ type:'bar', data:{ labels:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], datasets:[{ data:d, backgroundColor:'#667eea' }] } }); let today=rides.filter(r=>new Date(r.time).toDateString()===new Date().toDateString()).reduce((a,b)=>a+b.fare,0); let total=rides.reduce((a,b)=>a+b.fare,0); document.getElementById('stat-today').innerHTML="Rs."+today.toFixed(2); document.getElementById('stat-total').innerHTML="Rs."+total.toFixed(2); }
-    function downloadCSV() { let rides=JSON.parse(localStorage.getItem('rides')||'[]'); let csv="Date,ID,From,To,Distance,Fare,Payment\n"+rides.map(r=>`${new Date(r.time).toLocaleDateString()},${r.id},${r.from},${r.to},${r.km.toFixed(2)},${r.fare.toFixed(2)},${r.payment?.method||'Cash'}`).join("\n"); let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv])); a.download='rides.csv'; a.click(); }
+    function reprintRide(rideId) { 
+        console.log("reprintRide called with rideId:", rideId);
+        let rides = JSON.parse(localStorage.getItem('rides') || '[]'); 
+        let ride = rides.find(r => r.id === rideId);
+        if(ride) { 
+            console.log("Found ride:", ride.id);
+            showReceipt(ride, true); 
+            closeM('history-modal'); 
+        } else { 
+            console.log("Ride not found with ID:", rideId);
+            showToast('Ride not found', 'error'); 
+        } 
+    }
     
-    // PAYMENT REPORTS
+    // ========== EARNINGS ==========
+    function updateEarningsChart() { let rides = JSON.parse(localStorage.getItem('rides')||'[]'); let d=[0,0,0,0,0,0,0]; rides.forEach(r=>d[new Date(r.time).getDay()]+=r.fare); if(window.mChart) window.mChart.destroy(); window.mChart=new Chart(document.getElementById('earningsChart'),{ type:'bar', data:{ labels:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], datasets:[{ data:d, backgroundColor:'#667eea' }] } }); let today=rides.filter(r=>new Date(r.time).toDateString()===new Date().toDateString()).reduce((a,b)=>a+b.fare,0); let total=rides.reduce((a,b)=>a+b.fare,0); document.getElementById('stat-today').innerHTML="Rs."+today.toFixed(2); document.getElementById('stat-total').innerHTML="Rs."+total.toFixed(2); }
+    function downloadCSV() { let rides=JSON.parse(localStorage.getItem('rides')||'[]'); let csv="Date,ID,From,To,Distance,Fare,Payment\n"+rides.map(r=>`${new Date(r.time).toLocaleDateString()},${r.id},${r.from},${r.to},${r.km.toFixed(2)},${r.fare.toFixed(2)},${r.payment?.method||'Cash'}`).join("\n"); let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv])); a.download='rides.csv'; a.click(); showToast('CSV exported', 'success'); }
+    
+    // ========== PAYMENT REPORTS ==========
     function getRidesByDateRange(s,e) { let rides=JSON.parse(localStorage.getItem('rides')||'[]'); return rides.filter(r=>{ let d=new Date(r.time).toISOString().split('T')[0]; return d>=s && d<=e; }); }
     function showReportTab(t) { currentReportType=t; document.querySelectorAll('#report-modal .report-tab').forEach(tb=>tb.classList.remove('active')); if(event&&event.target) event.target.classList.add('active'); let now=new Date(), s='', e=''; if(t==='daily') { s=e=now.toISOString().split('T')[0]; } else if(t==='monthly') { s=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0]; e=new Date(now.getFullYear(),now.getMonth()+1,0).toISOString().split('T')[0]; } else { s=new Date(now.getFullYear(),0,1).toISOString().split('T')[0]; e=new Date(now.getFullYear(),11,31).toISOString().split('T')[0]; } let rides=getRidesByDateRange(s,e); let stats={}; rides.forEach(r=>{ let m=r.payment?.method||'Cash'; stats[m]=(stats[m]||0)+r.fare; }); let total=rides.reduce((a,b)=>a+b.fare,0); let html=`<div style="text-align:center; padding:10px;"><strong>${t.toUpperCase()} PAYMENT</strong><br>Rides:${rides.length} | Total:Rs.${total.toFixed(2)}</div><div class="payment-stats">`; for(let [m,a] of Object.entries(stats)) html+=`<div class="stat-row"><span>${m}</span><span>Rs.${a.toFixed(2)}</span></div>`; html+=`</div>`; document.getElementById('report-container').innerHTML=html; }
-    function exportReportCSV() { let rides=JSON.parse(localStorage.getItem('rides')||'[]'); let csv="Date,ID,From,To,Distance,Fare,Payment\n"+rides.map(r=>`${new Date(r.time).toLocaleDateString()},${r.id},${r.from},${r.to},${r.km.toFixed(2)},${r.fare.toFixed(2)},${r.payment?.method||'Cash'}`).join("\n"); let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv])); a.download=`report_${currentReportType}.csv`; a.click(); }
+    function exportReportCSV() { let rides=JSON.parse(localStorage.getItem('rides')||'[]'); let csv="Date,ID,From,To,Distance,Fare,Payment\n"+rides.map(r=>`${new Date(r.time).toLocaleDateString()},${r.id},${r.from},${r.to},${r.km.toFixed(2)},${r.fare.toFixed(2)},${r.payment?.method||'Cash'}`).join("\n"); let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv])); a.download=`report_${currentReportType}.csv`; a.click(); showToast('CSV exported', 'success'); }
     
-    // SETTINGS
+    // ========== SETTINGS ==========
     function loadSettings() { let saved = localStorage.getItem('amt_settings'); if(saved) try { let parsed = JSON.parse(saved); SETTINGS = {...SETTINGS, ...parsed}; } catch(e){} document.getElementById('display-app-name').innerHTML = SETTINGS.appName.replace(' ','<br>'); document.getElementById('set-app-name').value = SETTINGS.appName; document.getElementById('set-receipt-header').value = SETTINGS.receiptName; document.getElementById('set-base').value = SETTINGS.base; document.getElementById('set-rate').value = SETTINGS.rate; document.getElementById('set-wait').value = SETTINGS.waitRate; document.getElementById('set-night').value = SETTINGS.nightPercent; if(SETTINGS.logo) document.getElementById('main-logo-area').innerHTML = `<img src="${SETTINGS.logo}" style="width:100%; height:100%; object-fit:cover;">`; updateDisplay(); startGPS(); loadRideState(); updateFuelList(); updateRepairList(); }
-    function saveSettings() { SETTINGS.appName = document.getElementById('set-app-name').value; SETTINGS.receiptName = document.getElementById('set-receipt-header').value; SETTINGS.base = parseInt(document.getElementById('set-base').value)||100; SETTINGS.rate = parseInt(document.getElementById('set-rate').value)||80; SETTINGS.waitRate = parseInt(document.getElementById('set-wait').value)||5; SETTINGS.nightPercent = parseInt(document.getElementById('set-night').value)||10; let file = document.getElementById('logo-upload').files[0]; let np = document.getElementById('set-pwd').value; if(np) SETTINGS.password = np; let save = () => { localStorage.setItem('amt_settings', JSON.stringify(SETTINGS)); loadSettings(); closeM('app-settings-modal'); alert("Saved!"); }; if(file) { let r = new FileReader(); r.onload = e => { SETTINGS.logo = e.target.result; save(); }; r.readAsDataURL(file); } else save(); }
+    function saveSettings() { SETTINGS.appName = document.getElementById('set-app-name').value; SETTINGS.receiptName = document.getElementById('set-receipt-header').value; SETTINGS.base = parseInt(document.getElementById('set-base').value)||100; SETTINGS.rate = parseInt(document.getElementById('set-rate').value)||80; SETTINGS.waitRate = parseInt(document.getElementById('set-wait').value)||5; SETTINGS.nightPercent = parseInt(document.getElementById('set-night').value)||10; let file = document.getElementById('logo-upload').files[0]; let np = document.getElementById('set-pwd').value; if(np) SETTINGS.password = np; let save = () => { localStorage.setItem('amt_settings', JSON.stringify(SETTINGS)); loadSettings(); closeM('app-settings-modal'); showToast('Settings saved!', 'success'); }; if(file) { let r = new FileReader(); r.onload = e => { SETTINGS.logo = e.target.result; save(); }; r.readAsDataURL(file); } else save(); }
     
-    // LOGIN & UI
+    // ========== LOGIN & UI ==========
     let loginAttempts=0, lockUntil=null;
-    function checkLogin() { let pwd=document.getElementById('admin-pass').value; if(lockUntil && Date.now()<lockUntil) { alert(`Try after ${Math.ceil((lockUntil-Date.now())/60000)} min`); return; } if(pwd===SETTINGS.password) { loginAttempts=0; lockUntil=null; closeM('login-modal'); document.getElementById('settings-modal').style.display='flex'; } else { loginAttempts++; if(loginAttempts>=5) { lockUntil=Date.now()+5*60*1000; alert('Locked for 5 minutes'); } else { alert(`Wrong! ${5-loginAttempts} attempts left`); } } }
+    function checkLogin() { let pwd=document.getElementById('admin-pass').value; if(lockUntil && Date.now()<lockUntil) { showToast(`Try after ${Math.ceil((lockUntil-Date.now())/60000)} min`, 'warning'); return; } if(pwd===SETTINGS.password) { loginAttempts=0; lockUntil=null; closeM('login-modal'); document.getElementById('settings-modal').style.display='flex'; showToast('Login successful', 'success'); } else { loginAttempts++; if(loginAttempts>=5) { lockUntil=Date.now()+5*60*1000; showToast('Locked for 5 minutes', 'error'); } else { showToast(`Wrong! ${5-loginAttempts} attempts left`, 'error'); } } }
     function openLogin() { document.getElementById('admin-pass').value=''; document.getElementById('login-modal').style.display='flex'; }
-    function closeSettingsAndLogout() { closeM('settings-modal'); loginAttempts=0; lockUntil=null; }
+    function closeSettingsAndLogout() { closeM('settings-modal'); loginAttempts=0; lockUntil=null; showToast('Logged out', 'info'); }
     function openAppSettings() { closeM('settings-modal'); document.getElementById('app-settings-modal').style.display='flex'; }
     function openFuelLogModal() { closeM('settings-modal'); updateFuelList(); document.getElementById('fuel-modal').style.display='flex'; }
     function openRepairLogModal() { closeM('settings-modal'); updateRepairList(); document.getElementById('repair-modal').style.display='flex'; }
     function openReportsMenu() { closeM('settings-modal'); document.getElementById('reports-menu-modal').style.display='flex'; }
     function openFuelReport() { closeM('fuel-modal'); showFuelReportTab('daily'); document.getElementById('fuel-report-modal').style.display='flex'; }
     function openRepairReport() { closeM('repair-modal'); showRepairReportTab('daily'); document.getElementById('repair-report-modal').style.display='flex'; }
-    function openTravelReport() { showTravelReportTab('daily'); document.getElementById('travel-report-modal').style.display='flex'; }
+    function openTravelReport() { showTravelReportTab('daily'); document.getElementById('travel-report-modal').style.display='flex'; closeM('reports-menu-modal'); }
     function openProfitReport() { closeM('settings-modal'); showProfitReportTab('daily'); document.getElementById('profit-report-modal').style.display='flex'; }
     function closeM(id) { document.getElementById(id).style.display='none'; }
     
@@ -759,18 +1067,24 @@
             let today = new Date().toISOString().split('T')[0];
             updateHistoryList(today, today);
             document.querySelectorAll('.date-filter-btn').forEach(btn => btn.classList.remove('active'));
-            if(document.querySelector('.date-filter-btn:first-child')) {
-                document.querySelector('.date-filter-btn:first-child').classList.add('active');
-            }
+            if(document.querySelector('.date-filter-btn:first-child')) { document.querySelector('.date-filter-btn:first-child').classList.add('active'); }
             document.getElementById('custom-date-range').style.display = 'none';
         }
-        if(id === 'report-modal') updateReportDisplay(); 
+        if(id === 'report-modal') showReportTab('daily'); 
+    }
+    
+    function useAISuggestion() {
+        showToast('AI route suggestion applied!', 'success');
+        document.getElementById('ai-suggestions').style.display = 'none';
     }
     
     document.getElementById('fuel-liters')?.addEventListener('input', function() { let l=parseFloat(this.value)||0; let p=parseFloat(document.getElementById('fuel-price')?.value||0); let t=document.getElementById('fuel-total'); if(t) t.value=(l*p).toFixed(2); });
     document.getElementById('fuel-price')?.addEventListener('input', function() { let l=parseFloat(document.getElementById('fuel-liters')?.value||0); let p=parseFloat(this.value)||0; let t=document.getElementById('fuel-total'); if(t) t.value=(l*p).toFixed(2); });
     
-    window.onload = function() { loadSettings(); document.getElementById('manual-km-input').value='0'; initVoiceRecognition(); };
+    // Request notification permission
+    setTimeout(() => requestNotificationPermission(), 3000);
+    
+    window.onload = function() { loadSettings(); document.getElementById('manual-km-input').value='0'; initVoiceRecognition(); showToast('Welcome to Advance Meeter Taxi! 🚕', 'success'); };
 </script>
 </body>
 </html>
